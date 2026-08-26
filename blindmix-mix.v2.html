@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0b1020">
+<title>Blind Mix — Soirée</title>
+<style>
+*{box-sizing:border-box} :root{--bg:#090d18;--card:#11182a;--card2:#18223a;--line:#293650;--text:#f8fafc;--muted:#9aa8c2;--blue:#5b7cfa;--green:#21c77a;--orange:#ffad42;--red:#ff5c70;--pink:#e86cff}
+body{margin:0;background:radial-gradient(circle at 50% -10%,#26396d 0,#11182a 35%,var(--bg) 75%);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+.wrap{width:min(960px,100%);margin:auto;padding:14px 14px 40px}.hidden{display:none!important}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 2px 14px}.brand{font-size:23px;font-weight:950;letter-spacing:-.5px}.pill{padding:7px 11px;border:1px solid var(--line);border-radius:999px;background:#0d1424;color:var(--muted);font-size:12px}
+.hero{text-align:center;padding:20px 8px 12px}.hero h1{font-size:clamp(34px,8vw,64px);margin:0;font-weight:1000;letter-spacing:-2px}.hero p{color:var(--muted);margin:8px 0 22px}
+.card{background:linear-gradient(180deg,rgba(24,34,58,.96),rgba(17,24,42,.96));border:1px solid rgba(255,255,255,.06);box-shadow:0 14px 40px rgba(0,0,0,.22);border-radius:22px;padding:18px;margin:12px 0}
+.grid{display:grid;gap:10px}.two{grid-template-columns:repeat(2,minmax(0,1fr))}.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+button{width:100%;padding:13px 14px;border:1px solid transparent;border-radius:14px;background:#283650;color:#fff;font-weight:850;cursor:pointer;transition:.15s transform,.15s filter}button:hover{filter:brightness(1.08)}button:active{transform:scale(.98)}button:disabled{opacity:.4;cursor:not-allowed}
+.primary{background:linear-gradient(135deg,#5877ff,#7358ed)}.good{background:linear-gradient(135deg,#13ad69,#1fca83)}.warn{background:linear-gradient(135deg,#d77a21,#ffad42)}.bad{background:linear-gradient(135deg,#d63d59,#ff6072)}.ghost{background:#10182a;border-color:var(--line)}
+input{width:100%;padding:13px 14px;border-radius:13px;border:1px solid #35425f;background:#0b1220;color:#fff;outline:none;margin:5px 0}input:focus{border-color:#6c82ff;box-shadow:0 0 0 3px rgba(108,130,255,.12)}
+label{font-size:12px;color:var(--muted);font-weight:800}.muted,.small{color:var(--muted);font-size:13px;line-height:1.45}.big{text-align:center;font-size:52px;font-weight:1000}.room{text-align:center;font-size:42px;font-weight:1000;letter-spacing:8px;margin:4px 0}.row{display:flex;gap:8px}.row>*{flex:1}
+.status{padding:10px 12px;border-radius:13px;background:#0b1324;border:1px solid var(--line);color:var(--muted);font-size:13px}.ok{color:#7ff0b5}.danger{color:#ff9cab}
+.sectionTitle{display:flex;align-items:center;justify-content:space-between;gap:10px}.sectionTitle h2{margin:0;font-size:18px}
+.nav{position:sticky;top:0;z-index:20;padding:6px 0;background:rgba(9,13,24,.86);backdrop-filter:blur(12px)}.nav .row button{font-size:12px;padding:10px}
+.track{padding:12px 0;border-bottom:1px solid var(--line)}.track:last-child{border:0}
+.song{padding:12px;border:1px solid var(--line);border-radius:16px;background:#0d1527;margin:8px 0}.songHead{display:flex;justify-content:space-between;gap:10px}.tag{font-size:11px;border-radius:999px;padding:5px 8px;background:#202d4a;color:#b8c6ff}.found{background:rgba(33,199,122,.12);border-color:rgba(33,199,122,.35)}
+.answer{padding:14px;border:1px solid #33415f;border-radius:17px;background:#0c1424;margin:9px 0}.answer.pending{border-color:#6b5b28;box-shadow:0 0 0 2px rgba(255,173,66,.08)}.answer strong{font-size:16px}
+.answer .match{font-size:12px;color:var(--muted);margin:6px 0}.candidate{padding:8px 10px;border-radius:11px;background:#18243d;margin:7px 0;font-size:13px}
+.scoreline{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}.scoreline:last-child{border:0}.rank{width:28px;text-align:center;font-weight:950}.score{font-weight:950;font-size:18px}
+.bigBoard{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{padding:14px;border-radius:16px;background:#0d1527;border:1px solid var(--line);text-align:center}.stat b{display:block;font-size:27px}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:100;padding:12px 16px;border-radius:999px;background:#f8fafc;color:#0b1020;font-weight:850;box-shadow:0 12px 30px #0008;display:none}.toast.show{display:block}
+@media(max-width:620px){.two,.three,.bigBoard{grid-template-columns:1fr}.room{font-size:34px}.row{flex-wrap:wrap}.row>*{min-width:130px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><div class="brand">🎵 Blind Mix</div><div class="pill" id="networkPill">Hors ligne</div></div>
+
+  <section id="home">
+    <div class="hero"><h1>BLIND MIX</h1><p>Le blind test musical pensé pour une vraie soirée.</p></div>
+    <div class="card"><div class="grid two">
+      <button class="primary" id="goHost">🎛️ Créer / reprendre en MJ</button>
+      <button class="good" id="goPlayer">📱 Rejoindre comme joueur</button>
+    </div></div>
+    <div class="card"><div class="muted">Jusqu'à 7 morceaux joués en même temps. Les réponses sont envoyées au MJ, le morceau est identifié automatiquement parmi les morceaux encore en jeu, et les manches peuvent être préparées à l'avance.</div></div>
+  </section>
+
+  <section id="host" class="hidden">
+    <div class="nav"><div class="row">
+      <button class="ghost" id="tabGame">🎛️ Jeu</button><button class="ghost" id="tabPrep">🗂️ Préparer</button><button class="ghost" id="tabScores">🏆 Scores</button><button class="ghost" id="tabSettings">⚙️ Partie</button>
+    </div></div>
+
+    <div id="hostGame">
+      <div class="card">
+        <div class="sectionTitle"><h2>🎛️ Maître du jeu</h2><span class="tag" id="roundLabel">Manche 1</span></div>
+        <div class="room" id="roomCode">------</div><div class="muted" style="text-align:center">Code à afficher sur la TV / tablette</div>
+        <div class="bigBoard" style="margin-top:14px"><div class="stat"><b id="remaining">0</b><span class="small">morceaux restants</span></div><div class="stat"><b id="playerCount">0</b><span class="small">joueurs</span></div></div>
+        <div class="row" style="margin-top:10px"><button class="warn" id="hostPause">⏸️ Pause</button><button id="hostStop">⏹️ Stop</button><button class="primary" id="playMix">▶️ Lancer</button></div>
+        <div id="hostStatus" class="status" style="margin-top:10px">Initialisation…</div>
+      </div>
+
+      <div class="card"><div class="sectionTitle"><h2>👥 Joueurs</h2><span class="tag" id="connectedTag">0 connecté</span></div><div id="players"></div></div>
+
+      <div class="card"><div class="sectionTitle"><h2>🎶 Morceaux de la manche</h2><button class="ghost" id="openPrep">Modifier</button></div><div id="secretList"></div></div>
+
+      <div class="card"><div class="sectionTitle"><h2>📝 Réponses reçues</h2><span class="tag" id="pendingTag">0 en attente</span></div><div class="muted">Le site cherche automatiquement le morceau correspondant parmi les morceaux encore en jeu. Le MJ garde toujours le dernier mot.</div><div id="answers"></div></div>
+    </div>
+
+    <div id="hostPrep" class="hidden">
+      <div class="card"><div class="sectionTitle"><h2>🗂️ Préparer les manches</h2><button class="primary" id="addRound">＋ Manche</button></div><p class="muted">Prépare autant de manches que tu veux avant la soirée. Les fichiers restent dans cette page jusqu'à ce que tu quittes/recharges l'application.</p><div id="roundPlanner"></div></div>
+    </div>
+
+    <div id="hostScores" class="hidden"><div class="card"><div class="sectionTitle"><h2>🏆 Classement</h2><button class="ghost" id="resetScores">Réinitialiser</button></div><div id="hostScoreboard"></div></div></div>
+
+    <div id="hostSettings" class="hidden">
+      <div class="card"><h2>⚙️ Partie</h2><div class="grid">
+        <button class="primary" id="transferHost">👑 Transférer le rôle de MJ</button>
+        <button class="ghost" id="newRoundBtn">➕ Passer à la prochaine manche</button>
+        <button class="bad" id="leaveRoom">🚪 Fermer la partie</button>
+      </div><p class="muted">Le transfert envoie l'état de la partie et les fichiers audio au nouveau MJ. Le code de la partie reste identique : les joueurs n'ont pas à se reconnecter.</p></div>
+      <div class="card"><h2>🔐 Réseau</h2><div class="status">La partie utilise un jeton de session secret en plus du code affiché. Un appareil qui ne possède pas ce jeton ne peut pas rejoindre la session.</div></div>
+    </div>
+  </section>
+
+  <section id="player" class="hidden">
+    <div class="card"><h2>📱 Rejoindre la soirée</h2><input id="joinCode" maxlength="6" placeholder="Code de la partie"><input id="joinName" maxlength="24" placeholder="Ton prénom / pseudo"><button class="good" id="join">🚀 Rejoindre</button><div id="playerStatus" class="status" style="margin-top:10px">Pas encore connecté.</div></div>
+    <div id="playerGame" class="hidden">
+      <div class="card"><div class="sectionTitle"><h2>✍️ Ta réponse</h2><span class="tag" id="playerRound">Manche 1</span></div><p class="muted">Écris le titre et l'artiste/groupe. Les accents, majuscules et petites fautes sont tolérés.</p><input id="ansTitle" maxlength="120" placeholder="Titre de la chanson"><input id="ansArtist" maxlength="120" placeholder="Artiste ou groupe"><button class="primary" id="sendAnswer">🚀 Envoyer ma réponse</button><div id="sent" class="status" style="margin-top:10px"></div></div>
+      <div class="card"><h2>🏆 Mon score</h2><div id="myScore" class="big">0</div><div id="scoreboard"></div></div>
+    </div>
+  </section>
+  <div id="error" class="status hidden"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const state={role:null,peer:null,room:'',token:'',conns:[],players:{},pending:{},rounds:[],currentRound:0,songs:[],paused:false,answers:[],playerId:null,playerName:'',playerConn:null,hostConn:null,transfer:null,serverReady:false};
+const rid=()=>Math.random().toString(36).slice(2,8).toUpperCase();
+const token=()=>crypto.getRandomValues(new Uint32Array(4)).join('-')+'-'+Date.now().toString(36);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+const clean=s=>(s||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/&/g,' and ').replace(/\\bfeat\\.?\\b/g,' featuring ').replace(/[^a-z0-9]+/g,' ').trim().replace(/\\s+/g,' ');
+function lev(a,b){a=clean(a);b=clean(b);if(a===b)return 1;if(!a||!b)return 0;const d=Array.from({length:a.length+1},()=>Array(b.length+1).fill(0));for(let i=0;i<=a.length;i++)d[i][0]=i;for(let j=0;j<=b.length;j++)d[0][j]=j;for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return 1-d[a.length][b.length]/Math.max(a.length,b.length)}
+function match(candidate,song){const t=lev(candidate.title,song.title),a=lev(candidate.artist,song.artist);const exact=(t===1?1:0)+(a===1?1:0);const confidence=t*.55+a*.45;return{title:t,artist:a,confidence,exact,ok:t>=.78&&a>=.78}}
+function points(result){if(result.title>=.96&&result.artist>=.96)return 3;if(result.title>=.9&&result.artist>=.85)return 2;if(result.title>=.78&&result.artist>=.78)return 1;return 0}
+function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2400)}
+function show(r){['home','host','player'].forEach(x=>$(x).classList.add('hidden'));$(r).classList.remove('hidden');state.role=r}
+function msg(c,o){try{if(c?.open)c.send(o)}catch(e){}}
+function broadcast(o){state.conns.forEach(c=>msg(c,o))}
+function publicPlayers(){return Object.values(state.players).map(p=>({id:p.id,name:p.name,score:p.score,connected:p.connected!==false}))}
+function current(){return state.rounds[state.currentRound]}
+function serializeSong(s){return{sId:s.id,title:s.title,artist:s.artist,name:s.file.name,type:s.file.type}}
+async function fileBuffer(file){return await file.arrayBuffer()}
+
+function initHost(existingRoom=null,existingToken=null){
+  state.room=existingRoom||rid();state.token=existingToken||token();
+  $('roomCode').textContent=state.room;
+  $('networkPill').textContent='Session sécurisée';
+  state.peer=new Peer('blindmix-'+state.room.toLowerCase());
+  state.peer.on('open',()=>{state.serverReady=true;$('hostStatus').textContent='Partie prête. En attente des joueurs…';$('hostStatus').classList.add('ok')});
+  state.peer.on('connection',c=>{state.conns.push(c);c.on('data',d=>hostData(c,d));c.on('close',()=>{const p=Object.values(state.players).find(x=>x.conn===c);if(p){p.connected=false;renderPlayers()}})});
+  state.peer.on('error',e=>{$('hostStatus').textContent='Erreur réseau : '+e.message;$('hostStatus').classList.add('danger')});
+  renderAll();
+}
+function acceptJoin(c,d){
+  if(!d||!d.id)return;
+  const id=d.id,name=String(d.name||'Joueur').slice(0,24);
+  const old=state.players[id];
+  if(old){
+    state.players[id]={...old,name,conn:c,connected:true};
+    msg(c,{type:'welcome',round:state.currentRound,players:publicPlayers(),songs:state.songs.filter(s=>!s.found).map(serializeSong)});
+    renderAll();broadcastScore();return;
+  }
+  state.pending[id]={id,name,conn:c,score:0};
+  msg(c,{type:'joinPending',message:'Demande reçue. Le MJ doit valider ton entrée.'});
+  renderPending();
+}
+function approveJoin(id){
+  const q=state.pending[id];if(!q)return;
+  state.players[id]={id:q.id,name:q.name,score:q.score||0,conn:q.conn,connected:true};
+  delete state.pending[id];
+  msg(q.conn,{type:'welcome',round:state.currentRound,players:publicPlayers(),songs:state.songs.filter(s=>!s.found).map(serializeSong)});
+  renderAll();broadcastScore();
+}
+function rejectJoin(id){const q=state.pending[id];if(q)msg(q.conn,{type:'joinRejected'});delete state.pending[id];renderPending()}
+function renderPending(){
+  const arr=Object.values(state.pending);
+  let el=$('players');
+  const pending=arr.map(p=>`<div class="answer pending"><strong>🟡 ${esc(p.name)}</strong><div class="small">Demande de connexion</div><div class="row"><button class="good" onclick="approveJoin('${p.id}')">✓ Accepter</button><button class="bad" onclick="rejectJoin('${p.id}')">✕ Refuser</button></div></div>`).join('');
+  if(pending) el.innerHTML=pending+(Object.keys(state.players).length?'<hr style="border-color:#293650">'+el.innerHTML:'');
+}
+function hostData(c,d){
+  if(d.type==='join'){acceptJoin(c,d);return}
+  if(d.type==='answer'){
+    const p=state.players[d.playerId];if(!p||p.conn!==c||!state.songs.length)return;
+    if(!d.title||!d.artist)return;
+    const candidates=state.songs.filter(s=>!s.found).map(s=>({song:s,result:match(d,s)})).sort((x,y)=>y.result.confidence-x.result.confidence);
+    const best=candidates[0];if(!best)return;
+    const a={id:rid(),playerId:p.id,player:p.name,title:String(d.title).slice(0,120),artist:String(d.artist).slice(0,120),songId:best.song.id,result:best.result,candidates:candidates.slice(0,3).map(x=>({id:x.song.id,title:x.song.title,artist:x.song.artist,result:x.result})),state:'pending'};
+    state.answers.unshift(a);renderAnswers();return;
+  }
+  if(d.type==='reconnect'){acceptJoin(c,d);return}
+  if(d.type==='takeoverReady'){state.peer?.destroy();$('hostStatus').textContent='MJ transféré. Cette tablette peut être fermée.';return}
+}
+function broadcastScore(){broadcast({type:'scores',players:publicPlayers()});renderPlayers();renderScoreboards()}
+function renderPlayers(){
+  const ps=Object.values(state.players);$('playerCount').textContent=ps.filter(p=>p.connected!==false).length;$('connectedTag').textContent=ps.filter(p=>p.connected!==false).length+' connecté(s)';
+  $('players').innerHTML=ps.map(p=>`<div class="scoreline"><div><strong>${esc(p.name)}</strong><div class="small">${p.connected===false?'déconnecté':'connecté'}</div></div><div class="score">${p.score} pt</div></div>`).join('')||'<p class="muted">Aucun joueur pour le moment.</p>';
+}
+function renderSongs(){
+  $('remaining').textContent=state.songs.filter(s=>!s.found).length;
+  $('playMix').disabled=!state.songs.some(s=>!s.found);
+  $('secretList').innerHTML=state.songs.map((s,i)=>`<div class="song ${s.found?'found':''}"><div class="songHead"><strong>${i+1}. ${esc(s.title)}</strong><span class="tag">${s.found?'✓ trouvé':'en jeu'}</span></div><div class="small">${esc(s.artist)}</div>${!s.found?`<button class="good" style="margin-top:8px" onclick="manualFound('${s.id}')">✓ Marquer trouvé</button>`:''}</div>`).join('')||'<p class="muted">Aucun morceau chargé.</p>';
+}
+function renderAnswers(){
+  $('pendingTag').textContent=state.answers.filter(a=>a.state==='pending').length+' en attente';
+  $('answers').innerHTML=state.answers.map(a=>{
+    const badge=a.state==='pending'?'À VALIDER':a.state==='accepted'?'VALIDÉ':'REFUSÉ';
+    const c=a.candidates?.[0];
+    return `<div class="answer ${a.state==='pending'?'pending':''}">
+      <div class="sectionTitle"><strong>${esc(a.player)}</strong><span class="tag">${badge}</span></div>
+      <div style="margin-top:6px">« ${esc(a.title)} » — ${esc(a.artist)}</div>
+      <div class="match">Correspondance automatique : <strong>${c?esc(c.title):'?'}</strong> — ${c?esc(c.artist):''} · ${Math.round((a.result.confidence||0)*100)}%</div>
+      ${a.state==='pending'?`<div class="candidate">🎯 Morceau détecté : <strong>${esc(c?.title||'Aucun')}</strong><br><span class="small">${esc(c?.artist||'')} · Titre ${Math.round(a.result.title*100)}% · Artiste ${Math.round(a.result.artist*100)}%</span></div>
+      <div class="row"><button class="good" onclick="acceptAnswer('${a.id}')">✓ ${points(a.result)} point(s)</button><button class="bad" onclick="rejectAnswer('${a.id}')">✕ Refuser</button></div>`:
+      `<div class="small">${a.state==='accepted'?'✓ Points attribués':'✕ Réponse refusée'}</div>`}
+    </div>`;
+  }).join('')||'<p class="muted">Les réponses des joueurs apparaîtront ici.</p>';
+}
+function renderScoreboards(){
+  const ps=publicPlayers().sort((a,b)=>b.score-a.score);
+  $('hostScoreboard').innerHTML=ps.map((p,i)=>`<div class="scoreline"><div><span class="rank">${i+1}</span> <strong>${esc(p.name)}</strong></div><div class="score">${p.score} pt</div></div>`).join('')||'<p class="muted">Aucun joueur.</p>';
+}
+function renderAll(){renderPlayers();renderSongs();renderAnswers();renderScoreboards();renderPlanner();$('roundLabel').textContent='Manche '+(state.currentRound+1);}
+
+window.acceptAnswer=id=>{const a=state.answers.find(x=>x.id===id);if(!a||a.state!=='pending')return;const p=state.players[a.playerId],s=state.songs.find(x=>x.id===a.songId);if(!p||!s||s.found)return;const pts=points(a.result);p.score+=pts;a.state='accepted';s.found=true;try{s.audio.pause()}catch(e){}updateRound();broadcast({type:'songFound',songId:s.id,title:s.title,round:state.currentRound});broadcastScore();renderAnswers();toast(`${p.name} gagne ${pts} point${pts>1?'s':''} !`)}
+window.rejectAnswer=id=>{const a=state.answers.find(x=>x.id===id);if(!a||a.state!=='pending')return;a.state='rejected';renderAnswers()}
+window.manualFound=id=>{const s=state.songs.find(x=>x.id===id);if(!s||s.found)return;try{s.audio.pause()}catch(e){}s.found=true;updateRound();broadcast({type:'songFound',songId:id,title:s.title,round:state.currentRound});if(!state.songs.some(x=>!x.found))stopMix(false)}
+function updateRound(){renderSongs();if(!state.songs.some(s=>!s.found)){stopMix(false);toast('🎉 Manche terminée !')}broadcast({type:'roundState',round:state.currentRound,remaining:state.songs.filter(s=>!s.found).length})}
+
+function stopMix(reset=true){state.songs.forEach(s=>{try{s.audio.pause();if(reset)s.audio.currentTime=0}catch(e){}});state.paused=false;$('hostPause').textContent='⏸️ Pause'}
+async function playMix(){if(!state.songs.some(s=>!s.found))return;try{await Promise.all(state.songs.filter(s=>!s.found).map(s=>{if(s.audio.currentTime===0)s.audio.currentTime=0;return s.audio.play()}));state.paused=false;$('hostPause').textContent='⏸️ Pause'}catch(e){$('hostStatus').textContent='Lecture bloquée par le navigateur : appuie à nouveau sur Lancer.'}}
+$('playMix').onclick=playMix;
+$('hostStop').onclick=()=>stopMix(true);
+$('hostPause').onclick=async()=>{if(!state.songs.length)return;if(!state.paused){state.songs.filter(s=>!s.found).forEach(s=>s.audio.pause());state.paused=true;$('hostPause').textContent='▶️ Reprendre'}else{await playMix()}};
+
+function addRoundData(name='Manche '+(state.rounds.length+1)){state.rounds.push({name,songs:[]});state.currentRound=state.rounds.length-1;renderPlanner()}
+$('addRound').onclick=()=>addRoundData();
+function renderPlanner(){
+  const root=$('roundPlanner');if(!root)return;
+  root.innerHTML=state.rounds.map((r,ri)=>`<div class="card" style="margin:10px 0;background:#0d1527"><div class="sectionTitle"><strong>${esc(r.name)}</strong><span class="tag">${r.songs.length}/7 morceaux</span></div>
+    <input value="${esc(r.name)}" data-rname="${ri}" placeholder="Nom de la manche">
+    <input type="file" accept="audio/*" multiple data-rfiles="${ri}">
+    <div data-rsongs="${ri}">${r.songs.map((s,si)=>`<div class="song"><div class="songHead"><strong>${si+1}. ${esc(s.file.name)}</strong><button class="bad" style="width:auto;padding:7px 9px" data-del="${ri}:${si}">×</button></div><input value="${esc(s.title)}" data-title="${ri}:${si}" placeholder="Titre secret MJ"><input value="${esc(s.artist)}" data-artist="${ri}:${si}" placeholder="Artiste / groupe secret MJ"></div>`).join('')}</div>
+    <button class="primary" data-load="${ri}" ${r.songs.length?'':'disabled'}>▶️ Charger cette manche</button>
+  </div>`).join('');
+  root.querySelectorAll('[data-rname]').forEach(i=>i.oninput=()=>state.rounds[+i.dataset.rname].name=i.value);
+  root.querySelectorAll('[data-rfiles]').forEach(i=>i.onchange=()=>{const ri=+i.dataset.rfiles;[...i.files].slice(0,7-state.rounds[ri].songs.length).forEach(f=>state.rounds[ri].songs.push({file:f,title:f.name.replace(/\.[^.]+$/,''),artist:''}));renderPlanner()});
+  root.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const [ri,si]=b.dataset.del.split(':').map(Number);state.rounds[ri].songs.splice(si,1);renderPlanner()});
+  root.querySelectorAll('[data-title]').forEach(i=>i.oninput=()=>{const [ri,si]=i.dataset.title.split(':').map(Number);state.rounds[ri].songs[si].title=i.value});
+  root.querySelectorAll('[data-artist]').forEach(i=>i.oninput=()=>{const [ri,si]=i.dataset.artist.split(':').map(Number);state.rounds[ri].songs[si].artist=i.value});
+  root.querySelectorAll('[data-load]').forEach(b=>b.onclick=()=>loadPreparedRound(+b.dataset.load));
+}
+async function loadPreparedRound(ri){
+  const r=state.rounds[ri];if(!r?.songs.length){toast('Ajoute au moins un morceau.');return}
+  stopMix(true);state.currentRound=ri;state.songs=r.songs.map((x,i)=>({id:'s'+i+'-'+rid(),file:x.file,title:x.title||x.file.name,artist:x.artist||'Artiste non renseigné',found:false,audio:new Audio(URL.createObjectURL(x.file))}));
+  state.songs.forEach(s=>{s.audio.preload='auto';s.audio.volume=.65});state.answers=[];$('roundLabel').textContent=r.name||('Manche '+(ri+1));broadcast({type:'round',round:ri,name:r.name,remaining:state.songs.length});renderAll();showHostTab('game');toast(`${r.name} chargée !`);
+}
+$('openPrep').onclick=()=>showHostTab('prep');$('newRoundBtn').onclick=()=>{const n=state.currentRound+1;if(n<state.rounds.length)loadPreparedRound(n);else toast('Aucune autre manche préparée.')};
+function showHostTab(tab){['Game','Prep','Scores','Settings'].forEach(x=>$('host'+x).classList.add('hidden'));$('host'+({game:'Game',prep:'Prep',scores:'Scores',settings:'Settings'}[tab])).classList.remove('hidden')}
+$('tabGame').onclick=()=>showHostTab('game');$('tabPrep').onclick=()=>showHostTab('prep');$('tabScores').onclick=()=>showHostTab('scores');$('tabSettings').onclick=()=>showHostTab('settings');
+$('resetScores').onclick=()=>{Object.values(state.players).forEach(p=>p.score=0);broadcastScore()};
+
+$('goHost').onclick=()=>{show('host');if(!state.peer)initHost();if(!state.rounds.length)addRoundData();};
+$('goPlayer').onclick=()=>show('player');
+
+async function transferHost(){
+  const connected=Object.values(state.players).filter(p=>p.connected!==false);
+  if(!connected.length){toast('Aucun joueur connecté pour devenir MJ.');return}
+  const names=connected.map((p,i)=>`${i+1}. ${p.name}`).join('\\n');
+  const pick=prompt('Choisis le numéro du nouveau MJ :\\n\\n'+names);
+  const p=connected[Number(pick)-1];if(!p)return;
+  $('hostStatus').textContent='Transfert en cours… garde les deux téléphones ouverts.';
+  const meta={type:'hostTransfer',token:state.token,room:state.room,round:state.currentRound,players:publicPlayers(),songs:state.songs.map(serializeSong),answers:state.answers};
+  msg(p.conn,meta);
+  for(const s of state.songs){
+    const buf=await fileBuffer(s.file),chunk=16384;
+    msg(p.conn,{type:'fileStart',id:s.id,total:buf.byteLength,name:s.file.name,mime:s.file.type});
+    for(let i=0;i<buf.byteLength;i+=chunk)msg(p.conn,{type:'fileChunk',id:s.id,index:i/chunk,data:buf.slice(i,i+chunk)},);
+    msg(p.conn,{type:'fileEnd',id:s.id});
+  }
+  msg(p.conn,{type:'hostTransferEnd'});
+}
+$('transferHost').onclick=transferHost;
+
+$('leaveRoom').onclick=()=>{if(confirm('Fermer la partie pour tout le monde ?')){broadcast({type:'closed'});state.peer?.destroy();location.reload()}};
+
+$('join').onclick=()=>{
+  const code=$('joinCode').value.trim().toUpperCase(),name=$('joinName').value.trim();
+  if(!code||!name){$('playerStatus').textContent='Indique le code et ton prénom.';return}
+  state.playerId=localStorage.getItem('blindmix-player-id')||rid();localStorage.setItem('blindmix-player-id',state.playerId);state.playerName=name;state.playerRoomCode=code;
+  state.peer=new Peer();state.peer.on('open',()=>connectPlayer(code));state.peer.on('error',e=>$('playerStatus').textContent='Connexion impossible : '+e.message);
+};
+function connectPlayer(code){
+  const c=state.peer.connect('blindmix-'+code.toLowerCase(),{reliable:true});state.playerConn=c;
+  c.on('open',()=>{state.hostConn=c;msg(c,{type:'join',id:state.playerId,name:state.playerName});$('playerStatus').textContent='Connexion établie. Si le code seul ne suffit pas, le MJ doit te transmettre la session.'});
+  c.on('data',playerData);c.on('close',()=>{if(state.playerRoomCode){$('playerStatus').textContent='Ancien MJ déconnecté… reconnexion automatique.';setTimeout(()=>{if(state.role==='player'&&state.playerRoomCode)connectPlayer(state.playerRoomCode)},2200)}else $('playerStatus').textContent='Connexion perdue — tente une reconnexion.'});
+}
+function playerData(d){
+  if(d.type==='joinPending'){$('playerStatus').textContent=d.message||'Demande envoyée au MJ…';return}
+  if(d.type==='joinRejected'){$('playerStatus').textContent='Connexion refusée par le MJ.';return}
+  if(d.type==='welcome'){
+    $('playerStatus').textContent='Connecté à la soirée ✓';$('playerGame').classList.remove('hidden');$('playerRound').textContent='Manche '+(d.round+1);renderPlayerScores(d.players);return;
+  }
+  if(d.type==='scores'){renderPlayerScores(d.players);return}
+  if(d.type==='round'){state.playerRound=d.round;$('playerRound').textContent=d.name||('Manche '+(d.round+1));$('sent').textContent='Nouvelle manche prête !';return}
+  if(d.type==='roundState'){return}
+  if(d.type==='songFound'){$('sent').textContent='🎯 Morceau trouvé : '+d.title;return}
+  if(d.type==='newRound'||d.type==='roundReset'){$('sent').textContent='Nouvelle manche !';return}
+  if(d.type==='closed'){$('playerStatus').textContent='La partie est terminée.';$('playerGame').classList.add('hidden');return}
+  if(d.type==='hostTransfer'){state.transfer=d;state.transferBuffers={};state.transferExpected=d.songs.length;$('playerStatus').textContent='Transfert de la partie en cours…';return}
+  if(d.type==='fileStart'){state.transferBuffers[d.id]={meta:d,parts:[],received:0};return}
+  if(d.type==='fileChunk'){const x=state.transferBuffers[d.id];if(x){x.parts.push(d.data);x.received+=d.data.byteLength}return}
+  if(d.type==='fileEnd')return finishTransferFile(d.id);
+  if(d.type==='hostTransferEnd')return finalizeTakeover();
+}
+function renderPlayerScores(players){
+  const sorted=[...players].sort((a,b)=>b.score-a.score),me=players.find(p=>p.id===state.playerId);$('myScore').textContent=me?.score||0;
+  $('scoreboard').innerHTML=sorted.map((p,i)=>`<div class="scoreline"><div><span class="rank">${i+1}</span><strong>${esc(p.name)}</strong></div><div class="score">${p.score} pt</div></div>`).join('');
+}
+function finishTransferFile(id){/* marker; blobs are assembled in finalizeTakeover */}
+async function finalizeTakeover(){
+  if(!state.transfer)return;
+  const t=state.transfer;state.round=t.round;state.token=t.token;state.room=t.room;
+  const filesById={};
+  for(const s of t.songs){const b=state.transferBuffers?.[s.id];if(!b)continue;filesById[s.id]=new File(b.parts,s.name,{type:s.mime})}
+  state.rounds=[];state.currentRound=t.round;state.players={};t.players.forEach(p=>state.players[p.id]={...p,connected:p.id===state.playerId});
+  state.songs=t.songs.map(s=>{const f=filesById[s.sId];return{id:s.sId,file:f,title:s.title,artist:s.artist,found:false,audio:f?new Audio(URL.createObjectURL(f)):null}}).filter(s=>s.file);
+  state.answers=t.answers||[];
+  $('player').classList.add('hidden');show('host');$('roomCode').textContent=state.room;$('networkPill').textContent='Nouveau MJ — session sécurisée';
+  if(state.hostConn?.open)msg(state.hostConn,{type:'takeoverReady'});state.peer?.destroy();setTimeout(()=>initHost(state.room,state.token),1800);renderAll();toast('👑 Tu es maintenant MJ. Les joueurs restent dans la même partie.');
+}
+$('sendAnswer').onclick=()=>{const title=$('ansTitle').value.trim(),artist=$('ansArtist').value.trim();if(!title||!artist){$('sent').textContent='Remplis les deux champs.';return}if(!state.playerConn?.open){$('sent').textContent='Tu n’es plus connecté.';return}msg(state.playerConn,{type:'answer',playerId:state.playerId,title,artist});$('sent').textContent='Réponse envoyée ✓';$('ansTitle').value='';$('ansArtist').value=''};
+
+</script>
+</body></html>
