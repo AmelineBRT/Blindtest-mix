@@ -315,56 +315,57 @@ button:disabled {
 
 
 
+   .game-card {
+    position: relative;
+}
 
 
+
+.game-card {
+    position: relative;
+    overflow: hidden;
+}
 
 .game-card.has-group {
-    position: relative;
     padding-top: 38px;
-    overflow: hidden;
-
-    /* Petit liseré du groupe à gauche */
-    box-shadow:
-        inset 5px 0 0 var(--group-color);
-}
-
-.game-group-header {
-    position: absolute;
-
-    top: 0;
-    left: 0;
-    right: 0;
-
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 6px;
-
-    padding: 6px 10px;
-
-    font-size: 12px;
-    font-weight: bold;
-
-    color: #222;
-
-    border-radius: 10px 10px 0 0;
 }
 
 
-
-
-   .independent-header {
-    background: #555;
-    color: #ffffff !important;
-}
-
-
-.game-card:not(.has-group) {
-    position: relative;
-    box-shadow:
-        inset 5px 0 0 #555;
-}
    
+
+.game-card.has-group::after {
+    content: "";
+
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+
+    width: 35px;
+
+    background:
+        linear-gradient(
+            to right,
+            transparent 0%,
+            var(--group-color) 100%
+        );
+
+    pointer-events: none;
+}
+
+
+
+
+
+
+   
+.independent-header {
+    background: #e5e5e5;
+    color: #555555 !important;
+}
+
+
+  
    
    
 /* =========================================================
