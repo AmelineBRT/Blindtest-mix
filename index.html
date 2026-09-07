@@ -1385,8 +1385,7 @@ label {
     <input
         id="groupColor"
         type="color"
-        value="#ff0000"
-        onchange="updateGroupColorPreview()">
+        value="#ff0000">
 
 </div>
 
@@ -1419,13 +1418,8 @@ label {
         id="editGroupName"
         type="text">
 
-    <label>Créé par</label>
 
-    <input
-        id="editGroupCreator"
-        type="text">
-
-    <label>Informations / commentaires</label>
+   <label>Commentaires</label>
 
     <textarea
         id="editGroupComment"
@@ -1569,6 +1563,11 @@ label {
 
 <section id="gameScreen" class="screen">
 
+<div
+    id="gameScreenGroupHeader"
+    class="game-screen-group-header">
+</div>
+   
 <div class="card game-main-card">
 
     <div class="game-top-actions">
@@ -2234,8 +2233,6 @@ function showGames() {
     ).textContent =
         "🎶 Voir les parties";
 
-    activeGroupId = null;
-
     showScreen("gamesScreen");
 
     renderFilters();
@@ -2840,11 +2837,13 @@ div.onclick =
         div.style.background =
                 group.color;
        
-       const groupTextColor =
+const groupTextColor =
     isDarkColor(group.color)
         ? "#ffffff"
         : "#222222";
 
+
+div.innerHTML = `
 
     <div
         class="group-title"
@@ -2861,19 +2860,18 @@ div.onclick =
 
     </div>
 
-${
-    group.comment
-    ? `
-        <div
-            class="group-comment"
-            style="color:${groupTextColor} !important;"
-        >
-            💬 ${escapeHTML(group.comment)}
-        </div>
-    `
-    : ""
-}
-
+    ${
+        group.comment
+        ? `
+            <div
+                class="group-comment"
+                style="color:${groupTextColor} !important;"
+            >
+                💬 ${escapeHTML(group.comment)}
+            </div>
+        `
+        : ""
+    }
 
     <div class="group-games"></div>
 
@@ -3221,11 +3219,6 @@ function showEditGroup(groupId) {
         group.name || "";
 
     document.getElementById(
-        "editGroupCreator"
-    ).value =
-        group.creator || "";
-
-    document.getElementById(
         "editGroupComment"
     ).value =
         group.comment || "";
@@ -3268,12 +3261,7 @@ function saveGroupChanges() {
             .value
             .trim();
 
-    const creator =
-        document
-            .getElementById("editGroupCreator")
-            .value
-            .trim();
-
+ 
     const comment =
         document
             .getElementById("editGroupComment")
@@ -3295,18 +3283,9 @@ function saveGroupChanges() {
 
     }
 
-    if (!creator) {
 
-        alert(
-            "Indique qui a créé le groupe."
-        );
-
-        return;
-
-    }
 
     group.name = name;
-    group.creator = creator;
     group.comment = comment;
     group.color = color;
 
@@ -3426,7 +3405,6 @@ function deleteCurrentGroup() {
         });
 
     currentGroupId = null;
-    activeGroupId = null;
 
     saveData();
 
@@ -3438,19 +3416,6 @@ function deleteCurrentGroup() {
 
 }
    
-function updateGroupColorPreview() {
-
-    const color =
-        document.getElementById(
-            "groupColor"
-        ).value;
-
-    document.getElementById(
-        "groupColorPreview"
-    ).style.background =
-        color;
-
-}
 
 
 
@@ -3582,6 +3547,18 @@ if (group.comment) {
 
 }
 
+const groupCard =
+    document.getElementById(
+        "groupMainCard"
+    );
+
+groupCard.style.background =
+    "linear-gradient(" +
+    "to bottom, " +
+    group.color + " 0%, " +
+    lightenColor(group.color, 0.88) + " 100%" +
+    ")";
+      
     const gamesContainer =
         document.getElementById(
             "groupGamesList"
