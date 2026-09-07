@@ -3625,7 +3625,11 @@ groupCard.style.background =
 
 }
 
+function goBackFromGroup() {
 
+    showGroups();
+
+}
 
 function showCreateGameForCurrentGroup() {
 
@@ -4060,8 +4064,67 @@ function showGame() {
         return;
     }
 
+    /*
+       Groupe auquel appartient la partie
+    */
+
+    const gameGroup =
+        groups.find(function(group) {
+            return group.id === game.groupId;
+        });
+
+
+    /*
+       Bandeau du groupe au-dessus de la carte
+    */
+
+    const groupHeader =
+        document.getElementById(
+            "gameScreenGroupHeader"
+        );
+
+
+    if (gameGroup) {
+
+        const groupTextColor =
+            isDarkColor(gameGroup.color)
+                ? "#ffffff"
+                : "#222222";
+
+        groupHeader.innerHTML = `
+
+            <span>
+                ${escapeHTML(gameGroup.name)}
+            </span>
+
+            <span>
+                🎉
+            </span>
+
+        `;
+
+        groupHeader.style.background =
+            gameGroup.color;
+
+        groupHeader.style.color =
+            groupTextColor;
+
+        groupHeader.style.display =
+            "flex";
+
+    } else {
+
+        groupHeader.innerHTML = "";
+
+        groupHeader.style.display =
+            "none";
+
+    }
+
+
     document.getElementById("gameTitle").textContent =
         "🎶 " + game.name;
+
 
     document.getElementById("gameCreatorDisplay").innerHTML = `
 
@@ -4075,12 +4138,12 @@ function showGame() {
 
     `;
 
+
     renderRounds();
 
     showScreen("gameScreen");
 
 }
-
 
 /* ========================================================
    MODIFIER UNE PARTIE
