@@ -2582,58 +2582,104 @@ function createGameCard(game, group = null) {
     div.className =
         "game-card clickable";
 
-    if (group) {
+    const gameGroup =
+        group ||
+        groups.find(function(g) {
+            return g.id === game.groupId;
+        });
 
-        div.style.setProperty(
-            "--group-color",
-            group.color
+    if (gameGroup) {
+
+        const groupTextColor =
+            isDarkColor(gameGroup.color)
+                ? "#ffffff"
+                : "#222222";
+
+        div.classList.add(
+            "has-group"
         );
 
         div.style.background =
             lightenColor(
-                group.color,
+                gameGroup.color,
                 0.88
             );
+
+        div.innerHTML = `
+
+            <div
+                class="game-group-header"
+                style="
+                    background:${gameGroup.color};
+                    color:${groupTextColor} !important;
+                "
+            >
+                🎉 ${escapeHTML(gameGroup.name)}
+            </div>
+
+            <div class="game-card-content">
+
+                <h3>
+                    🎶 ${escapeHTML(game.name)}
+                    ${game.password ? " 🔒" : ""}
+                </h3>
+
+                <div class="game-info">
+
+                    <span class="creator-label">
+                        Créé par :
+                    </span>
+
+                    <span class="creator-name">
+                        ${escapeHTML(game.creator)}
+                    </span>
+
+                </div>
+
+                <div class="game-info">
+                    ${game.rounds.length} manche(s)
+                </div>
+
+            </div>
+
+        `;
+
+    } else {
+
+        div.innerHTML = `
+
+            <div class="game-card-content">
+
+                <h3>
+                    🎶 ${escapeHTML(game.name)}
+                    ${game.password ? " 🔒" : ""}
+                </h3>
+
+                <div class="game-info">
+
+                    <span class="creator-label">
+                        Créé par :
+                    </span>
+
+                    <span class="creator-name">
+                        ${escapeHTML(game.creator)}
+                    </span>
+
+                </div>
+
+                <div class="game-info">
+                    ${game.rounds.length} manche(s)
+                </div>
+
+            </div>
+
+        `;
 
     }
 
     div.onclick = function() {
         openGame(game.id);
     };
-
-    const passwordIcon =
-        game.password
-        ? " 🔒"
-        : "";
-
-    div.innerHTML = `
-
-        <div class="game-card-content">
-
-            <h3>
-                🎶 ${escapeHTML(game.name)}
-                ${passwordIcon}
-            </h3>
-
-            <div class="game-info">
-
-                <span class="creator-label">
-                    Créé par :
-                </span>
-
-                <span class="creator-name">
-                    ${escapeHTML(game.creator)}
-                </span>
-
-            </div>
-
-            <div class="game-info">
-                ${game.rounds.length} manche(s)
-            </div>
-
-        </div>
-
-    `;
 
     return div;
 
