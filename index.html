@@ -2516,20 +2516,28 @@ function renderGroupsView(container) {
 
         div.style.background =
                 group.color;
+       
+       const groupTextColor =
+    isDarkColor(group.color)
+        ? "#ffffff"
+        : "#222222";
 
         div.innerHTML = `
 
-            <div class="group-title">
+<div
+    class="group-title"
+    style="color:${groupTextColor} !important;"
+>
 
-                <span>
-                    ${escapeHTML(group.name)}
-                </span>
+    <span>
+        ${escapeHTML(group.name)}
+    </span>
 
-                <span>
-                    🎉
-                </span>
+    <span>
+        🎉
+    </span>
 
-            </div>
+</div>
 
             <div class="group-games"></div>
 
@@ -2582,104 +2590,58 @@ function createGameCard(game, group = null) {
     div.className =
         "game-card clickable";
 
-    const gameGroup =
-        group ||
-        groups.find(function(g) {
-            return g.id === game.groupId;
-        });
+    if (group) {
 
-    if (gameGroup) {
-
-        const groupTextColor =
-            isDarkColor(gameGroup.color)
-                ? "#ffffff"
-                : "#222222";
-
-        div.classList.add(
-            "has-group"
+        div.style.setProperty(
+            "--group-color",
+            group.color
         );
 
         div.style.background =
             lightenColor(
-                gameGroup.color,
+                group.color,
                 0.88
             );
-
-        div.innerHTML = `
-
-            <div
-                class="game-group-header"
-                style="
-                    background:${gameGroup.color};
-                    color:${groupTextColor} !important;
-                "
-            >
-                🎉 ${escapeHTML(gameGroup.name)}
-            </div>
-
-            <div class="game-card-content">
-
-                <h3>
-                    🎶 ${escapeHTML(game.name)}
-                    ${game.password ? " 🔒" : ""}
-                </h3>
-
-                <div class="game-info">
-
-                    <span class="creator-label">
-                        Créé par :
-                    </span>
-
-                    <span class="creator-name">
-                        ${escapeHTML(game.creator)}
-                    </span>
-
-                </div>
-
-                <div class="game-info">
-                    ${game.rounds.length} manche(s)
-                </div>
-
-            </div>
-
-        `;
-
-    } else {
-
-        div.innerHTML = `
-
-            <div class="game-card-content">
-
-                <h3>
-                    🎶 ${escapeHTML(game.name)}
-                    ${game.password ? " 🔒" : ""}
-                </h3>
-
-                <div class="game-info">
-
-                    <span class="creator-label">
-                        Créé par :
-                    </span>
-
-                    <span class="creator-name">
-                        ${escapeHTML(game.creator)}
-                    </span>
-
-                </div>
-
-                <div class="game-info">
-                    ${game.rounds.length} manche(s)
-                </div>
-
-            </div>
-
-        `;
 
     }
 
     div.onclick = function() {
         openGame(game.id);
     };
+
+    const passwordIcon =
+        game.password
+        ? " 🔒"
+        : "";
+
+    div.innerHTML = `
+
+        <div class="game-card-content">
+
+            <h3>
+                🎶 ${escapeHTML(game.name)}
+                ${passwordIcon}
+            </h3>
+
+            <div class="game-info">
+
+                <span class="creator-label">
+                    Créé par :
+                </span>
+
+                <span class="creator-name">
+                    ${escapeHTML(game.creator)}
+                </span>
+
+            </div>
+
+            <div class="game-info">
+                ${game.rounds.length} manche(s)
+            </div>
+
+        </div>
+
+    `;
 
     return div;
 
