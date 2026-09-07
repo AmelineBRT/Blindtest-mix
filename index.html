@@ -2650,14 +2650,14 @@ function createGameCard(game, group = null) {
         groups.find(function(g) {
             return g.id === game.groupId;
         });
-
+   
+const groupTextColor =
+    gameGroup &&
+    isDarkColor(gameGroup.color)
+        ? "#ffffff"
+        : "#222222";
 
 if (gameGroup) {
-
-    const groupTextColor =
-        isDarkColor(gameGroup.color)
-            ? "#ffffff"
-            : "#222222";
 
     div.classList.add(
         "has-group"
