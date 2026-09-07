@@ -285,6 +285,29 @@ button:disabled {
     color: #4b3500;
 }
 
+   .game-main-card {
+    position: relative;
+}
+
+.game-top-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+
+    display: flex;
+    gap: 3px;
+}
+
+.game-icon-button {
+    width: auto;
+    margin: 0;
+    padding: 5px 7px;
+
+    background: transparent;
+    color: #777;
+
+    font-size: 17px;
+}
 
 /* =========================================================
    ÉCRANS
@@ -1331,7 +1354,29 @@ label {
 
 <section id="gameScreen" class="screen">
 
-<div class="card">
+<div class="card game-main-card">
+
+    <div class="game-top-actions">
+
+        <button
+            class="game-icon-button"
+            onclick="shareCurrentGame()"
+            title="Partager">
+
+            📨
+
+        </button>
+
+        <button
+            class="game-icon-button"
+            onclick="showEditGame()"
+            title="Modifier les informations">
+
+            ⚙️
+
+        </button>
+
+    </div>
 
     <h2 id="gameTitle"></h2>
 
@@ -1343,14 +1388,6 @@ label {
 
     <button class="blue" onclick="startGameDirect()">
         🎮 Jouer la partie
-    </button>
-
-    <button class="share-button" onclick="shareCurrentGame()">
-        🔗 Partager
-    </button>
-
-    <button class="light" onclick="showEditGame()">
-        ⚙️ Modifier informations partie
     </button>
 
     <button class="secondary" onclick="showGames()">
