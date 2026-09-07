@@ -376,23 +376,14 @@ button:disabled {
 
     width: 100px;
 
-    background:
-        linear-gradient(
-            to right,
-            transparent 0%,
-            transparent 35%,
-            color-mix(
-                in srgb,
-                var(--group-color) 20%,
-                transparent
-            ) 55%,
-            color-mix(
-                in srgb,
-                var(--group-color) 60%,
-                transparent
-            ) 75%,
-            var(--group-color) 100%
-        );
+    background: linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(255, 255, 255, 0) 20%,
+        rgba(255, 255, 255, 0.15) 45%,
+        rgba(255, 255, 255, 0.45) 70%,
+        var(--group-color) 100%
+    );
 
     pointer-events: none;
 
