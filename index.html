@@ -318,8 +318,15 @@ button:disabled {
 
 
 
+.game-card.has-group {
+    position: relative;
+    padding-top: 38px;
+    overflow: hidden;
+}
+
 .game-group-header {
     position: absolute;
+
     top: 0;
     left: 0;
     right: 0;
@@ -335,10 +342,8 @@ button:disabled {
     font-weight: bold;
 
     color: #222;
-}
 
-.game-card.has-group {
-    padding-top: 38px;
+    border-radius: 10px 10px 0 0;
 }
 
    
@@ -2658,7 +2663,10 @@ function createGameCard(game, group = null) {
                 gameGroup.color,
                 0.88
             );
-
+       
+    div.style.color =
+        "#222222";
+       
     }
 
 
@@ -2712,9 +2720,12 @@ function createGameCard(game, group = null) {
                     Créé par :
                 </span>
 
-                <span class="creator-name">
-                    ${escapeHTML(game.creator)}
-                </span>
+                <span
+    class="creator-name"
+    style="color:#555 !important;"
+>
+    ${escapeHTML(game.creator)}
+</span>
 
             </div>
 
