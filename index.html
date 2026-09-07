@@ -395,6 +395,23 @@ button:disabled {
     line-height: 1.5;
     font-size: 14px;
 }
+
+
+.game-screen-group-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
+
+    padding: 6px 10px;
+    margin-bottom: 0;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    border-radius: 12px 12px 0 0;
+}
+
    
    
 /* =========================================================
@@ -1563,35 +1580,32 @@ label {
 
 <section id="gameScreen" class="screen">
 
-<div
-    id="gameScreenGroupHeader"
-    class="game-screen-group-header">
-</div>
-   
-<div class="card game-main-card">
-
-    <div class="game-top-actions">
-
-        <button
-            class="game-icon-button"
-            onclick="shareCurrentGame()"
-            title="Partager">
-
-            📨
-
-        </button>
-
-        <button
-            class="game-icon-button"
-            onclick="showEditGame()"
-            title="Modifier les informations">
-
-            ⚙️
-
-        </button>
-
+    <div
+        id="gameScreenGroupHeader"
+        class="game-screen-group-header">
     </div>
 
+    <div class="card game-main-card">
+
+        <div class="game-top-actions">
+
+            <button
+                class="game-icon-button"
+                onclick="shareCurrentGame()"
+                title="Partager">
+                📨
+            </button>
+
+            <button
+                class="game-icon-button"
+                onclick="showEditGame()"
+                title="Modifier les informations">
+                ⚙️
+            </button>
+
+        </div>
+
+        <h2 id="gameTitle"></h2>
     <h2 id="gameTitle"></h2>
 
     <p id="gameCreatorDisplay"></p>
@@ -2050,7 +2064,8 @@ let duplicateRoundId = null;
 let duplicateSourceGameId = null;
 let recoveryGameId = null;
 let currentGroupId = null;
-
+let gameReturnContext = "games";
+   
 let players = [];
 let playersVisible = false;
 
@@ -2992,10 +3007,22 @@ function createGameCard(game, group = null) {
     }
 
 
-    div.onclick = function() {
-        openGame(game.id);
-    };
+div.onclick = function() {
 
+    if (group !== null) {
+
+        gameReturnContext = "group";
+        currentGroupId = group.id;
+
+    } else {
+
+        gameReturnContext = "games";
+
+    }
+
+    openGame(game.id);
+
+};
 
     const passwordIcon =
         game.password
@@ -3812,6 +3839,25 @@ function openGame(id) {
 
 }
 
+/* ========================================================
+   BOUTON DE RETOUR EN ARRIERE
+   ======================================================== */
+   function goBackFromGame() {
+
+    if (
+        gameReturnContext === "group" &&
+        currentGroupId
+    ) {
+
+        showGroup(currentGroupId);
+
+    } else {
+
+        showGames();
+
+    }
+
+}
 
 /* ========================================================
    MOT DE PASSE OUBLIÉ
