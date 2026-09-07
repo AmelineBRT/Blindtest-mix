@@ -61,7 +61,8 @@ body.dark-mode .track-name {
 }
 
 body.dark-mode input,
-body.dark-mode select {
+body.dark-mode select,
+body.dark-mode textarea {
     background: #363636;
     color: #f0f0f0;
     border-color: #555;
@@ -421,13 +422,20 @@ button:disabled {
    ========================================================= */
 
 input,
-select {
+select,
+textarea {
     width: 100%;
     padding: 11px;
     margin: 6px 0 12px 0;
     border: 1px solid #ccc;
     border-radius: 7px;
     font-size: 15px;
+    font-family: Arial, sans-serif;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 70px;
 }
 
 label {
@@ -675,6 +683,51 @@ label {
 }
 
 
+
+.group-top-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+
+    display: flex;
+    gap: 3px;
+}
+
+.group-icon-button {
+    width: auto;
+    margin: 0;
+    padding: 4px 6px;
+
+    background: transparent;
+    color: inherit;
+
+    font-size: 16px;
+}
+
+.group-info {
+    font-size: 13px;
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.group-comment {
+    margin-top: 4px;
+    white-space: pre-line;
+}
+
+.clickable-group {
+    cursor: pointer;
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.clickable-group:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+   
 
 
 /* =========================================================
@@ -1304,12 +1357,26 @@ label {
 
     <h2>🎉 Nouveau groupe</h2>
 
-    <label>Nom du groupe</label>
+ <label>Nom du groupe</label>
 
-    <input
-        id="groupName"
-        type="text"
-        placeholder="Ex : Soirées entre amis">
+<input
+    id="groupName"
+    type="text"
+    placeholder="Ex : Soirées entre amis">
+
+<label>Créé par</label>
+
+<input
+    id="groupCreator"
+    type="text"
+    placeholder="Ton prénom">
+
+<label>Informations / commentaires</label>
+
+<textarea
+    id="groupComment"
+    placeholder="Ex : Groupe pour nos soirées du vendredi..."
+    rows="3"></textarea>
 
 <label>Couleur personnalisée</label>
 
@@ -1336,6 +1403,73 @@ label {
 </section>
 
 
+<!-- ==================================================
+     MODIFIER UN GROUPE
+     ================================================== -->
+
+<section id="editGroupScreen" class="screen">
+
+<div class="card">
+
+    <h2>⚙️ Modifier les informations du groupe</h2>
+
+    <label>Nom du groupe</label>
+
+    <input
+        id="editGroupName"
+        type="text">
+
+    <label>Créé par</label>
+
+    <input
+        id="editGroupCreator"
+        type="text">
+
+    <label>Informations / commentaires</label>
+
+    <textarea
+        id="editGroupComment"
+        rows="4"></textarea>
+
+    <label>Couleur personnalisée</label>
+
+    <div class="color-picker-container">
+
+        <input
+            id="editGroupColor"
+            type="color"
+            value="#ff0000">
+
+    </div>
+
+    <button
+        class="primary"
+        onclick="saveGroupChanges()">
+
+        💾 Enregistrer les modifications
+
+    </button>
+
+    <button
+        class="danger"
+        onclick="deleteCurrentGroup()">
+
+        🗑️ Supprimer le groupe
+
+    </button>
+
+    <button
+        class="secondary"
+        onclick="showGroups()">
+
+        ← Retour
+
+    </button>
+
+</div>
+
+</section>
+   
 <!-- ==================================================
      ÉCRAN : CRÉER UNE PARTIE
      ================================================== -->
@@ -1863,6 +1997,8 @@ let currentRoundId = null;
 let duplicateRoundId = null;
 let duplicateSourceGameId = null;
 let recoveryGameId = null;
+let currentGroupId = null;
+let activeGroupId = null;
 
 let players = [];
 let playersVisible = false;
@@ -1961,11 +2097,23 @@ function loadData() {
 
     }
 
-    if (savedGroups) {
+if (savedGroups) {
 
-        groups = JSON.parse(savedGroups);
+    groups = JSON.parse(savedGroups);
 
-    }
+    groups.forEach(function(group) {
+
+        if (!group.creator) {
+            group.creator = "";
+        }
+
+        if (!group.comment) {
+            group.comment = "";
+        }
+
+    });
+
+}
 
 }
 
@@ -2024,6 +2172,29 @@ function showGames() {
 
 }
 
+   function showGroups() {
+
+    gamesView = "groups";
+
+    document.getElementById(
+        "gamesViewTitle"
+    ).textContent =
+        "🎉 Mes groupes";
+
+    document.getElementById(
+        "gamesViewToggle"
+    ).textContent =
+        "🎶 Voir les parties";
+
+    activeGroupId = null;
+
+    showScreen("gamesScreen");
+
+    renderFilters();
+
+    renderGames();
+
+}
 
 /* ========================================================
    BASCULER PARTIES / GROUPES
@@ -2548,27 +2719,32 @@ function renderGroupsView(container) {
             .trim()
             .toLowerCase();
 
-    const filteredGroups =
-        groups.filter(function(group) {
+const filteredGroups =
+    groups.filter(function(group) {
 
-            const matchesGroup =
-                selectedGroups.length === 0 ||
-                selectedGroups.includes(
-                    group.id
-                );
+        const matchesActiveGroup =
+            !activeGroupId ||
+            group.id === activeGroupId;
 
-            const matchesSearch =
-                !search ||
-                group.name
-                    .toLowerCase()
-                    .includes(search);
-
-            return (
-                matchesGroup &&
-                matchesSearch
+        const matchesGroup =
+            selectedGroups.length === 0 ||
+            selectedGroups.includes(
+                group.id
             );
 
-        });
+        const matchesSearch =
+            !search ||
+            group.name
+                .toLowerCase()
+                .includes(search);
+
+        return (
+            matchesActiveGroup &&
+            matchesGroup &&
+            matchesSearch
+        );
+
+    });
 
     if (filteredGroups.length === 0) {
 
@@ -2579,6 +2755,32 @@ function renderGroupsView(container) {
 
     }
 
+if (activeGroupId) {
+
+    const backButton =
+        document.createElement("button");
+
+    backButton.className =
+        "secondary";
+
+    backButton.textContent =
+        "← Tous les groupes";
+
+    backButton.onclick =
+        function() {
+
+            activeGroupId = null;
+
+            renderGames();
+
+        };
+
+    container.appendChild(
+        backButton
+    );
+
+}
+   
     filteredGroups.forEach(function(group) {
 
         const groupGames =
@@ -2600,11 +2802,20 @@ function renderGroupsView(container) {
 
             });
 
-        const div =
-            document.createElement("div");
+const div =
+    document.createElement("div");
 
-        div.className =
-            "group-card";
+div.className =
+    "group-card clickable-group";
+
+div.onclick =
+    function() {
+
+        activeGroupId = group.id;
+
+        renderGames();
+
+    };
 
         div.style.setProperty(
             "--group-color",
@@ -2619,27 +2830,76 @@ function renderGroupsView(container) {
         ? "#ffffff"
         : "#222222";
 
-        div.innerHTML = `
+div.innerHTML = `
 
-<div
-    class="group-title"
-    style="color:${groupTextColor} !important;"
->
+    <div
+        class="group-top-actions"
+        onclick="event.stopPropagation();"
+    >
 
-    <span>
-        ${escapeHTML(group.name)}
-    </span>
+        <button
+            class="group-icon-button"
+            onclick="shareGroup('${group.id}')"
+            title="Partager le groupe">
 
-    <span>
-        🎉
-    </span>
+            📨
 
-</div>
+        </button>
 
-            <div class="group-games"></div>
+        <button
+            class="group-icon-button"
+            onclick="showEditGroup('${group.id}')"
+            title="Modifier le groupe">
 
-        `;
+            ⚙️
 
+        </button>
+
+    </div>
+
+
+    <div
+        class="group-title"
+        style="color:${groupTextColor} !important;"
+    >
+
+        <span>
+            ${escapeHTML(group.name)}
+        </span>
+
+        <span>
+            🎉
+        </span>
+
+    </div>
+
+
+    <div
+        class="group-info"
+        style="color:${groupTextColor} !important;"
+    >
+
+        <div>
+            👤 Créé par :
+            ${escapeHTML(group.creator || "Non renseigné")}
+        </div>
+
+        ${
+            group.comment
+            ? `
+                <div class="group-comment">
+                    💬 ${escapeHTML(group.comment)}
+                </div>
+            `
+            : ""
+        }
+
+    </div>
+
+
+    <div class="group-games"></div>
+
+`;
         const gamesContainer =
             div.querySelector(
                 ".group-games"
@@ -2946,12 +3206,243 @@ function showCreateGroup() {
     ).value = "";
 
     document.getElementById(
+        "groupCreator"
+    ).value = "";
+
+    document.getElementById(
+        "groupComment"
+    ).value = "";
+
+    document.getElementById(
         "groupColor"
     ).value = "#ff0000";
 
     showScreen(
         "createGroupScreen"
     );
+
+}
+
+
+/* ========================================================
+   MODIFIER UN GROUPE
+   ======================================================== */
+
+function showEditGroup(groupId) {
+
+    const group =
+        groups.find(function(g) {
+            return g.id === groupId;
+        });
+
+    if (!group) {
+        return;
+    }
+
+    currentGroupId = groupId;
+
+    document.getElementById(
+        "editGroupName"
+    ).value =
+        group.name || "";
+
+    document.getElementById(
+        "editGroupCreator"
+    ).value =
+        group.creator || "";
+
+    document.getElementById(
+        "editGroupComment"
+    ).value =
+        group.comment || "";
+
+    document.getElementById(
+        "editGroupColor"
+    ).value =
+        group.color || "#ff0000";
+
+    showScreen(
+        "editGroupScreen"
+    );
+
+}
+
+
+function saveGroupChanges() {
+
+    const group =
+        groups.find(function(g) {
+            return g.id === currentGroupId;
+        });
+
+    if (!group) {
+        return;
+    }
+
+    const name =
+        document
+            .getElementById("editGroupName")
+            .value
+            .trim();
+
+    const creator =
+        document
+            .getElementById("editGroupCreator")
+            .value
+            .trim();
+
+    const comment =
+        document
+            .getElementById("editGroupComment")
+            .value
+            .trim();
+
+    const color =
+        document.getElementById(
+            "editGroupColor"
+        ).value;
+
+    if (!name) {
+
+        alert(
+            "Donne un nom à ton groupe."
+        );
+
+        return;
+
+    }
+
+    if (!creator) {
+
+        alert(
+            "Indique qui a créé le groupe."
+        );
+
+        return;
+
+    }
+
+    group.name = name;
+    group.creator = creator;
+    group.comment = comment;
+    group.color = color;
+
+    saveData();
+
+    alert(
+        "Groupe modifié !"
+    );
+
+    currentGroupId = null;
+
+    showGroups();
+
+}
+
+   
+/* ========================================================
+   PARTAGER UN GROUPE
+   ======================================================== */
+
+function shareGroup(groupId) {
+
+    const group =
+        groups.find(function(g) {
+            return g.id === groupId;
+        });
+
+    if (!group) {
+        return;
+    }
+
+    const url =
+        window.location.origin +
+        window.location.pathname +
+        "#group=" +
+        encodeURIComponent(group.id);
+
+    if (
+        navigator.clipboard &&
+        navigator.clipboard.writeText
+    ) {
+
+        navigator.clipboard
+            .writeText(url)
+            .then(function() {
+
+                alert(
+                    "🔗 Lien du groupe copié dans le presse-papiers !"
+                );
+
+            })
+            .catch(function() {
+
+                prompt(
+                    "Copie ce lien :",
+                    url
+                );
+
+            });
+
+    } else {
+
+        prompt(
+            "Copie ce lien :",
+            url
+        );
+
+    }
+
+}
+
+
+function deleteCurrentGroup() {
+
+    const group =
+        groups.find(function(g) {
+            return g.id === currentGroupId;
+        });
+
+    if (!group) {
+        return;
+    }
+
+    const confirmation =
+        confirm(
+            '⚠️ Voulez-vous vraiment supprimer le groupe "' +
+            group.name +
+            '" ?\n\n' +
+            'Les parties du groupe ne seront pas supprimées. ' +
+            'Elles deviendront simplement indépendantes.'
+        );
+
+    if (!confirmation) {
+        return;
+    }
+
+    games.forEach(function(game) {
+
+        if (game.groupId === group.id) {
+            game.groupId = "";
+        }
+
+    });
+
+    groups =
+        groups.filter(function(g) {
+            return g.id !== group.id;
+        });
+
+    currentGroupId = null;
+    activeGroupId = null;
+
+    saveData();
+
+    alert(
+        "Le groupe a été supprimé."
+    );
+
+    showGroups();
 
 }
    
@@ -2979,6 +3470,18 @@ function createGroup() {
             .value
             .trim();
 
+    const creator =
+        document
+            .getElementById("groupCreator")
+            .value
+            .trim();
+
+    const comment =
+        document
+            .getElementById("groupComment")
+            .value
+            .trim();
+
     if (!name) {
 
         alert(
@@ -2989,10 +3492,21 @@ function createGroup() {
 
     }
 
- const color =
-    document.getElementById(
-        "groupColor"
-    ).value;
+    if (!creator) {
+
+        alert(
+            "Indique qui a créé le groupe."
+        );
+
+        return;
+
+    }
+
+    const color =
+        document.getElementById(
+            "groupColor"
+        ).value;
+
     groups.push({
 
         id:
@@ -3003,8 +3517,11 @@ function createGroup() {
 
         name: name,
 
-color:
-    color
+        creator: creator,
+
+        comment: comment,
+
+        color: color
 
     });
 
