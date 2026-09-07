@@ -601,16 +601,28 @@ label {
     margin: 8px 0 15px 0;
 }
 
-.color-slider {
-    margin-bottom: 10px;
+.color-picker-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0 15px 0;
 }
 
-.color-slider label {
-    display: block;
-    margin-bottom: 2px;
+.color-picker-container input[type="color"] {
+    width: 55px;
+    height: 50px;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
 }
 
-.color-slider input {
+.color-preview {
+    flex: 1;
+    height: 50px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
     margin: 0;
 }
 
@@ -1211,54 +1223,22 @@ label {
         type="text"
         placeholder="Ex : Soirées entre amis">
 
-    <label>Couleur personnalisée</label>
+<label>Couleur personnalisée</label>
+
+<div class="color-picker-container">
+
+    <input
+        id="groupColor"
+        type="color"
+        value="#ff0000"
+        onchange="updateGroupColorPreview()">
 
     <div
         id="groupColorPreview"
         class="color-preview">
     </div>
 
-    <div class="color-slider">
-
-        <label>Rouge</label>
-
-        <input
-            id="groupColorRed"
-            type="range"
-            min="0"
-            max="255"
-            value="0"
-            oninput="updateGroupColorPreview()">
-
-    </div>
-
-    <div class="color-slider">
-
-        <label>Vert</label>
-
-        <input
-            id="groupColorGreen"
-            type="range"
-            min="0"
-            max="255"
-            value="0"
-            oninput="updateGroupColorPreview()">
-
-    </div>
-
-    <div class="color-slider">
-
-        <label>Bleu</label>
-
-        <input
-            id="groupColorBlue"
-            type="range"
-            min="0"
-            max="255"
-            value="0"
-            oninput="updateGroupColorPreview()">
-
-    </div>
+</div>
 
     <button class="primary" onclick="createGroup()">
         💾 Créer le groupe
@@ -2722,16 +2702,8 @@ function showCreateGroup() {
     ).value = "";
 
     document.getElementById(
-        "groupColorRed"
-    ).value = 0;
-
-    document.getElementById(
-        "groupColorGreen"
-    ).value = 0;
-
-    document.getElementById(
-        "groupColorBlue"
-    ).value = 0;
+        "groupColor"
+    ).value = "#ff0000";
 
     updateGroupColorPreview();
 
@@ -2741,52 +2713,20 @@ function showCreateGroup() {
 
 }
 
-
 function updateGroupColorPreview() {
 
-    const red =
-        Number(
-            document.getElementById(
-                "groupColorRed"
-            ).value
-        );
-
-    const green =
-        Number(
-            document.getElementById(
-                "groupColorGreen"
-            ).value
-        );
-
-    const blue =
-        Number(
-            document.getElementById(
-                "groupColorBlue"
-            ).value
-        );
+    const color =
+        document.getElementById(
+            "groupColor"
+        ).value;
 
     document.getElementById(
         "groupColorPreview"
     ).style.background =
-        rgbToHex(
-            red,
-            green,
-            blue
-        );
+        color;
 
 }
 
-
-function rgbToHex(r, g, b) {
-
-    return (
-        "#" +
-        r.toString(16).padStart(2, "0") +
-        g.toString(16).padStart(2, "0") +
-        b.toString(16).padStart(2, "0")
-    );
-
-}
 
 
 function createGroup() {
@@ -2807,27 +2747,10 @@ function createGroup() {
 
     }
 
-    const red =
-        Number(
-            document.getElementById(
-                "groupColorRed"
-            ).value
-        );
-
-    const green =
-        Number(
-            document.getElementById(
-                "groupColorGreen"
-            ).value
-        );
-
-    const blue =
-        Number(
-            document.getElementById(
-                "groupColorBlue"
-            ).value
-        );
-
+ const color =
+    document.getElementById(
+        "groupColor"
+    ).value;
     groups.push({
 
         id:
@@ -2838,12 +2761,8 @@ function createGroup() {
 
         name: name,
 
-        color:
-            rgbToHex(
-                red,
-                green,
-                blue
-            )
+color:
+    color
 
     });
 
