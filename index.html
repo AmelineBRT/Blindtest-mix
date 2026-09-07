@@ -2725,6 +2725,24 @@ function isDarkColor(hex) {
 
 }
 
+function showCreateGroup() {
+
+    document.getElementById(
+        "groupName"
+    ).value = "";
+
+    document.getElementById(
+        "groupColor"
+    ).value = "#ff0000";
+
+    updateGroupColorPreview();
+
+    showScreen(
+        "createGroupScreen"
+    );
+
+}
+   
 function updateGroupColorPreview() {
 
     const color =
