@@ -2652,22 +2652,27 @@ function createGameCard(game, group = null) {
         });
 
 
-    if (gameGroup) {
+if (gameGroup) {
 
-        div.classList.add(
-            "has-group"
+    const groupTextColor =
+        isDarkColor(gameGroup.color)
+            ? "#ffffff"
+            : "#222222";
+
+    div.classList.add(
+        "has-group"
+    );
+
+    div.style.background =
+        lightenColor(
+            gameGroup.color,
+            0.88
         );
 
-        div.style.background =
-            lightenColor(
-                gameGroup.color,
-                0.88
-            );
-       
     div.style.color =
         "#222222";
-       
-    }
+
+}
 
 
     div.onclick = function() {
@@ -2685,9 +2690,13 @@ function createGameCard(game, group = null) {
         gameGroup
         ? `
 
-            <div
-                class="game-group-header"
-                style="background:${gameGroup.color}">
+<div
+    class="game-group-header"
+    style="
+        background:${gameGroup.color};
+        color:${groupTextColor} !important;
+    "
+>
 
                 <span>
                     ${escapeHTML(gameGroup.name)}
