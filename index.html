@@ -402,16 +402,14 @@ button:disabled {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
 
-    padding: 0px 10px 6px 10px;
+    padding: 3px 8px;
 
-    font-size: 12px;
+    font-size: 11px;
     font-weight: bold;
 
-    min-height: 32px;
-
-    border-radius: 12px 12px 0 0;
+    min-height: 24px;
 }
 
    
@@ -4132,11 +4130,14 @@ function showGame() {
 
         `;
 
-        groupHeader.style.color =
-            groupTextColor;
+groupHeader.style.color =
+    groupTextColor;
 
-        groupHeader.style.display =
-            "flex";
+groupHeader.style.background =
+    gameGroup.color;
+
+groupHeader.style.display =
+    "flex";
 
     } else {
 
@@ -4153,6 +4154,9 @@ function showGame() {
 
         groupHeader.style.display =
             "none";
+
+       groupHeader.style.background =
+    "";
 
     }
 
