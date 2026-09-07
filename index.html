@@ -321,14 +321,13 @@ button:disabled {
     overflow: hidden;
 }
 
-.game-card.has-group {
+.game-card.has-group-header {
     padding-top: 38px;
 }
 
-
    
 
-   .game-group-header { 
+.game-group-header { 
     position: absolute; 
     top: 0; 
     left: 0; 
@@ -344,7 +343,15 @@ button:disabled {
     font-size: 12px; 
     font-weight: bold;  
   
-    color: #222; 
+    color: #222;
+
+    z-index: 2;
+}
+
+
+.game-card-content {
+    position: relative;
+    z-index: 1;
 }
 
 
@@ -358,24 +365,28 @@ button:disabled {
 
 
 /* dégradé */
-.game-card.has-group::after {
+.game-card.has-group-header.has-group::after {
     content: "";
 
     position: absolute;
+
     top: 0;
     right: 0;
     bottom: 0;
 
-    width: 50px;
+    width: 80px;
 
     background:
         linear-gradient(
             to right,
-            transparent 40%,
+            transparent 0%,
+            rgba(0, 0, 0, 0) 20%,
             var(--group-color) 100%
         );
 
     pointer-events: none;
+
+    z-index: 0;
 }
 
    
@@ -2669,7 +2680,6 @@ function renderGroupsView(container) {
 
 }
 
-
 function createGameCard(game, group = null) {
 
     const div =
@@ -2684,34 +2694,68 @@ function createGameCard(game, group = null) {
         groups.find(function(g) {
             return g.id === game.groupId;
         });
-   
-const groupTextColor =
-    gameGroup &&
-    isDarkColor(gameGroup.color)
-        ? "#ffffff"
-        : "#222222";
 
-if (gameGroup) {
 
-    div.classList.add(
-        "has-group"
-    );
+    const groupTextColor =
+        gameGroup &&
+        isDarkColor(gameGroup.color)
+            ? "#ffffff"
+            : "#222222";
 
-    div.style.background =
-        lightenColor(
-            gameGroup.color,
-            0.88
+
+    /*
+       Si "group" est fourni, cela signifie que
+       la carte est affichée DANS un encadré de groupe.
+
+       Dans ce cas :
+       → pas de bandeau
+       → pas de dégradé
+       → uniquement le fond éclairci
+    */
+
+    const showGroupHeader =
+        group === null;
+
+
+    if (gameGroup) {
+
+        div.classList.add(
+            "has-group"
         );
 
-    div.style.color =
-        "#222222";
+        div.style.background =
+            lightenColor(
+                gameGroup.color,
+                0.88
+            );
 
-   div.style.setProperty(
-    "--group-color",
-    gameGroup.color
-);
+        div.style.color =
+            "#222222";
 
-}
+
+        if (showGroupHeader) {
+
+            div.classList.add(
+                "has-group-header"
+            );
+
+            div.style.setProperty(
+                "--group-color",
+                gameGroup.color
+            );
+
+        }
+
+    }
+
+
+    if (showGroupHeader) {
+
+        div.classList.add(
+            "has-group-header"
+        );
+
+    }
 
 
     div.onclick = function() {
@@ -2726,45 +2770,48 @@ if (gameGroup) {
 
 
     const groupHeader =
-    gameGroup
-    ? `
+        !showGroupHeader
+        ? ""
+        : gameGroup
+        ? `
 
-        <div
-            class="game-group-header"
-            style="
-                background:${gameGroup.color};
-                color:${groupTextColor} !important;
-            "
-        >
+            <div
+                class="game-group-header"
+                style="
+                    background:${gameGroup.color};
+                    color:${groupTextColor} !important;
+                "
+            >
 
-            <span>
-                ${escapeHTML(gameGroup.name)}
-            </span>
+                <span>
+                    ${escapeHTML(gameGroup.name)}
+                </span>
 
-            <span>
-                🎉
-            </span>
+                <span>
+                    🎉
+                </span>
 
-        </div>
+            </div>
 
-    `
-    : `
+        `
+        : `
 
-        <div
-            class="game-group-header independent-header"
-        >
+            <div
+                class="game-group-header independent-header"
+            >
 
-            <span>
-                Indépendant
-            </span>
+                <span>
+                    Indépendant
+                </span>
 
-            <span>
-                🎭
-            </span>
+                <span>
+                    🎭
+                </span>
 
-        </div>
+            </div>
 
-    `;
+        `;
+
 
     div.innerHTML = `
 
@@ -2784,11 +2831,11 @@ if (gameGroup) {
                 </span>
 
                 <span
-    class="creator-name"
-    style="color:#555 !important;"
->
-    ${escapeHTML(game.creator)}
-</span>
+                    class="creator-name"
+                    style="color:#555 !important;"
+                >
+                    ${escapeHTML(game.creator)}
+                </span>
 
             </div>
 
@@ -2803,6 +2850,9 @@ if (gameGroup) {
     return div;
 
 }
+
+
+   
    /* ========================================================
    ÉCLAIRCIR COULEUR
    ======================================================== */
