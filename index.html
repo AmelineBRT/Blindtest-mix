@@ -322,6 +322,10 @@ button:disabled {
     position: relative;
     padding-top: 38px;
     overflow: hidden;
+
+    /* Petit liseré du groupe à gauche */
+    box-shadow:
+        inset 5px 0 0 var(--group-color);
 }
 
 .game-group-header {
@@ -346,6 +350,22 @@ button:disabled {
     border-radius: 10px 10px 0 0;
 }
 
+
+
+
+   .independent-header {
+    background: #555;
+    color: #ffffff !important;
+}
+
+
+.game-card:not(.has-group) {
+    position: relative;
+    box-shadow:
+        inset 5px 0 0 #555;
+}
+   
+   
    
 /* =========================================================
    ÉCRANS
@@ -2672,6 +2692,11 @@ if (gameGroup) {
     div.style.color =
         "#222222";
 
+   div.style.setProperty(
+    "--group-color",
+    gameGroup.color
+);
+
 }
 
 
@@ -2687,30 +2712,45 @@ if (gameGroup) {
 
 
     const groupHeader =
-        gameGroup
-        ? `
+    gameGroup
+    ? `
 
-<div
-    class="game-group-header"
-    style="
-        background:${gameGroup.color};
-        color:${groupTextColor} !important;
-    "
->
+        <div
+            class="game-group-header"
+            style="
+                background:${gameGroup.color};
+                color:${groupTextColor} !important;
+            "
+        >
 
-                <span>
-                    ${escapeHTML(gameGroup.name)}
-                </span>
+            <span>
+                ${escapeHTML(gameGroup.name)}
+            </span>
 
-                <span>
-                    🎉
-                </span>
+            <span>
+                🎉
+            </span>
 
-            </div>
+        </div>
 
-        `
-        : "";
+    `
+    : `
 
+        <div
+            class="game-group-header independent-header"
+        >
+
+            <span>
+                Indépendant
+            </span>
+
+            <span>
+                🎭
+            </span>
+
+        </div>
+
+    `;
 
     div.innerHTML = `
 
