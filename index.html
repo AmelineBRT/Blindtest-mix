@@ -328,28 +328,6 @@ button:disabled {
 
    
 
-.game-card.has-group::after {
-    content: "";
-
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-
-    width: 50px;
-
-    background:
-        linear-gradient(
-            to right,
-            transparent 0%,
-            var(--group-color) 100%
-        );
-
-    pointer-events: none;
-}
-
-
-
    .game-group-header { 
     position: absolute; 
     top: 0; 
@@ -378,7 +356,29 @@ button:disabled {
 }
 
 
-  
+
+/* dégradé */
+.game-card.has-group::after {
+    content: "";
+
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+
+    width: 50px;
+
+    background:
+        linear-gradient(
+            to right,
+            transparent 0%,
+            var(--group-color) 100%
+        );
+
+    pointer-events: none;
+}
+
+   
    
    
 /* =========================================================
