@@ -292,8 +292,26 @@ button:disabled {
    
    .game-main-card {
     position: relative;
+    overflow: hidden;
 }
 
+.game-screen-group-header {
+    display: none;
+
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
+
+    padding: 7px 10px;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    margin: -20px -20px 20px -20px;
+
+    min-height: 32px;
+}
+   
 .game-top-actions {
     position: absolute;
     top: 10px;
@@ -1581,11 +1599,13 @@ label {
 <section id="gameScreen" class="screen">
 
     <div
-        id="gameScreenGroupHeader"
-        class="game-screen-group-header">
-    </div>
+        id="gameMainCard"
+        class="card game-main-card">
 
-    <div class="card game-main-card">
+        <div
+            id="gameScreenGroupHeader"
+            class="game-screen-group-header">
+        </div>
 
         <div class="game-top-actions">
 
@@ -1605,30 +1625,36 @@ label {
 
         </div>
 
-        <h2 id="gameTitle"></h2>
-    <h2 id="gameTitle"></h2>
+        <div class="game-card-content">
 
-    <p id="gameCreatorDisplay"></p>
+            <h2 id="gameTitle"></h2>
 
-    <button class="primary" onclick="showCreateRound()">
-        ＋ Ajouter une manche
-    </button>
+            <p id="gameCreatorDisplay"></p>
 
-    <button class="blue" onclick="startGameDirect()">
-        🎮 Jouer la partie
-    </button>
+            <button
+                class="primary"
+                onclick="showCreateRound()">
+                ＋ Ajouter une manche
+            </button>
 
-<button
-    id="gameBackButton"
-    class="secondary"
-    onclick="goBackFromGame()"
->
-    ← Retour
-</button>
+            <button
+                class="blue"
+                onclick="startGameDirect()">
+                🎮 Jouer la partie
+            </button>
 
-</div>
+            <button
+                id="gameBackButton"
+                class="secondary"
+                onclick="goBackFromGame()">
+                ← Retour
+            </button>
 
-<div id="roundsList"></div>
+        </div>
+
+    </div>
+
+    <div id="roundsList"></div>
 
 </section>
 
@@ -4064,9 +4090,6 @@ function showGame() {
         return;
     }
 
-    /*
-       Groupe auquel appartient la partie
-    */
 
     const gameGroup =
         groups.find(function(group) {
@@ -4074,9 +4097,8 @@ function showGame() {
         });
 
 
-    /*
-       Bandeau du groupe au-dessus de la carte
-    */
+    const gameCard =
+        document.getElementById("gameMainCard");
 
     const groupHeader =
         document.getElementById(
@@ -4084,12 +4106,33 @@ function showGame() {
         );
 
 
+    /*
+       Si la partie appartient à un groupe
+    */
+
     if (gameGroup) {
+
+        const lightColor =
+            lightenColor(
+                gameGroup.color,
+                0.88
+            );
 
         const groupTextColor =
             isDarkColor(gameGroup.color)
                 ? "#ffffff"
                 : "#222222";
+
+
+        gameCard.style.background =
+            "linear-gradient(" +
+            "to bottom, " +
+            gameGroup.color + " 0%, " +
+            gameGroup.color + " 18%, " +
+            lightColor + " 42%, " +
+            lightColor + " 100%" +
+            ")";
+
 
         groupHeader.innerHTML = `
 
@@ -4103,9 +4146,6 @@ function showGame() {
 
         `;
 
-        groupHeader.style.background =
-            gameGroup.color;
-
         groupHeader.style.color =
             groupTextColor;
 
@@ -4114,12 +4154,45 @@ function showGame() {
 
     } else {
 
-        groupHeader.innerHTML = "";
+        /*
+           Partie indépendante :
+           on remet l'apparence normale
+        */
+
+        gameCard.style.background =
+            "";
+
+        groupHeader.innerHTML =
+            "";
 
         groupHeader.style.display =
             "none";
 
     }
+
+
+    document.getElementById("gameTitle").textContent =
+        "🎶 " + game.name;
+
+
+    document.getElementById("gameCreatorDisplay").innerHTML = `
+
+        <span class="creator-label">
+            Créé par :
+        </span>
+
+        <span class="creator-name">
+            ${escapeHTML(game.creator)}
+        </span>
+
+    `;
+
+
+    renderRounds();
+
+    showScreen("gameScreen");
+
+}
 
 
     document.getElementById("gameTitle").textContent =
