@@ -2590,20 +2590,23 @@ function createGameCard(game, group = null) {
     div.className =
         "game-card clickable";
 
-    if (group) {
+if (group) {
 
-        div.style.setProperty(
-            "--group-color",
-            group.color
+    div.style.setProperty(
+        "--group-color",
+        group.color
+    );
+
+    div.style.background =
+        lightenColor(
+            group.color,
+            0.88
         );
 
-        div.style.background =
-            lightenColor(
-                group.color,
-                0.88
-            );
+    div.style.color =
+        "#222222";
 
-    }
+}
 
     div.onclick = function() {
         openGame(game.id);
