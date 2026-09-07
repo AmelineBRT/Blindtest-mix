@@ -380,7 +380,7 @@ button:disabled {
         linear-gradient(
             to right,
             transparent 0%,
-            rgba(0, 0, 0, 0) 45%,
+            rgba(0, 0, 0, 0) 10%,
             var(--group-color) 100%
         );
 
@@ -389,6 +389,12 @@ button:disabled {
     z-index: 0;
 }
    
+
+.group-screen-comment {
+    margin: 10px 0 15px 0;
+    line-height: 1.5;
+    font-size: 14px;
+}
    
    
 /* =========================================================
@@ -1364,14 +1370,8 @@ label {
     type="text"
     placeholder="Ex : Soirées entre amis">
 
-<label>Créé par</label>
 
-<input
-    id="groupCreator"
-    type="text"
-    placeholder="Ton prénom">
-
-<label>Informations / commentaires</label>
+<label>Commentaires</label>
 
 <textarea
     id="groupComment"
@@ -1615,6 +1615,52 @@ label {
 
 </section>
 
+  <section id="groupScreen" class="screen">
+
+    <div class="card game-main-card">
+
+        <div class="game-top-actions">
+
+            <button
+                class="game-icon-button"
+                onclick="shareCurrentGroup()"
+                title="Partager">
+                📨
+            </button>
+
+            <button
+                class="game-icon-button"
+                onclick="showEditCurrentGroup()"
+                title="Modifier les informations">
+                ⚙️
+            </button>
+
+        </div>
+
+        <h2 id="groupScreenTitle"></h2>
+
+        <div
+            id="groupScreenComment"
+            class="group-screen-comment">
+        </div>
+
+        <button
+            class="primary"
+            onclick="showCreateGameForCurrentGroup()">
+            ＋ 🎶 Nouvelle partie
+        </button>
+
+        <button
+            class="secondary"
+            onclick="showGroups()">
+            ← Mes groupes
+        </button>
+
+    </div>
+
+    <div id="groupGamesList"></div>
+
+</section> 
 
 <!-- ==================================================
      MODIFIER UNE PARTIE
@@ -1998,7 +2044,6 @@ let duplicateRoundId = null;
 let duplicateSourceGameId = null;
 let recoveryGameId = null;
 let currentGroupId = null;
-let activeGroupId = null;
 
 let players = [];
 let playersVisible = false;
@@ -2102,10 +2147,6 @@ if (savedGroups) {
     groups = JSON.parse(savedGroups);
 
     groups.forEach(function(group) {
-
-        if (!group.creator) {
-            group.creator = "";
-        }
 
         if (!group.comment) {
             group.comment = "";
@@ -2722,10 +2763,6 @@ function renderGroupsView(container) {
 const filteredGroups =
     groups.filter(function(group) {
 
-        const matchesActiveGroup =
-            !activeGroupId ||
-            group.id === activeGroupId;
-
         const matchesGroup =
             selectedGroups.length === 0 ||
             selectedGroups.includes(
@@ -2739,13 +2776,11 @@ const filteredGroups =
                 .includes(search);
 
         return (
-            matchesActiveGroup &&
             matchesGroup &&
             matchesSearch
         );
 
     });
-
     if (filteredGroups.length === 0) {
 
         container.innerHTML =
@@ -2755,31 +2790,7 @@ const filteredGroups =
 
     }
 
-if (activeGroupId) {
 
-    const backButton =
-        document.createElement("button");
-
-    backButton.className =
-        "secondary";
-
-    backButton.textContent =
-        "← Tous les groupes";
-
-    backButton.onclick =
-        function() {
-
-            activeGroupId = null;
-
-            renderGames();
-
-        };
-
-    container.appendChild(
-        backButton
-    );
-
-}
    
     filteredGroups.forEach(function(group) {
 
@@ -2811,12 +2822,9 @@ div.className =
 div.onclick =
     function() {
 
-        activeGroupId = group.id;
-
-        renderGames();
+        showGroup(group.id);
 
     };
-
         div.style.setProperty(
             "--group-color",
             group.color
@@ -3206,10 +3214,6 @@ function showCreateGroup() {
     ).value = "";
 
     document.getElementById(
-        "groupCreator"
-    ).value = "";
-
-    document.getElementById(
         "groupComment"
     ).value = "";
 
@@ -3267,6 +3271,15 @@ function showEditGroup(groupId) {
 
 }
 
+   function showEditCurrentGroup() {
+
+    if (!currentGroupId) {
+        return;
+    }
+
+    showEditGroup(currentGroupId);
+
+}
 
 function saveGroupChanges() {
 
@@ -3395,6 +3408,15 @@ function shareGroup(groupId) {
 
 }
 
+   function shareCurrentGroup() {
+
+    if (!currentGroupId) {
+        return;
+    }
+
+    shareGroup(currentGroupId);
+
+}
 
 function deleteCurrentGroup() {
 
@@ -3470,12 +3492,6 @@ function createGroup() {
             .value
             .trim();
 
-    const creator =
-        document
-            .getElementById("groupCreator")
-            .value
-            .trim();
-
     const comment =
         document
             .getElementById("groupComment")
@@ -3492,15 +3508,6 @@ function createGroup() {
 
     }
 
-    if (!creator) {
-
-        alert(
-            "Indique qui a créé le groupe."
-        );
-
-        return;
-
-    }
 
     const color =
         document.getElementById(
@@ -3516,8 +3523,6 @@ function createGroup() {
                 .substring(2, 7),
 
         name: name,
-
-        creator: creator,
 
         comment: comment,
 
@@ -3569,7 +3574,106 @@ function updateGroupSelect(
 
 }
 
+/* ========================================================
+   PAGE GROUPE
+   ======================================================== */
+   function showGroup(groupId) {
 
+    const group =
+        groups.find(function(g) {
+            return g.id === groupId;
+        });
+
+    if (!group) {
+        return;
+    }
+
+    currentGroupId = groupId;
+
+    document.getElementById(
+        "groupScreenTitle"
+    ).textContent =
+        "🎉 " + group.name;
+
+    const commentElement =
+        document.getElementById(
+            "groupScreenComment"
+        );
+
+    if (group.comment) {
+
+        commentElement.innerHTML =
+            "<strong>Commentaires</strong><br>" +
+            escapeHTML(group.comment);
+
+    } else {
+
+        commentElement.innerHTML =
+            "<strong>Commentaires</strong>";
+
+    }
+
+    const gamesContainer =
+        document.getElementById(
+            "groupGamesList"
+        );
+
+    gamesContainer.innerHTML = "";
+
+    const groupGames =
+        games.filter(function(game) {
+            return game.groupId === group.id;
+        });
+
+    if (groupGames.length === 0) {
+
+        gamesContainer.innerHTML =
+            "<div class='card'>" +
+            "Aucune partie dans ce groupe." +
+            "</div>";
+
+    } else {
+
+        groupGames.forEach(function(game) {
+
+            const card =
+                createGameCard(
+                    game,
+                    group
+                );
+
+            gamesContainer.appendChild(card);
+
+        });
+
+    }
+
+    showScreen("groupScreen");
+
+}
+
+
+
+function showCreateGameForCurrentGroup() {
+
+    if (!currentGroupId) {
+        return;
+    }
+
+    showCreateGame();
+
+    document.getElementById(
+        "gameGroup"
+    ).value =
+        currentGroupId;
+
+}
+
+
+
+
+
+   
 /* ========================================================
    CRÉER UNE PARTIE
    ======================================================== */
