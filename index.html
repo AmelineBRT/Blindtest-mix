@@ -4090,87 +4090,26 @@ function showGame() {
         return;
     }
 
+    document.getElementById("gameTitle").textContent =
+        "🎶 " + game.name;
 
-    const gameGroup =
-        groups.find(function(group) {
-            return group.id === game.groupId;
-        });
+    document.getElementById("gameCreatorDisplay").innerHTML = `
 
+        <span class="creator-label">
+            Créé par :
+        </span>
 
-    const gameCard =
-        document.getElementById("gameMainCard");
+        <span class="creator-name">
+            ${escapeHTML(game.creator)}
+        </span>
 
-    const groupHeader =
-        document.getElementById(
-            "gameScreenGroupHeader"
-        );
+    `;
 
+    renderRounds();
 
-    /*
-       Si la partie appartient à un groupe
-    */
+    showScreen("gameScreen");
 
-    if (gameGroup) {
-
-        const lightColor =
-            lightenColor(
-                gameGroup.color,
-                0.88
-            );
-
-        const groupTextColor =
-            isDarkColor(gameGroup.color)
-                ? "#ffffff"
-                : "#222222";
-
-
-        gameCard.style.background =
-            "linear-gradient(" +
-            "to bottom, " +
-            gameGroup.color + " 0%, " +
-            gameGroup.color + " 18%, " +
-            lightColor + " 42%, " +
-            lightColor + " 100%" +
-            ")";
-
-
-        groupHeader.innerHTML = `
-
-            <span>
-                ${escapeHTML(gameGroup.name)}
-            </span>
-
-            <span>
-                🎉
-            </span>
-
-        `;
-
-        groupHeader.style.color =
-            groupTextColor;
-
-        groupHeader.style.display =
-            "flex";
-
-    } else {
-
-        /*
-           Partie indépendante :
-           on remet l'apparence normale
-        */
-
-        gameCard.style.background =
-            "";
-
-        groupHeader.innerHTML =
-            "";
-
-        groupHeader.style.display =
-            "none";
-
-    }
-
-
+}
     document.getElementById("gameTitle").textContent =
         "🎶 " + game.name;
 
