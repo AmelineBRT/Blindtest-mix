@@ -1605,9 +1605,13 @@ label {
         🎮 Jouer la partie
     </button>
 
-    <button class="secondary" onclick="showGames()">
-        ← Mes parties
-    </button>
+<button
+    id="gameBackButton"
+    class="secondary"
+    onclick="goBackFromGame()"
+>
+    ← Retour
+</button>
 
 </div>
 
@@ -1615,9 +1619,12 @@ label {
 
 </section>
 
-  <section id="groupScreen" class="screen">
+<section id="groupScreen" class="screen">
 
-    <div class="card game-main-card">
+    <div
+        id="groupMainCard"
+        class="card game-main-card group-main-card"
+    >
 
         <div class="game-top-actions">
 
@@ -1650,11 +1657,11 @@ label {
             ＋ 🎶 Nouvelle partie
         </button>
 
-        <button
-            class="secondary"
-            onclick="showGroups()">
-            ← Mes groupes
-        </button>
+<button
+    class="secondary"
+    onclick="goBackFromGroup()">
+    ← Retour
+</button>
 
     </div>
 
@@ -2838,33 +2845,6 @@ div.onclick =
         ? "#ffffff"
         : "#222222";
 
-div.innerHTML = `
-
-    <div
-        class="group-top-actions"
-        onclick="event.stopPropagation();"
-    >
-
-        <button
-            class="group-icon-button"
-            onclick="shareGroup('${group.id}')"
-            title="Partager le groupe">
-
-            📨
-
-        </button>
-
-        <button
-            class="group-icon-button"
-            onclick="showEditGroup('${group.id}')"
-            title="Modifier le groupe">
-
-            ⚙️
-
-        </button>
-
-    </div>
-
 
     <div
         class="group-title"
@@ -2881,28 +2861,18 @@ div.innerHTML = `
 
     </div>
 
-
-    <div
-        class="group-info"
-        style="color:${groupTextColor} !important;"
-    >
-
-        <div>
-            👤 Créé par :
-            ${escapeHTML(group.creator || "Non renseigné")}
+${
+    group.comment
+    ? `
+        <div
+            class="group-comment"
+            style="color:${groupTextColor} !important;"
+        >
+            💬 ${escapeHTML(group.comment)}
         </div>
-
-        ${
-            group.comment
-            ? `
-                <div class="group-comment">
-                    💬 ${escapeHTML(group.comment)}
-                </div>
-            `
-            : ""
-        }
-
-    </div>
+    `
+    : ""
+}
 
 
     <div class="group-games"></div>
@@ -3600,18 +3570,17 @@ function updateGroupSelect(
             "groupScreenComment"
         );
 
-    if (group.comment) {
+if (group.comment) {
 
-        commentElement.innerHTML =
-            "<strong>Commentaires</strong><br>" +
-            escapeHTML(group.comment);
+    commentElement.innerHTML =
+        "💬 " +
+        escapeHTML(group.comment);
 
-    } else {
+} else {
 
-        commentElement.innerHTML =
-            "<strong>Commentaires</strong>";
+    commentElement.innerHTML = "";
 
-    }
+}
 
     const gamesContainer =
         document.getElementById(
