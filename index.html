@@ -285,6 +285,10 @@ button:disabled {
     color: #4b3500;
 }
 
+   /*  ==================================
+       AUTRES
+       ====================================== */
+   
    .game-main-card {
     position: relative;
 }
@@ -309,6 +313,35 @@ button:disabled {
     font-size: 17px;
 }
 
+
+
+
+
+
+.game-group-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
+
+    padding: 6px 10px;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    color: #222;
+}
+
+.game-card.has-group {
+    padding-top: 38px;
+}
+
+   
 /* =========================================================
    ÉCRANS
    ========================================================= */
@@ -2606,34 +2639,65 @@ function createGameCard(game, group = null) {
     div.className =
         "game-card clickable";
 
-if (group) {
 
-    div.style.setProperty(
-        "--group-color",
-        group.color
-    );
+    const gameGroup =
+        group ||
+        groups.find(function(g) {
+            return g.id === game.groupId;
+        });
 
-    div.style.background =
-        lightenColor(
-            group.color,
-            0.88
+
+    if (gameGroup) {
+
+        div.classList.add(
+            "has-group"
         );
 
-    div.style.color =
-        "#222222";
+        div.style.background =
+            lightenColor(
+                gameGroup.color,
+                0.88
+            );
 
-}
+    }
+
 
     div.onclick = function() {
         openGame(game.id);
     };
+
 
     const passwordIcon =
         game.password
         ? " 🔒"
         : "";
 
+
+    const groupHeader =
+        gameGroup
+        ? `
+
+            <div
+                class="game-group-header"
+                style="background:${gameGroup.color}">
+
+                <span>
+                    ${escapeHTML(gameGroup.name)}
+                </span>
+
+                <span>
+                    🎉
+                </span>
+
+            </div>
+
+        `
+        : "";
+
+
     div.innerHTML = `
+
+        ${groupHeader}
 
         <div class="game-card-content">
 
@@ -2648,12 +2712,9 @@ if (group) {
                     Créé par :
                 </span>
 
-              <span
-    class="creator-name"
-    style="color:#555 !important;"
->
-    ${escapeHTML(game.creator)}
-</span>
+                <span class="creator-name">
+                    ${escapeHTML(game.creator)}
+                </span>
 
             </div>
 
@@ -2668,7 +2729,6 @@ if (group) {
     return div;
 
 }
-
    /* ========================================================
    ÉCLAIRCIR COULEUR
    ======================================================== */
