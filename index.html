@@ -544,7 +544,15 @@ label {
     overflow: hidden;
 }
 
-
+.group-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 8px;
+    background: var(--group-color);
+}
 
 .group-title {
     display: flex;
@@ -570,6 +578,16 @@ label {
     margin-bottom: 0;
 }
 
+.group-games .game-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background: var(--group-color);
+}
+
 
 /* =========================================================
    COULEUR GROUPE
@@ -583,28 +601,16 @@ label {
     margin: 8px 0 15px 0;
 }
 
-.color-picker-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 8px 0 15px 0;
+.color-slider {
+    margin-bottom: 10px;
 }
 
-.color-picker-container input[type="color"] {
-    width: 55px;
-    height: 50px;
-    padding: 0;
-    margin: 0;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    cursor: pointer;
+.color-slider label {
+    display: block;
+    margin-bottom: 2px;
 }
 
-.color-preview {
-    flex: 1;
-    height: 50px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
+.color-slider input {
     margin: 0;
 }
 
@@ -1205,22 +1211,54 @@ label {
         type="text"
         placeholder="Ex : Soirées entre amis">
 
-   <label>Couleur personnalisée</label>
-
-<div class="color-picker-container">
-
-    <input
-        id="groupColor"
-        type="color"
-        value="#ff0000"
-        onchange="updateGroupColorPreview()">
+    <label>Couleur personnalisée</label>
 
     <div
         id="groupColorPreview"
         class="color-preview">
     </div>
 
-</div>
+    <div class="color-slider">
+
+        <label>Rouge</label>
+
+        <input
+            id="groupColorRed"
+            type="range"
+            min="0"
+            max="255"
+            value="0"
+            oninput="updateGroupColorPreview()">
+
+    </div>
+
+    <div class="color-slider">
+
+        <label>Vert</label>
+
+        <input
+            id="groupColorGreen"
+            type="range"
+            min="0"
+            max="255"
+            value="0"
+            oninput="updateGroupColorPreview()">
+
+    </div>
+
+    <div class="color-slider">
+
+        <label>Bleu</label>
+
+        <input
+            id="groupColorBlue"
+            type="range"
+            min="0"
+            max="255"
+            value="0"
+            oninput="updateGroupColorPreview()">
+
+    </div>
 
     <button class="primary" onclick="createGroup()">
         💾 Créer le groupe
@@ -1334,29 +1372,7 @@ label {
 
 <section id="gameScreen" class="screen">
 
-<div class="card game-main-card">
-
-    <div class="game-top-actions">
-
-        <button
-            class="game-icon-button"
-            onclick="shareCurrentGame()"
-            title="Partager">
-
-            📨
-
-        </button>
-
-        <button
-            class="game-icon-button"
-            onclick="showEditGame()"
-            title="Modifier les informations">
-
-            ⚙️
-
-        </button>
-
-    </div>
+<div class="card">
 
     <h2 id="gameTitle"></h2>
 
@@ -1368,6 +1384,14 @@ label {
 
     <button class="blue" onclick="startGameDirect()">
         🎮 Jouer la partie
+    </button>
+
+    <button class="share-button" onclick="shareCurrentGame()">
+        🔗 Partager
+    </button>
+
+    <button class="light" onclick="showEditGame()">
+        ⚙️ Modifier informations partie
     </button>
 
     <button class="secondary" onclick="showGames()">
@@ -2578,110 +2602,21 @@ function createGameCard(game, group = null) {
     div.className =
         "game-card clickable";
 
+    if (group) {
 
-    const gameGroup =
-        group ||
-        groups.find(function(g) {
-            return g.id === game.groupId;
-        });
-
-
-    if (gameGroup) {
-
-        div.classList.add(
-            "has-group"
+        div.style.setProperty(
+            "--group-color",
+            group.color
         );
 
         div.style.background =
             lightenColor(
-                gameGroup.color,
+                group.color,
                 0.88
             );
 
     }
 
-
-    div.onclick = function() {
-        openGame(game.id);
-    };
-
-
-    const passwordIcon =
-        game.password
-        ? " 🔒"
-        : "";
-
-
-    let groupHeader = "";
-
-
-    if (gameGroup) {
-
-        const groupTextColor =
-            isDarkColor(gameGroup.color)
-                ? "#ffffff"
-                : "#222222";
-
-
-        groupHeader = `
-
-            <div
-                class="game-group-header"
-                style="
-                    background:${gameGroup.color};
-                    color:${groupTextColor};
-                ">
-
-                <span>
-                    ${escapeHTML(gameGroup.name)}
-                </span>
-
-                <span>
-                    🎉
-                </span>
-
-            </div>
-
-        `;
-
-    }
-
-
-    div.innerHTML = `
-
-        ${groupHeader}
-
-        <div class="game-card-content">
-
-            <h3>
-                🎶 ${escapeHTML(game.name)}
-                ${passwordIcon}
-            </h3>
-
-            <div class="game-info">
-
-                <span class="creator-label">
-                    Créé par :
-                </span>
-
-                <span class="creator-name">
-                    ${escapeHTML(game.creator)}
-                </span>
-
-            </div>
-
-            <div class="game-info">
-                ${game.rounds.length} manche(s)
-            </div>
-
-        </div>
-
-    `;
-
-    return div;
-
-}
-
     div.onclick = function() {
         openGame(game.id);
     };
@@ -2724,8 +2659,7 @@ function createGameCard(game, group = null) {
 
 }
 
-
-/* ========================================================
+   /* ========================================================
    ÉCLAIRCIR COULEUR
    ======================================================== */
 
@@ -2776,43 +2710,7 @@ function lightenColor(hex, amount) {
 
 }
 
-   /* ========================================================
-   CONTRASTE TEXTE GROUPE
-   ======================================================== */
 
-function isDarkColor(hex) {
-
-    const color =
-        hex.replace("#", "");
-
-    const r =
-        parseInt(
-            color.substring(0, 2),
-            16
-        );
-
-    const g =
-        parseInt(
-            color.substring(2, 4),
-            16
-        );
-
-    const b =
-        parseInt(
-            color.substring(4, 6),
-            16
-        );
-
-    const brightness =
-        (r * 299 +
-         g * 587 +
-         b * 114) / 1000;
-
-    return brightness < 140;
-
-}
-
-   
 /* ========================================================
    GROUPES
    ======================================================== */
@@ -2824,8 +2722,16 @@ function showCreateGroup() {
     ).value = "";
 
     document.getElementById(
-        "groupColor"
-    ).value = "#ff0000";
+        "groupColorRed"
+    ).value = 0;
+
+    document.getElementById(
+        "groupColorGreen"
+    ).value = 0;
+
+    document.getElementById(
+        "groupColorBlue"
+    ).value = 0;
 
     updateGroupColorPreview();
 
@@ -2838,18 +2744,49 @@ function showCreateGroup() {
 
 function updateGroupColorPreview() {
 
-    const color =
-        document.getElementById(
-            "groupColor"
-        ).value;
+    const red =
+        Number(
+            document.getElementById(
+                "groupColorRed"
+            ).value
+        );
+
+    const green =
+        Number(
+            document.getElementById(
+                "groupColorGreen"
+            ).value
+        );
+
+    const blue =
+        Number(
+            document.getElementById(
+                "groupColorBlue"
+            ).value
+        );
 
     document.getElementById(
         "groupColorPreview"
     ).style.background =
-        color;
+        rgbToHex(
+            red,
+            green,
+            blue
+        );
 
 }
 
+
+function rgbToHex(r, g, b) {
+
+    return (
+        "#" +
+        r.toString(16).padStart(2, "0") +
+        g.toString(16).padStart(2, "0") +
+        b.toString(16).padStart(2, "0")
+    );
+
+}
 
 
 function createGroup() {
@@ -2870,10 +2807,26 @@ function createGroup() {
 
     }
 
-   const color =
-    document.getElementById(
-        "groupColor"
-    ).value;
+    const red =
+        Number(
+            document.getElementById(
+                "groupColorRed"
+            ).value
+        );
+
+    const green =
+        Number(
+            document.getElementById(
+                "groupColorGreen"
+            ).value
+        );
+
+    const blue =
+        Number(
+            document.getElementById(
+                "groupColorBlue"
+            ).value
+        );
 
     groups.push({
 
@@ -2885,8 +2838,12 @@ function createGroup() {
 
         name: name,
 
-color:
-    color
+        color:
+            rgbToHex(
+                red,
+                green,
+                blue
+            )
 
     });
 
