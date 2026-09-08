@@ -130,7 +130,7 @@ body.dark-mode .track.playing .volume-icon {
 }
 
 body.dark-mode .active-filter {
-    background: #444;
+    background: #666;
     color: #eee;
 }
 
@@ -554,8 +554,11 @@ label {
 }
 
 #filtersContainer {
-    display: flex;
     gap: 10px;
+}
+
+#filtersContainer.filters-visible {
+    display: flex;
 }
 
 #filtersContainer .filter-section {
@@ -589,7 +592,7 @@ label {
     display: flex;
     align-items: center;
     gap: 6px;
-    background: #ddd;
+    background: #eeeeee;
     border-radius: 20px;
     padding: 5px 8px 5px 10px;
     font-size: 12px;
@@ -605,12 +608,19 @@ label {
 }
 
 .reset-filters {
-    width: auto;
-    margin-top: 10px;
-    padding: 7px 10px;
-    font-size: 12px;
+    width: 28px;
+    height: 28px;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: #f0b4b4;
     color: #7a2222;
+    border-radius: 50%;
+    font-size: 18px;
+    font-weight: bold;
+    flex-shrink: 0;
 }
 
 
@@ -1393,16 +1403,6 @@ label {
         id="activeFilters"
         class="active-filters">
     </div>
-
-    <button
-        id="resetFiltersButton"
-        class="light reset-filters"
-        onclick="resetFilters()"
-        style="display:none;">
-
-        ✖ Réinitialiser les filtres
-
-    </button>
 
 </div>
 
@@ -2619,149 +2619,134 @@ function toggleGroupFilter(groupId) {
 function renderActiveFilters() {
 
     const container =
-        document.getElementById(
-            "activeFilters"
-        );
-
-    const resetButton =
-        document.getElementById(
-            "resetFiltersButton"
-        );
+        document.getElementById("activeFilters");
 
     container.innerHTML = "";
 
+    let hasFilters = false;
 
-    selectedCreators.forEach(
-        function(creator) {
 
-            const div =
-                document.createElement("div");
+    /* =========================
+       CRÉATEURS
+       ========================= */
 
-            div.className =
-                "active-filter";
+    selectedCreators.forEach(function(creator) {
 
-            const text =
-                document.createElement("span");
+        hasFilters = true;
 
-            text.textContent =
-                "👤 " + creator;
+        const chip =
+            document.createElement("div");
 
-            const button =
-                document.createElement("button");
+        chip.className =
+            "active-filter";
 
-            button.textContent =
-                "×";
+        chip.innerHTML =
+            "<span>👤 " +
+            escapeHTML(creator) +
+            "</span>" +
+            "<button type=\"button\" title=\"Supprimer ce filtre\">×</button>";
 
-            button.onclick =
-                function() {
+        chip.querySelector("button").onclick =
+            function() {
 
-                    selectedCreators =
-                        selectedCreators.filter(
-                            function(item) {
-                                return item !== creator;
-                            }
-                        );
+                selectedCreators =
+                    selectedCreators.filter(
+                        function(item) {
+                            return item !== creator;
+                        }
+                    );
 
-                    renderFilters();
-                    renderGames();
+                renderFilters();
+                renderGames();
 
-                };
+            };
 
-            div.appendChild(text);
-            div.appendChild(button);
+        container.appendChild(chip);
 
-            container.appendChild(div);
+    });
 
+
+    /* =========================
+       GROUPES
+       ========================= */
+
+    selectedGroups.forEach(function(groupId) {
+
+        const group =
+            groups.find(function(g) {
+                return g.id === groupId;
+            });
+
+        if (!group) {
+            return;
         }
-    );
+
+        hasFilters = true;
+
+        const chip =
+            document.createElement("div");
+
+        chip.className =
+            "active-filter";
+
+        chip.innerHTML =
+            "<span>🎉 " +
+            escapeHTML(group.name) +
+            "</span>" +
+            "<button type=\"button\" title=\"Supprimer ce filtre\">×</button>";
+
+        chip.querySelector("button").onclick =
+            function() {
+
+                selectedGroups =
+                    selectedGroups.filter(
+                        function(item) {
+                            return item !== groupId;
+                        }
+                    );
+
+                renderFilters();
+                renderGames();
+
+            };
+
+        container.appendChild(chip);
+
+    });
 
 
-    selectedGroups.forEach(
-        function(groupId) {
+    /* =========================
+       BOUTON RÉINITIALISER
+       ========================= */
 
-            const group =
-                groups.find(function(g) {
-                    return g.id === groupId;
-                });
+    if (hasFilters) {
 
-            if (!group) {
-                return;
-            }
+        const resetButton =
+            document.createElement("button");
 
-            const div =
-                document.createElement("div");
+        resetButton.type = "button";
 
-            div.className =
-                "active-filter";
+        resetButton.className =
+            "reset-filters";
 
-            const text =
-                document.createElement("span");
+        resetButton.textContent =
+            "×";
 
-            text.textContent =
-                "🎉 " + group.name;
+        resetButton.title =
+            "Réinitialiser les filtres";
 
-            const button =
-                document.createElement("button");
+        resetButton.onclick =
+            function() {
+                resetFilters();
+            };
 
-            button.textContent =
-                "×";
-
-            button.onclick =
-                function() {
-
-                    selectedGroups =
-                        selectedGroups.filter(
-                            function(item) {
-                                return item !== groupId;
-                            }
-                        );
-
-                    renderFilters();
-                    renderGames();
-
-                };
-
-            div.appendChild(text);
-            div.appendChild(button);
-
-            container.appendChild(div);
-
-        }
-    );
-
-
-    if (
-        selectedCreators.length > 0 ||
-        selectedGroups.length > 0
-    ) {
-
-        resetButton.style.display =
-            "inline-block";
-
-    } else {
-
-        resetButton.style.display =
-            "none";
+        container.appendChild(
+            resetButton
+        );
 
     }
 
 }
-
-
-function resetFilters() {
-
-    selectedCreators = [];
-    selectedGroups = [];
-
-    document.getElementById(
-        "gameSearch"
-    ).value = "";
-
-    renderFilters();
-    renderGames();
-
-}
-
 
 /* ========================================================
    FILTRER PARTIES
@@ -3068,17 +3053,21 @@ function createGameCard(game, group = null) {
             "has-group"
         );
 
+const lightGroupColor =
+    lightenColor(gameGroup.color, 0.88);
+
 div.style.background =
-    "linear-gradient(" +
-    "to top right, " +
-    lightenColor(gameGroup.color, 0.88) + " 0%, " +
-    lightenColor(gameGroup.color, 0.88) + " 65%, " +
+    "radial-gradient(" +
+    "circle at 100% 0%, " +
+    gameGroup.color + " 0%, " +
     "color-mix(in srgb, " +
     gameGroup.color +
-    " 55%, " +
-    lightenColor(gameGroup.color, 0.88) +
-    ") 82%, " +
-    gameGroup.color +
+    " 45%, " +
+    lightGroupColor +
+    ") 12%, " +
+    lightGroupColor +
+    " 35%, " +
+    lightGroupColor +
     " 100%" +
     ")";
        
