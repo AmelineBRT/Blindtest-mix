@@ -693,21 +693,39 @@ label {
 }
 
 
- .game-card.has-group-header.has-group::after {
+.game-card.has-group-header.has-group::after {
     content: "";
 
     position: absolute;
-    width: 120%;
-    height: 180%;
+    inset: 0;
 
-    left: 0;
-    bottom: -90%;
-
-    border-radius: 50%;
+    pointer-events: none;
 
     background: var(--group-gradient);
 
-    pointer-events: none;
+    /*
+     * On garde uniquement la partie
+     * située À L'EXTÉRIEUR de l'ellipse.
+     */
+    -webkit-mask:
+        radial-gradient(
+            ellipse 100% 120% at 0% 100%,
+            transparent 0%,
+            transparent 50%,
+            black 51%,
+            black 100%
+        );
+
+    mask:
+        radial-gradient(
+            ellipse 100% 120% at 0% 100%,
+            transparent 0%,
+            transparent 50%,
+            black 51%,
+            black 100%
+        );
+
+    z-index: 0;
 }
    
 /* Créateur */
@@ -3103,7 +3121,7 @@ function createGameCard(game, group = null) {
 
     div.style.setProperty(
         "--group-gradient",
-        "linear-gradient(" +
+        "radial-gradient(" +
         "to top right, " +
         "transparent 0%, " +
         gameGroup.color + " 100%" +
