@@ -313,24 +313,24 @@ button:disabled {
     z-index: 2;
 }
 
-   .independent-card::after {
+.independent-card::after {
     content: "";
 
     position: absolute;
-    inset: 0;
 
-    background:
-        linear-gradient(
-            to top right,
-            #e5e5e5 0%,
-            transparent 100%
-        );
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    border-radius: 50%;
+
+    background: var(--group-color);
 
     pointer-events: none;
 
-    z-index: 1;
+    z-index: 0;
 }
-
 /* =========================================================
    AUTRES
    ========================================================= */
@@ -3197,7 +3197,12 @@ if (!gameGroup) {
     );
 
     div.style.background =
-        "#d0d0d0";
+        "#e5e5e5";
+
+    div.style.setProperty(
+        "--group-color",
+        "#bdbdbd"
+    );
 
 }
 
