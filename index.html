@@ -306,6 +306,19 @@ button:disabled {
     width: 90%;
     height: 85%;
 
+    background: #e5e5e5;
+
+    border-radius: 0 12px 0 12px;
+
+    z-index: 0;
+}
+
+   .independent-card::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
     background:
         linear-gradient(
             to top right,
@@ -313,11 +326,10 @@ button:disabled {
             transparent 100%
         );
 
-    border-radius: 0 12px 0 12px;
+    pointer-events: none;
 
-    z-index: 0;
+    z-index: 1;
 }
-
 
 /* =========================================================
    AUTRES
