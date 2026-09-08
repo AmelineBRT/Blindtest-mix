@@ -698,30 +698,18 @@ label {
 
     position: absolute;
 
-    width: 200%;
-    height: 180%;
+    top: 0;
+    right: 0;
 
-    left: -100%;
-    bottom: -90%;
+    width: 55%;
+    height: 38%;
 
-    border-radius: 50%;
-
-    background: var(--light-group-color);
-
-    -webkit-mask:
+    background:
         radial-gradient(
-            ellipse at center,
-            black 0%,
-            black 94%,
-            transparent 100%
-        );
-
-    mask:
-        radial-gradient(
-            ellipse at center,
-            black 0%,
-            black 50%,
-            transparent 90%
+            ellipse at 100% 0%,
+            var(--group-color) 0%,
+            var(--group-color) 12%,
+            var(--light-group-color) 100%
         );
 
     pointer-events: none;
@@ -3109,21 +3097,26 @@ function createGameCard(game, group = null) {
      * Dégradé uniquement dans
      * "Voir les parties"
      */
-   if (showGroupHeader) {
+if (showGroupHeader) {
 
-   const lightGroupColor =
-    lightenColor(
-        gameGroup.color,
-        0.88
+    const lightGroupColor =
+        lightenColor(
+            gameGroup.color,
+            0.88
+        );
+
+    div.style.background =
+        lightGroupColor;
+
+    div.style.setProperty(
+        "--group-color",
+        gameGroup.color
     );
 
-div.style.background =
-    gameGroup.color;
-
-div.style.setProperty(
-    "--light-group-color",
-    lightGroupColor
-);
+    div.style.setProperty(
+        "--light-group-color",
+        lightGroupColor
+    );
 
 } else {
         /*
