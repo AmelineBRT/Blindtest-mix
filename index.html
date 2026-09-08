@@ -693,21 +693,22 @@ label {
 }
 
 
-   .game-card.has-group-header.has-group::after {
+ .game-card.has-group-header.has-group::after {
     content: "";
 
     position: absolute;
+    width: 120%;
+    height: 180%;
 
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 50%;
+    left: 0;
+    bottom: -90%;
+
+    border-radius: 50%;
 
     background: var(--group-gradient);
 
     pointer-events: none;
 }
-
    
 /* Créateur */
 
@@ -3089,29 +3090,27 @@ function createGameCard(game, group = null) {
      * Dégradé uniquement dans
      * "Voir les parties"
      */
-    if (showGroupHeader) {
+   if (showGroupHeader) {
 
-        const lightGroupColor =
-            lightenColor(
-                gameGroup.color,
-                0.88
-            );
+    const lightGroupColor =
+        lightenColor(
+            gameGroup.color,
+            0.88
+        );
 
-div.style.background =
-    lightGroupColor;
+    div.style.background =
+        lightGroupColor;
 
-div.style.setProperty(
-    "--group-gradient",
-    "radial-gradient(" +
-    "ellipse 120% 110% at 0% 100%, " +
-    lightGroupColor + " 0%, " +
-    gameGroup.color + " 100%" +
-    ")"
-);
+    div.style.setProperty(
+        "--group-gradient",
+        "linear-gradient(" +
+        "to top right, " +
+        "transparent 0%, " +
+        gameGroup.color + " 100%" +
+        ")"
+    );
 
-       
-    } else {
-
+} else {
         /*
          * Dans "Voir les groupes",
          * on garde la couleur claire
