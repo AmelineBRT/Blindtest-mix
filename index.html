@@ -96,7 +96,7 @@ body.dark-mode .light,
 body.dark-mode .show-tracks-button,
 body.dark-mode .duplicate-button,
 body.dark-mode .players-toggle,
-body.dark-mode .filter-option,
+body.dark-mode .filter-select,
 body.dark-mode .filter-toggle,
 body.dark-mode .view-toggle {
     background: #555;
@@ -553,24 +553,14 @@ label {
     margin-bottom: 6px;
 }
 
-.filter-options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-}
-
-.filter-option {
-    width: auto;
+.filter-select {
+    width: 100%;
     margin: 0;
-    padding: 6px 10px;
+    padding: 8px 10px;
     font-size: 13px;
     background: #e5e5e5;
     color: #444;
-}
-
-.filter-option.selected {
-    background: #09463E;
-    color: white;
+    border-radius: 8px;
 }
 
 .active-filters {
@@ -2390,6 +2380,10 @@ function renderFilters() {
 
     container.innerHTML = "";
 
+    /* =========================
+       CRÉATEURS
+       ========================= */
+
     const creators =
         [...new Set(
             games
@@ -2399,7 +2393,6 @@ function renderFilters() {
                 .filter(Boolean)
         )].sort();
 
-
     if (creators.length > 0) {
 
         const creatorSection =
@@ -2408,66 +2401,72 @@ function renderFilters() {
         creatorSection.className =
             "filter-section";
 
-        const title =
+        const creatorLabel =
             document.createElement("label");
 
-        title.className =
+        creatorLabel.className =
             "filter-title";
 
-        title.textContent =
-            "Filtrer par créateur";
+        creatorLabel.textContent =
+            "Créateur";
 
-        const options =
-            document.createElement("div");
+        const creatorSelect =
+            document.createElement("select");
 
-        options.className =
-            "filter-options";
+        creatorSelect.className =
+            "filter-select";
+
+        creatorSelect.innerHTML =
+            '<option value="">Tous les créateurs</option>';
 
         creators.forEach(function(creator) {
 
-            const button =
-                document.createElement("button");
+            const option =
+                document.createElement("option");
 
-            button.className =
-                "filter-option";
+            option.value = creator;
+            option.textContent = creator;
 
-            if (
-                selectedCreators.includes(
-                    creator
-                )
-            ) {
-
-                button.classList.add(
-                    "selected"
-                );
-
-            }
-
-            button.textContent =
-                creator;
-
-            button.onclick =
-                function() {
-
-                    toggleCreatorFilter(
-                        creator
-                    );
-
-                };
-
-            options.appendChild(button);
+            creatorSelect.appendChild(option);
 
         });
 
-        creatorSection.appendChild(title);
-        creatorSection.appendChild(options);
+        creatorSelect.value =
+            selectedCreators[0] || "";
+
+        creatorSelect.onchange =
+            function() {
+
+                selectedCreators = [];
+
+                if (this.value) {
+                    selectedCreators.push(
+                        this.value
+                    );
+                }
+
+                renderActiveFilters();
+                renderGames();
+
+            };
+
+        creatorSection.appendChild(
+            creatorLabel
+        );
+
+        creatorSection.appendChild(
+            creatorSelect
+        );
 
         container.appendChild(
             creatorSection
         );
-
     }
 
+
+    /* =========================
+       GROUPES
+       ========================= */
 
     if (groups.length > 0) {
 
@@ -2477,70 +2476,74 @@ function renderFilters() {
         groupSection.className =
             "filter-section";
 
-        const title =
+        const groupLabel =
             document.createElement("label");
 
-        title.className =
+        groupLabel.className =
             "filter-title";
 
-        title.textContent =
-            "Filtrer par groupe";
+        groupLabel.textContent =
+            "Groupe";
 
-        const options =
-            document.createElement("div");
+        const groupSelect =
+            document.createElement("select");
 
-        options.className =
-            "filter-options";
+        groupSelect.className =
+            "filter-select";
+
+        groupSelect.innerHTML =
+            '<option value="">Tous les groupes</option>';
 
         groups.forEach(function(group) {
 
-            const button =
-                document.createElement("button");
+            const option =
+                document.createElement("option");
 
-            button.className =
-                "filter-option";
+            option.value = group.id;
 
-            if (
-                selectedGroups.includes(
-                    group.id
-                )
-            ) {
-
-                button.classList.add(
-                    "selected"
-                );
-
-            }
-
-            button.textContent =
+            option.textContent =
                 "🎉 " + group.name;
 
-            button.onclick =
-                function() {
-
-                    toggleGroupFilter(
-                        group.id
-                    );
-
-                };
-
-            options.appendChild(button);
+            groupSelect.appendChild(
+                option
+            );
 
         });
 
-        groupSection.appendChild(title);
-        groupSection.appendChild(options);
+        groupSelect.value =
+            selectedGroups[0] || "";
+
+        groupSelect.onchange =
+            function() {
+
+                selectedGroups = [];
+
+                if (this.value) {
+                    selectedGroups.push(
+                        this.value
+                    );
+                }
+
+                renderActiveFilters();
+                renderGames();
+
+            };
+
+        groupSection.appendChild(
+            groupLabel
+        );
+
+        groupSection.appendChild(
+            groupSelect
+        );
 
         container.appendChild(
             groupSection
         );
-
     }
 
     renderActiveFilters();
-
 }
-
 
 function toggleCreatorFilter(creator) {
 
@@ -3048,13 +3051,13 @@ function createGameCard(game, group = null) {
             "has-group"
         );
 
-     div.style.background =
+div.style.background =
     "linear-gradient(" +
     "to top right, " +
     "transparent 0%, " +
     "color-mix(in srgb, " +
     gameGroup.color +
-    " 90%, transparent) 100%" +
+    " 55%, transparent) 100%" +
     "), " +
     lightenColor(gameGroup.color, 0.88);
        
