@@ -399,6 +399,7 @@ button:disabled {
 
 
 .game-screen-group-header {
+.game-screen-group-header {
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -410,6 +411,13 @@ button:disabled {
     font-weight: bold;
 
     min-height: 24px;
+
+    border-radius: 12px 12px 0 0;
+
+    position: relative;
+    z-index: 2;
+
+    margin-bottom: -5px;
 }
 
    
@@ -4108,14 +4116,14 @@ function showGame() {
                 : "#222222";
 
 
-        gameCard.style.background =
-            "linear-gradient(" +
-            "to bottom, " +
-            gameGroup.color + " 0%, " +
-            gameGroup.color + " 18%, " +
-            lightColor + " 42%, " +
-            lightColor + " 100%" +
-            ")";
+gameCard.style.background =
+    "linear-gradient(" +
+    "to bottom, " +
+    gameGroup.color + " 0%, " +
+    gameGroup.color + " 18%, " +
+    lightColor + " 42%, " +
+    lightColor + " 100%" +
+    ")";
 
 
         groupHeader.innerHTML = `
@@ -4161,8 +4169,16 @@ groupHeader.style.display =
     }
 
 
-    document.getElementById("gameTitle").textContent =
-        "🎶 " + game.name;
+   const gameTitleElement =
+    document.getElementById("gameTitle");
+
+gameTitleElement.textContent =
+    "🎶 " + game.name;
+
+gameTitleElement.style.color =
+    isDarkColor(gameGroup ? gameGroup.color : "")
+        ? "#ffffff"
+        : "";
 
 
     document.getElementById("gameCreatorDisplay").innerHTML = `
