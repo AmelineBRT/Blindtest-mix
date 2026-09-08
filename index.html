@@ -3079,18 +3079,16 @@ function createGameCard(game, group = null) {
                 0.88
             );
 
-       div.style.background =
+    div.style.background =
     "radial-gradient(" +
-    "ellipse 90% 65% at 115% -15%, " +
-    gameGroup.color + " 0%, " +
+    "ellipse 65% 50% at 100% 0%, " +
+    lightGroupColor + " 0%, " +
     "color-mix(in srgb, " +
     gameGroup.color +
-    " 55%, " +
+    " 45%, " +
     lightGroupColor +
-    ") 12%, " +
-    lightGroupColor +
-    " 38%, " +
-    lightGroupColor +
+    ") 55%, " +
+    gameGroup.color +
     " 100%" +
     ")";
 
