@@ -295,7 +295,7 @@ button:disabled {
 /* =========================================================
    DEGRADE CARTES PARTIES
    ========================================================= */
-.game-card.has-group-header:not(.has-group)::after {
+.game-card.independent-card::after {
     content: "";
 
     position: absolute;
@@ -3215,11 +3215,6 @@ if (!gameGroup) {
 
     div.style.background =
         "#e5e5e5";
-
-    div.style.setProperty(
-        "--group-color",
-        "#bdbdbd"
-    );
 
 }
 
