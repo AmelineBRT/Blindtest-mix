@@ -522,13 +522,42 @@ label {
     margin-top: 15px;
 }
 
-.filter-container label {
-    font-size: 14px;
-    color: #555;
+.search-filter-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .search-input {
-    margin-bottom: 8px;
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.filter-toggle {
+    width: 42px;
+    height: 42px;
+    margin: 0;
+    padding: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e5e5e5;
+    color: #444;
+    border-radius: 8px;
+}
+
+.filter-toggle svg {
+    width: 21px;
+    height: 21px;
+    fill: currentColor;
+}
+
+.filters-hidden {
+    display: none;
+}
+
+.filters-visible {
+    display: block;
 }
 
 .filter-section {
@@ -1340,7 +1369,9 @@ label {
         + 🎉 Nouveau groupe
     </button>
 
-    <div class="filter-container">
+<div class="filter-container">
+
+    <div class="search-filter-row">
 
         <input
             id="gameSearch"
@@ -1349,24 +1380,41 @@ label {
             placeholder="🔍 Rechercher..."
             oninput="renderGames()">
 
-        <div id="filtersContainer"></div>
-
-        <div
-            id="activeFilters"
-            class="active-filters">
-        </div>
-
         <button
-            id="resetFiltersButton"
-            class="light reset-filters"
-            onclick="resetFilters()"
-            style="display:none;">
+            id="filterToggleButton"
+            class="filter-toggle"
+            onclick="toggleFilters()"
+            title="Afficher les filtres">
 
-            ✖ Réinitialiser les filtres
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"></path>
+            </svg>
 
         </button>
 
     </div>
+
+    <div
+        id="filtersContainer"
+        class="filters-hidden">
+    </div>
+
+    <div
+        id="activeFilters"
+        class="active-filters">
+    </div>
+
+    <button
+        id="resetFiltersButton"
+        class="light reset-filters"
+        onclick="resetFilters()"
+        style="display:none;">
+
+        ✖ Réinitialiser les filtres
+
+    </button>
+
+</div>
 
 </div>
 
@@ -2324,6 +2372,32 @@ function toggleGamesView() {
    FILTRES
    ======================================================== */
 
+function toggleFilters() {
+
+    const container =
+        document.getElementById("filtersContainer");
+
+    const button =
+        document.getElementById("filterToggleButton");
+
+    if (container.classList.contains("filters-hidden")) {
+
+        container.classList.remove("filters-hidden");
+        container.classList.add("filters-visible");
+
+        button.title = "Masquer les filtres";
+
+    } else {
+
+        container.classList.remove("filters-visible");
+        container.classList.add("filters-hidden");
+
+        button.title = "Afficher les filtres";
+
+    }
+
+}
+   
 function renderFilters() {
 
     const container =
