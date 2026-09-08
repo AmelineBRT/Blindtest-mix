@@ -697,14 +697,19 @@ label {
     content: "";
 
     position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
 
-    background: var(--group-gradient);
+    width: 150%;
+    height: 180%;
+
+    left: -75%;
+    bottom: -90%;
+
+    border-radius: 50%;
+
+    background: var(--light-group-color);
 
     pointer-events: none;
+
     z-index: 0;
 }
    
@@ -3090,23 +3095,18 @@ function createGameCard(game, group = null) {
      */
    if (showGroupHeader) {
 
-    const lightGroupColor =
-        lightenColor(
-            gameGroup.color,
-            0.88
-        );
+   const lightGroupColor =
+    lightenColor(
+        gameGroup.color,
+        0.88
+    );
 
-    div.style.background =
-        lightGroupColor;
+div.style.background =
+    gameGroup.color;
 
 div.style.setProperty(
-    "--group-gradient",
-    "radial-gradient(" +
-    "ellipse 120% 110% at 0% 100%, " +
-    "transparent 0%, " +
-    "transparent 50%, " +
-    gameGroup.color + " 100%" +
-    ")"
+    "--light-group-color",
+    lightGroupColor
 );
 
 } else {
