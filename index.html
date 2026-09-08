@@ -699,14 +699,30 @@ label {
     position: absolute;
 
     width: 200%;
-    height: 210%;
+    height: 180%;
 
     left: -100%;
-    bottom: -105%;
+    bottom: -90%;
 
     border-radius: 50%;
 
     background: var(--light-group-color);
+
+    -webkit-mask:
+        radial-gradient(
+            ellipse at center,
+            black 0%,
+            black 72%,
+            transparent 100%
+        );
+
+    mask:
+        radial-gradient(
+            ellipse at center,
+            black 0%,
+            black 72%,
+            transparent 100%
+        );
 
     pointer-events: none;
 
