@@ -130,7 +130,7 @@ body.dark-mode .track.playing .volume-icon {
 }
 
 body.dark-mode .active-filter {
-    background: #666;
+    background: #707070;
     color: #eee;
 }
 
@@ -592,7 +592,7 @@ label {
     display: flex;
     align-items: center;
     gap: 6px;
-    background: #eeeeee;
+    background: #f5f5f5;
     border-radius: 20px;
     padding: 5px 8px 5px 10px;
     font-size: 12px;
@@ -608,21 +608,31 @@ label {
 }
 
 .reset-filters {
-    width: 28px;
-    height: 28px;
-    margin: 0;
-    padding: 0;
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px;
+    max-width: 30px;
+
+    margin: 0 0 0 2px !important;
+    padding: 0 !important;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     background: #f0b4b4;
     color: #7a2222;
-    border-radius: 50%;
+
+    border: none;
+    border-radius: 8px;
+
     font-size: 18px;
     font-weight: bold;
-    flex-shrink: 0;
-}
+    line-height: 1;
 
+    flex-shrink: 0;
+    cursor: pointer;
+}
 
 /* =========================================================
    VUE PARTIES / GROUPES
@@ -2735,10 +2745,7 @@ function renderActiveFilters() {
         resetButton.title =
             "Réinitialiser les filtres";
 
-        resetButton.onclick =
-            function() {
-                resetFilters();
-            };
+resetButton.onclick = resetFilters;
 
         container.appendChild(
             resetButton
@@ -2794,6 +2801,17 @@ function getFilteredGames() {
 
 }
 
+   function resetFilters() {
+
+    selectedCreators = [];
+    selectedGroups = [];
+
+    document.getElementById("gameSearch").value = "";
+
+    renderFilters();
+    renderGames();
+
+}
 
 /* ========================================================
    AFFICHER PARTIES / GROUPES
@@ -3047,49 +3065,56 @@ function createGameCard(game, group = null) {
         group === null;
 
 
-    if (gameGroup) {
+  if (gameGroup) {
 
-        div.classList.add(
-            "has-group"
-        );
+    div.classList.add(
+        "has-group"
+    );
 
-const lightGroupColor =
-    lightenColor(gameGroup.color, 0.88);
+    /*
+     * Dégradé uniquement dans
+     * "Voir les parties"
+     */
+    if (showGroupHeader) {
 
-div.style.background =
-    "radial-gradient(" +
-    "circle at 100% 0%, " +
-    gameGroup.color + " 0%, " +
-    "color-mix(in srgb, " +
-    gameGroup.color +
-    " 45%, " +
-    lightGroupColor +
-    ") 12%, " +
-    lightGroupColor +
-    " 35%, " +
-    lightGroupColor +
-    " 100%" +
-    ")";
-       
-        div.style.color =
-            "#222222";
-
-
-        if (showGroupHeader) {
-
-            div.classList.add(
-                "has-group-header"
+        const lightGroupColor =
+            lightenColor(
+                gameGroup.color,
+                0.88
             );
 
-            div.style.setProperty(
-                "--group-color",
-                gameGroup.color
-            );
+        div.style.background =
+            "radial-gradient(" +
+            "ellipse 85% 75% at 100% 0%, " +
+            gameGroup.color + " 0%, " +
+            "color-mix(in srgb, " +
+            gameGroup.color +
+            " 55%, " +
+            lightGroupColor +
+            ") 18%, " +
+            lightGroupColor +
+            " 55%, " +
+            lightGroupColor +
+            " 100%" +
+            ")";
 
-        }
+    } else {
+
+        /*
+         * Dans "Voir les groupes",
+         * on garde la couleur claire
+         * du groupe sans nouveau dégradé.
+         */
+        div.style.background =
+            lightenColor(
+                gameGroup.color,
+                0.88
+            );
 
     }
 
+    div.style.color =
+        "#222222";
 
     if (showGroupHeader) {
 
@@ -3097,7 +3122,14 @@ div.style.background =
             "has-group-header"
         );
 
+        div.style.setProperty(
+            "--group-color",
+            gameGroup.color
+        );
+
     }
+
+}
 if (!gameGroup) {
 
     div.style.background =
