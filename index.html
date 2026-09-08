@@ -296,6 +296,41 @@ button:disabled {
    DEGRADE CARTES PARTIES
    ========================================================= */
 
+.independent-card::before {
+    content: "";
+
+    position: absolute;
+    left: 0;
+    bottom: 0;
+
+    width: 90%;
+    height: 85%;
+
+    background: #e5e5e5;
+
+    border-radius: 12px;
+
+    z-index: 0;
+}
+
+.independent-card::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(
+            to top right,
+            #e5e5e5 0%,
+            transparent 70%
+        );
+
+    pointer-events: none;
+
+    z-index: 1;
+}
+   
 /* =========================================================
    AUTRES
    ========================================================= */
@@ -364,7 +399,7 @@ button:disabled {
 
 .game-card-content {
     position: relative;
-    z-index: 1;
+    z-index: 2;
 }
 
 
@@ -3157,12 +3192,12 @@ if (showGroupHeader) {
 }
 if (!gameGroup) {
 
+    div.classList.add(
+        "independent-card"
+    );
+
     div.style.background =
-        "linear-gradient(" +
-        "to top right, " +
-        "transparent 0%, " +
-        "rgba(150, 150, 150, 0.35) 100%" +
-        ")";
+        "#d0d0d0";
 
 }
 
