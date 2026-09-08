@@ -102,7 +102,12 @@ body.dark-mode .view-toggle {
     background: #555;
     color: #eee;
 }
-
+   
+body.dark-mode .reset-filters {
+    background: #704040;
+    color: #ffdede;
+}
+   
 body.dark-mode .quit-game {
     background: #555;
     color: #eee;
@@ -545,6 +550,16 @@ label {
 
 .filter-section {
     margin-top: 12px;
+    flex: 1;
+}
+
+#filtersContainer {
+    display: flex;
+    gap: 10px;
+}
+
+#filtersContainer .filter-section {
+    min-width: 0;
 }
 
 .filter-title {
@@ -594,6 +609,8 @@ label {
     margin-top: 10px;
     padding: 7px 10px;
     font-size: 12px;
+    background: #f0b4b4;
+    color: #7a2222;
 }
 
 
@@ -3054,15 +3071,16 @@ function createGameCard(game, group = null) {
 div.style.background =
     "linear-gradient(" +
     "to top right, " +
-    "transparent 0%, " +
+    lightenColor(gameGroup.color, 0.88) + " 0%, " +
+    lightenColor(gameGroup.color, 0.88) + " 65%, " +
     "color-mix(in srgb, " +
     gameGroup.color +
-    " 65%, transparent) 65%, " +
-    "color-mix(in srgb, " +
+    " 55%, " +
+    lightenColor(gameGroup.color, 0.88) +
+    ") 82%, " +
     gameGroup.color +
-    " 65%, transparent) 100%" +
-    "), " +
-    lightenColor(gameGroup.color, 0.88);
+    " 100%" +
+    ")";
        
         div.style.color =
             "#222222";
