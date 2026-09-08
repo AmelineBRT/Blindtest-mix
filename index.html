@@ -697,34 +697,14 @@ label {
     content: "";
 
     position: absolute;
-    inset: 0;
-
-    pointer-events: none;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
 
     background: var(--group-gradient);
 
-    /*
-     * On garde uniquement la partie
-     * située À L'EXTÉRIEUR de l'ellipse.
-     */
-    -webkit-mask:
-        radial-gradient(
-            ellipse 100% 120% at 0% 100%,
-            transparent 0%,
-            transparent 50%,
-            black 51%,
-            black 100%
-        );
-
-    mask:
-        radial-gradient(
-            ellipse 100% 120% at 0% 100%,
-            transparent 0%,
-            transparent 50%,
-            black 51%,
-            black 100%
-        );
-
+    pointer-events: none;
     z-index: 0;
 }
    
@@ -3119,14 +3099,15 @@ function createGameCard(game, group = null) {
     div.style.background =
         lightGroupColor;
 
-    div.style.setProperty(
-        "--group-gradient",
-        "radial-gradient(" +
-        "to top right, " +
-        "transparent 0%, " +
-        gameGroup.color + " 100%" +
-        ")"
-    );
+div.style.setProperty(
+    "--group-gradient",
+    "radial-gradient(" +
+    "ellipse 120% 110% at 0% 100%, " +
+    "transparent 0%, " +
+    "transparent 50%, " +
+    gameGroup.color + " 100%" +
+    ")"
+);
 
 } else {
         /*
