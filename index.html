@@ -706,7 +706,13 @@ label {
 
     border-radius: 50%;
 
-    background: var(--light-group-color);
+    background:
+    radial-gradient(
+        ellipse at center,
+        var(--light-group-color) 0%,
+        var(--light-group-color) 70%,
+        transparent 100%
+    );
 
     -webkit-mask:
         radial-gradient(
