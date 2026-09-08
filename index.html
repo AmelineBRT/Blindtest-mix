@@ -293,6 +293,50 @@ button:disabled {
 }
 
 /* =========================================================
+   DEGRADE CARTES PARTIES
+   ========================================================= */
+.independent-card::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    bottom: 0;
+
+    width: 92%;
+    height: 88%;
+
+    background: #e5e5e5;
+
+    border-radius: 12px;
+
+    z-index: 0;
+}
+
+.independent-card::after {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    background:
+        linear-gradient(
+            to top right,
+            rgba(229, 229, 229, 1) 0%,
+            rgba(229, 229, 229, 0) 70%
+        );
+
+    pointer-events: none;
+
+    z-index: 1;
+}
+
+   
+/* =========================================================
    AUTRES
    ========================================================= */
    
@@ -360,7 +404,7 @@ button:disabled {
 
 .game-card-content {
     position: relative;
-    z-index: 1;
+    z-index: 2;
 }
 
 
@@ -710,7 +754,7 @@ label {
         radial-gradient(
             ellipse at 20% 150%,
             var(--light-group-color) 0%,
-            var(--light-group-color) 40%,
+            var(--light-group-color) 55%,
             var(--group-color) 100%
         );
 
@@ -3153,13 +3197,9 @@ if (showGroupHeader) {
 }
 if (!gameGroup) {
 
-    div.style.background =
-        "linear-gradient(" +
-        "to top right, " +
-        "transparent 0%, " +
-        "rgba(150, 150, 150, 0.35) 100%" +
-        ")";
+    div.classList.add("independent-card");
 
+}
 }
 
 div.onclick = function() {
