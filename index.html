@@ -379,13 +379,12 @@ button:disabled {
     background:
         linear-gradient(
             to top right,
-            transparent 0%,
-            rgba(0, 0, 0, 0) 35%,
-            var(--group-color) 100%
+            rgba(0, 0, 0, 0) 0%,
+            color-mix(in srgb, var(--group-color) 0%, transparent) 35%,
+            color-mix(in srgb, var(--group-color) 85%, transparent) 100%
         );
 
     pointer-events: none;
-
     z-index: 0;
 }
    
