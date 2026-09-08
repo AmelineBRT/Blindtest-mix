@@ -97,6 +97,7 @@ body.dark-mode .show-tracks-button,
 body.dark-mode .duplicate-button,
 body.dark-mode .players-toggle,
 body.dark-mode .filter-option,
+body.dark-mode .filter-toggle,
 body.dark-mode .view-toggle {
     background: #555;
     color: #eee;
@@ -334,19 +335,15 @@ button:disabled {
     top: 0; 
     left: 0; 
     right: 0;  
-  
     display: flex; 
     justify-content: flex-end; 
     align-items: center; 
     gap: 6px;  
-  
     padding: 6px 10px;  
-  
     font-size: 12px; 
     font-weight: bold;  
-  
     color: #222;
-
+    background: transparent !important;
     z-index: 2;
 }
 
@@ -367,26 +364,7 @@ button:disabled {
 
 
 /* dégradé cartes parties */
-.game-card.has-group-header.has-group::after {
-    content: "";
 
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-
-    background:
-        linear-gradient(
-            to top right,
-            rgba(0, 0, 0, 0) 0%,
-            color-mix(in srgb, var(--group-color) 0%, transparent) 35%,
-            color-mix(in srgb, var(--group-color) 85%, transparent) 100%
-        );
-
-    pointer-events: none;
-    z-index: 0;
-}
    
 
 .group-screen-comment {
@@ -3065,12 +3043,16 @@ function createGameCard(game, group = null) {
             "has-group"
         );
 
-        div.style.background =
-            lightenColor(
-                gameGroup.color,
-                0.88
-            );
-
+     div.style.background =
+    "linear-gradient(" +
+    "to top right, " +
+    "transparent 0%, " +
+    "color-mix(in srgb, " +
+    gameGroup.color +
+    " 90%, transparent) 100%" +
+    "), " +
+    lightenColor(gameGroup.color, 0.88);
+       
         div.style.color =
             "#222222";
 
@@ -3098,7 +3080,16 @@ function createGameCard(game, group = null) {
         );
 
     }
+if (!gameGroup) {
 
+    div.style.background =
+        "linear-gradient(" +
+        "to top right, " +
+        "transparent 0%, " +
+        "rgba(150, 150, 150, 0.35) 100%" +
+        ")";
+
+}
 
 div.onclick = function() {
 
@@ -3129,13 +3120,12 @@ div.onclick = function() {
         : gameGroup
         ? `
 
-            <div
-                class="game-group-header"
-                style="
-                    background:${gameGroup.color};
-                    color:${groupTextColor} !important;
-                "
-            >
+   <div
+       class="game-group-header"
+       style="
+           color:${groupTextColor} !important;
+       "
+   >
 
                 <span>
                     ${escapeHTML(gameGroup.name)}
@@ -3522,9 +3512,6 @@ if (verification !== "SUPPRIMER") {
     return;
 }
 
-    if (!confirmation) {
-        return;
-    }
 
     games.forEach(function(game) {
 
