@@ -2940,7 +2940,7 @@ div.onclick =
             group.color
         );
 
-div.style.background =
+
     "linear-gradient(" +
     "to bottom, " +
     group.color + " 0%, " +
@@ -3079,15 +3079,16 @@ function createGameCard(game, group = null) {
                 0.88
             );
 
-    div.style.background =
+   div.style.background =
     "radial-gradient(" +
     "ellipse 120% 90% at 0% 100%, " +
     lightGroupColor + " 0%, " +
+    lightGroupColor + " 45%, " +
     "color-mix(in srgb, " +
     gameGroup.color +
-    " 45%, " +
+    " 50%, " +
     lightGroupColor +
-    ") 70%, " +
+    ") 75%, " +
     gameGroup.color +
     " 100%" +
     ")";
