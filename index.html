@@ -379,7 +379,7 @@ button:disabled {
 
     background:
         linear-gradient(
-            to right,
+            to bottom left,
             transparent 0%,
             rgba(0, 0, 0, 0) 10%,
             var(--group-color) 100%
@@ -2866,8 +2866,12 @@ div.onclick =
             group.color
         );
 
-        div.style.background =
-                group.color;
+div.style.background =
+    "linear-gradient(" +
+    "to bottom, " +
+    group.color + " 0%, " +
+    lightenColor(group.color, 0.88) + " 100%" +
+    ")";
        
 const groupTextColor =
     isDarkColor(group.color)
