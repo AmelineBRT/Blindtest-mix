@@ -693,6 +693,22 @@ label {
 }
 
 
+   .game-card.has-group-header.has-group::after {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 50%;
+
+    background: var(--group-gradient);
+
+    pointer-events: none;
+}
+
+   
 /* Créateur */
 
 .creator-label {
@@ -705,6 +721,7 @@ label {
     color: #555;
 }
 
+   
 
 /* =========================================================
    GROUPES
@@ -3081,12 +3098,16 @@ function createGameCard(game, group = null) {
             );
 
 div.style.background =
+    lightGroupColor;
+
+div.style.setProperty(
+    "--group-gradient",
     "radial-gradient(" +
     "ellipse 120% 110% at 0% 100%, " +
     lightGroupColor + " 0%, " +
-       lightGroupColor + " 50%, " +
     gameGroup.color + " 100%" +
-    ")";
+    ")"
+);
 
        
     } else {
