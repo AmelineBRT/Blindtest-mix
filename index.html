@@ -374,14 +374,13 @@ button:disabled {
     top: 0;
     right: 0;
     bottom: 0;
-
-    width: 45px;
+    left: 0;
 
     background:
         linear-gradient(
             to bottom left,
             transparent 0%,
-            rgba(0, 0, 0, 0) 10%,
+            rgba(0, 0, 0, 0) 35%,
             var(--group-color) 100%
         );
 
@@ -3426,14 +3425,29 @@ function deleteCurrentGroup() {
         return;
     }
 
-    const confirmation =
-        confirm(
-            '⚠️ Voulez-vous vraiment supprimer le groupe "' +
-            group.name +
-            '" ?\n\n' +
-            'Les parties du groupe ne seront pas supprimées. ' +
-            'Elles deviendront simplement indépendantes.'
-        );
+const confirmation =
+    confirm(
+        '⚠️ Voulez-vous vraiment supprimer le groupe "' +
+        group.name +
+        '" ?\n\n' +
+        'Les parties du groupe ne seront pas supprimées. ' +
+        'Elles deviendront simplement indépendantes.\n\n' +
+        'Une seconde confirmation sera demandée.'
+    );
+
+if (!confirmation) {
+    return;
+}
+
+const verification =
+    prompt(
+        'Pour confirmer la suppression du groupe, écris exactement : SUPPRIMER'
+    );
+
+if (verification !== "SUPPRIMER") {
+    alert("Suppression annulée.");
+    return;
+}
 
     if (!confirmation) {
         return;
