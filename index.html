@@ -1544,10 +1544,25 @@ label {
 
     </div>
 
+<button
+    id="sortToggleButton"
+    class="filter-toggle"
+    onclick="toggleSort()"
+    title="Afficher le tri">
+
+    ↕️
+
+</button>
+   
     <div
         id="filtersContainer"
         class="filters-hidden">
     </div>
+
+   <div
+    id="sortContainer"
+    class="filters-hidden">
+</div>
 
     <div
         id="activeFilters"
@@ -2454,8 +2469,10 @@ function showGames() {
     showScreen("gamesScreen");
 
     renderFilters();
+      renderSort();
 
     renderGames();
+      renderSort();
 
 }
 
@@ -2504,6 +2521,7 @@ function toggleGamesView() {
     }
 
     renderGames();
+   renderSort();
 
 }
 
@@ -2535,6 +2553,134 @@ function toggleFilters() {
         button.title = "Afficher les filtres";
 
     }
+
+}
+
+   function toggleSort() {
+
+    const container =
+        document.getElementById("sortContainer");
+
+    const button =
+        document.getElementById("sortToggleButton");
+
+    if (container.classList.contains("filters-hidden")) {
+
+        container.classList.remove("filters-hidden");
+        container.classList.add("filters-visible");
+
+        button.title =
+            "Masquer le tri";
+
+        renderSort();
+
+    } else {
+
+        container.classList.remove("filters-visible");
+        container.classList.add("filters-hidden");
+
+        button.title =
+            "Afficher le tri";
+
+    }
+
+}
+
+   function renderSort() {
+
+    const container =
+        document.getElementById("sortContainer");
+
+    container.innerHTML = "";
+
+    const section =
+        document.createElement("div");
+
+    section.className =
+        "filter-section";
+
+    const label =
+        document.createElement("label");
+
+    label.className =
+        "filter-title";
+
+    label.textContent =
+        "Trier par";
+
+    const select =
+        document.createElement("select");
+
+    select.className =
+        "filter-select";
+
+    if (gamesView === "games") {
+
+        select.innerHTML = `
+            <option value="creation">
+                Ordre de création
+            </option>
+
+            <option value="creation-reverse">
+                Plus récentes d'abord
+            </option>
+
+            <option value="alphabetical">
+                Ordre alphabétique (A → Z)
+            </option>
+
+            <option value="alphabetical-reverse">
+                Ordre alphabétique (Z → A)
+            </option>
+
+            <option value="creator">
+                Par créateur
+            </option>
+
+            <option value="group">
+                Par groupe
+            </option>
+        `;
+
+    } else {
+
+        select.innerHTML = `
+            <option value="creation">
+                Ordre de création
+            </option>
+
+            <option value="creation-reverse">
+                Plus récents d'abord
+            </option>
+
+            <option value="alphabetical">
+                Ordre alphabétique (A → Z)
+            </option>
+
+            <option value="alphabetical-reverse">
+                Ordre alphabétique (Z → A)
+            </option>
+        `;
+
+    }
+
+    select.value =
+        sortMode;
+
+    select.onchange =
+        function() {
+
+            sortMode =
+                this.value;
+
+            renderGames();
+
+        };
+
+    section.appendChild(label);
+    section.appendChild(select);
+
+    container.appendChild(section);
 
 }
    
@@ -2612,107 +2758,7 @@ function renderFilters() {
                     );
                 }
 
-                  /* =========================
-   TRI
-   ========================= */
-
-const sortSection =
-    document.createElement("div");
-
-sortSection.className =
-    "filter-section";
-
-const sortLabel =
-    document.createElement("label");
-
-sortLabel.className =
-    "filter-title";
-
-sortLabel.textContent =
-    "Trier par";
-
-const sortSelect =
-    document.createElement("select");
-
-sortSelect.className =
-    "filter-select";
-
-if (gamesView === "games") {
-
-    sortSelect.innerHTML = `
-        <option value="creation">
-            Ordre de création
-        </option>
-
-        <option value="creation-reverse">
-            Plus récentes d'abord
-        </option>
-
-        <option value="alphabetical">
-            Ordre alphabétique (A → Z)
-        </option>
-
-        <option value="alphabetical-reverse">
-            Ordre alphabétique (Z → A)
-        </option>
-
-        <option value="creator">
-            Par créateur
-        </option>
-
-        <option value="group">
-            Par groupe
-        </option>
-    `;
-
-} else {
-
-    sortSelect.innerHTML = `
-        <option value="creation">
-            Ordre de création
-        </option>
-
-        <option value="creation-reverse">
-            Plus récents d'abord
-        </option>
-
-        <option value="alphabetical">
-            Ordre alphabétique (A → Z)
-        </option>
-
-        <option value="alphabetical-reverse">
-            Ordre alphabétique (Z → A)
-        </option>
-    `;
-
-}
-
-sortSelect.value =
-    sortMode;
-
-sortSelect.onchange =
-    function() {
-
-        sortMode =
-            this.value;
-
-        renderGames();
-
-    };
-
-sortSection.appendChild(
-    sortLabel
-);
-
-sortSection.appendChild(
-    sortSelect
-);
-
-container.appendChild(
-    sortSection
-);
-
-               
+              
                 renderActiveFilters();
                 renderGames();
 
