@@ -704,11 +704,7 @@ label {
     left: 0;
     bottom: 0;
 
-    background: linear-gradient(
-    to right,
-    var(--light-group-color) 0%,
-    var(--group-color) 100%
-);
+    background: var(--light-group-color);
 
     border-radius: 0 50px 0 0;
 
@@ -3134,9 +3130,13 @@ if (showGroupHeader) {
             gameGroup.color,
             0.88
         );
-
-    div.style.background =
-        gameGroup.color;
+   
+div.style.background =
+    "linear-gradient(" +
+    "to right, " +
+    lightGroupColor + " 0%, " +
+    gameGroup.color + " 100%" +
+    ")";
 
     div.style.setProperty(
         "--group-color",
