@@ -380,7 +380,7 @@ button:disabled {
 
 .game-main-card .game-top-actions {
     position: absolute;
-    top: 35px;
+    top: 25px;
     right: 10px;
     z-index: 2;
 }
@@ -772,6 +772,13 @@ label {
     margin-bottom: 8px;
 }
 
+   #gameTitle {
+    margin-bottom: 4px;
+}
+
+#gameCreatorDisplay {
+    margin-top: 0;
+}
 
 .game-card.has-group-header.has-group::before,
 .game-card.independent-card::before {
@@ -1797,9 +1804,7 @@ label {
             <h2 id="gameTitle"></h2>
 
             <p id="gameCreatorDisplay"></p>
-#gameCreatorDisplay {
-    margin-top: 2px;
-}
+
             <button
                 class="primary"
                 onclick="showCreateRound()">
