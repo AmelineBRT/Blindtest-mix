@@ -3627,16 +3627,31 @@ function renderGroupsView(container) {
                     group.id
                 );
 
-            const matchesSearch =
-                !search ||
-                group.name
-                    .toLowerCase()
-                    .includes(search);
+const matchesSearch =
+    !search ||
+    group.name
+        .toLowerCase()
+        .includes(search) ||
+    games.some(function(game) {
 
-            return (
-                matchesGroup &&
-                matchesSearch
-            );
+        return (
+            game.groupId === group.id &&
+            (
+                game.name
+                    .toLowerCase()
+                    .includes(search) ||
+                game.creator
+                    .toLowerCase()
+                    .includes(search)
+            )
+        );
+
+    });
+
+return (
+    matchesGroup &&
+    matchesSearch
+);
 
         });
 
