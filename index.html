@@ -5684,9 +5684,52 @@ if (alreadyExists) {
 
 item.participants.push(name);
 
+
+/*
+ * Si on ajoute une personne à un groupe,
+ * on l'ajoute automatiquement à toutes
+ * les parties de ce groupe.
+ */
+if (type === "group") {
+
+    games.forEach(function(game) {
+
+        if (game.groupId !== item.id) {
+            return;
+        }
+
+        if (!Array.isArray(game.participants)) {
+            game.participants = [];
+        }
+
+        const alreadyInGame =
+            game.participants.some(
+                function(participant) {
+
+                    return participant.toLowerCase() ===
+                           name.toLowerCase();
+
+                }
+            );
+
+        if (!alreadyInGame) {
+
+            game.participants.push(name);
+
+        }
+
+    });
+
+}
+
+
 saveData();
 
 renderParticipants(type);
+
+document.getElementById(
+    type + "ParticipantInput"
+).focus();
 
 document.getElementById(
     type + "ParticipantInput"
@@ -5731,7 +5774,7 @@ function toggleParticipantDelete(type, index) {
 
 }
    
-   function removeParticipant(type, index) {
+ function removeParticipant(type, index) {
 
     const item =
         type === "game"
@@ -5744,16 +5787,82 @@ function toggleParticipantDelete(type, index) {
         return;
     }
 
+    const participant =
+        item.participants[index];
+
+    /*
+     * Le créateur d'une partie
+     * ne peut jamais être supprimé.
+     */
+    if (
+        type === "game" &&
+        participant &&
+        item.creator &&
+        participant.toLowerCase() ===
+        item.creator.toLowerCase()
+    ) {
+
+        return;
+
+    }
+
     item.participants.splice(
         index,
         1
     );
+
+
+    /*
+     * Si on retire une personne d'un groupe,
+     * on la retire aussi de toutes ses parties.
+     */
+    if (type === "group") {
+
+        games.forEach(function(game) {
+
+            if (game.groupId !== item.id) {
+                return;
+            }
+
+            if (!Array.isArray(game.participants)) {
+                game.participants = [];
+            }
+
+            game.participants =
+                game.participants.filter(
+                    function(name) {
+
+                        /*
+                         * On conserve le créateur
+                         * de chaque partie.
+                         */
+                        if (
+                            game.creator &&
+                            name.toLowerCase() ===
+                            game.creator.toLowerCase()
+                        ) {
+
+                            return true;
+
+                        }
+
+                        return name.toLowerCase() !==
+                               participant.toLowerCase();
+
+                    }
+                );
+
+        });
+
+    }
+
 
     saveData();
 
     renderParticipants(type);
 
 }
+
    
 /* ========================================================
    MODIFIER UNE PARTIE
@@ -5861,12 +5970,88 @@ function saveGameChanges() {
 
     }
 
-    game.name = name;
-    game.creator = creator;
-    game.groupId = groupId;
-    game.password = password;
-    game.email =
-        password ? email : "";
+game.name = name;
+game.creator = creator;
+
+const oldGroupId =
+    game.groupId;
+
+game.groupId =
+    groupId;
+
+game.password =
+    password;
+
+game.email =
+    password ? email : "";
+
+
+/*
+ * Le créateur doit toujours être présent.
+ */
+if (!Array.isArray(game.participants)) {
+    game.participants = [];
+}
+
+if (
+    game.creator &&
+    !game.participants.some(function(participant) {
+
+        return participant.toLowerCase() ===
+               game.creator.toLowerCase();
+
+    })
+) {
+
+    game.participants.unshift(
+        game.creator
+    );
+
+}
+
+
+/*
+ * Si la partie rejoint un groupe,
+ * récupérer automatiquement les personnes
+ * déjà présentes dans ce groupe.
+ */
+if (groupId) {
+
+    const newGroup =
+        groups.find(function(group) {
+            return group.id === groupId;
+        });
+
+    if (
+        newGroup &&
+        Array.isArray(newGroup.participants)
+    ) {
+
+        newGroup.participants.forEach(
+            function(name) {
+
+                const alreadyInGame =
+                    game.participants.some(
+                        function(participant) {
+
+                            return participant.toLowerCase() ===
+                                   name.toLowerCase();
+
+                        }
+                    );
+
+                if (!alreadyInGame) {
+
+                    game.participants.push(name);
+
+                }
+
+            }
+        );
+
+    }
+
+}
 
     saveData();
 
