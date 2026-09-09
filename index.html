@@ -3859,6 +3859,13 @@ function updateGroupSelect(
     ).textContent =
         "🎉 " + group.name;
 
+document.getElementById(
+    "groupScreenTitle"
+).style.color =
+    isDarkColor(group.color)
+        ? "#ffffff"
+        : "#222222";
+      
     const commentElement =
         document.getElementById(
             "groupScreenComment"
