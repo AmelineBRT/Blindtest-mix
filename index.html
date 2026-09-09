@@ -353,9 +353,13 @@ button:disabled {
     z-index: 1;
 }
 
-.game-main-card .game-card-content,
-.game-main-card .game-top-actions {
+.game-main-card .game-card-content {
     position: relative;
+    z-index: 2;
+}
+
+.game-main-card .game-top-actions {
+    position: absolute;
     z-index: 2;
 }
    
@@ -451,7 +455,7 @@ button:disabled {
     border-radius: 12px 12px 0 0;
     position: relative;
     z-index: 2;
-    margin-bottom: -15px;
+    margin-bottom: -24px;
 }
 
    
