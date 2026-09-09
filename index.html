@@ -693,9 +693,34 @@ label {
     margin-bottom: 8px;
 }
 
-
 .game-card.has-group-header.has-group::after {
+    content: "";
 
+    position: absolute;
+
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    background:
+        radial-gradient(
+            ellipse 180% 140% at 0% 100%,
+            var(--light-group-color) 0%,
+            var(--light-group-color) 65%,
+            color-mix(
+                in srgb,
+                var(--group-color) 40%,
+                var(--light-group-color)
+            ) 90%,
+            var(--group-color) 100%
+        );
+
+    pointer-events: none;
+
+    z-index: 0;
+}
+   
 .game-card.has-group-header:not(.has-group)::after {
     content: "";
 
