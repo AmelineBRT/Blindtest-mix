@@ -418,7 +418,82 @@ button:disabled {
 }
 
 
+.participants-panel {
+    display: none;
 
+    margin-top: 12px;
+    padding: 10px;
+
+    background: rgba(255,255,255,0.65);
+
+    border-radius: 8px;
+
+    font-size: 13px;
+}
+
+.participants-panel.visible {
+    display: block;
+}
+
+.participants-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.participant-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 8px;
+}
+
+.participant-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+
+    padding: 5px 7px;
+
+    background: rgba(255,255,255,0.65);
+
+    border-radius: 6px;
+}
+
+.participant-remove {
+    width: auto;
+    margin: 0;
+    padding: 1px 5px;
+
+    background: transparent;
+    color: #777;
+
+    font-size: 16px;
+}
+
+.participant-add {
+    display: flex;
+    gap: 5px;
+}
+
+.participant-add input {
+    flex: 1;
+    margin: 0;
+    min-width: 0;
+    padding: 7px 8px;
+    font-size: 13px;
+}
+
+.participant-add button {
+    width: auto;
+    margin: 0;
+    padding: 7px 10px;
+
+    background: #09463E;
+    color: white;
+
+    font-size: 13px;
+}
 
 .game-card {
     position: relative;
@@ -1952,6 +2027,13 @@ label {
 
         <div class="game-top-actions">
 
+<button
+    class="game-icon-button"
+    onclick="toggleParticipants('game')"
+    title="Afficher les participants">
+    👥
+</button>
+           
             <button
                 class="game-icon-button"
                 onclick="shareCurrentGame()"
@@ -1974,6 +2056,11 @@ label {
 
             <p id="gameCreatorDisplay"></p>
 
+<div
+    id="gameParticipantsPanel"
+    class="participants-panel">
+</div>
+           
             <button
                 class="primary"
                 onclick="showCreateRound()">
@@ -2010,6 +2097,13 @@ label {
 
         <div class="game-top-actions">
 
+<button
+    class="game-icon-button"
+    onclick="toggleParticipants('group')"
+    title="Afficher les participants">
+    👥
+</button>
+           
             <button
                 class="game-icon-button"
                 onclick="shareCurrentGroup()"
@@ -2032,6 +2126,11 @@ label {
             id="groupScreenComment"
             class="group-screen-comment">
         </div>
+
+       <div
+    id="groupParticipantsPanel"
+    class="participants-panel">
+</div>
 
         <button
             class="primary"
@@ -2520,6 +2619,10 @@ function loadData() {
                 game.groupId = "";
             }
 
+if (!Array.isArray(game.participants)) {
+    game.participants = [];
+}
+           
             game.rounds.forEach(function(round) {
 
                 if (!round.tracks) {
@@ -2542,6 +2645,10 @@ if (savedGroups) {
             group.comment = "";
         }
 
+if (!Array.isArray(group.participants)) {
+    group.participants = [];
+}
+       
     });
 
 }
@@ -5333,7 +5440,193 @@ gameTitleElement.style.color =
 
 }
 
+function toggleParticipants(type) {
 
+    const panel =
+        document.getElementById(
+            type === "game"
+                ? "gameParticipantsPanel"
+                : "groupParticipantsPanel"
+        );
+
+    if (!panel) {
+        return;
+    }
+
+    if (panel.classList.contains("visible")) {
+
+        panel.classList.remove("visible");
+
+    } else {
+
+        renderParticipants(type);
+
+        panel.classList.add("visible");
+
+    }
+
+}
+
+   function renderParticipants(type) {
+
+    const panel =
+        document.getElementById(
+            type === "game"
+                ? "gameParticipantsPanel"
+                : "groupParticipantsPanel"
+        );
+
+    if (!panel) {
+        return;
+    }
+
+    const item =
+        type === "game"
+            ? getCurrentGame()
+            : groups.find(function(group) {
+                return group.id === currentGroupId;
+            });
+
+    if (!item) {
+        return;
+    }
+
+    if (!Array.isArray(item.participants)) {
+        item.participants = [];
+    }
+
+    let html = `
+        <div class="participants-title">
+            👥 Participants
+        </div>
+
+        <div class="participant-list">
+    `;
+
+    if (item.participants.length === 0) {
+
+        html += `
+            <div class="password-help">
+                Aucun participant pour le moment.
+            </div>
+        `;
+
+    } else {
+
+        item.participants.forEach(function(name, index) {
+
+            html += `
+                <div class="participant-item">
+
+                    <span>
+                        ${escapeHTML(name)}
+                    </span>
+
+                    <button
+                        type="button"
+                        class="participant-remove"
+                        onclick="removeParticipant('${type}', ${index})"
+                        title="Supprimer">
+                        ×
+                    </button>
+
+                </div>
+            `;
+
+        });
+
+    }
+
+    html += `
+        </div>
+
+        <div class="participant-add">
+
+            <input
+                id="${type}ParticipantInput"
+                type="text"
+                placeholder="Nom du participant">
+
+            <button
+                type="button"
+                onclick="addParticipant('${type}')">
+
+                ＋ Ajouter
+
+            </button>
+
+        </div>
+    `;
+
+    panel.innerHTML = html;
+
+}
+
+   function addParticipant(type) {
+
+    const item =
+        type === "game"
+            ? getCurrentGame()
+            : groups.find(function(group) {
+                return group.id === currentGroupId;
+            });
+
+    if (!item) {
+        return;
+    }
+
+    const input =
+        document.getElementById(
+            type + "ParticipantInput"
+        );
+
+    const name =
+        input.value.trim();
+
+    if (!name) {
+        return;
+    }
+
+    if (!Array.isArray(item.participants)) {
+        item.participants = [];
+    }
+
+    item.participants.push(name);
+
+    saveData();
+
+    renderParticipants(type);
+
+    document.getElementById(
+        type + "ParticipantInput"
+    ).focus();
+
+}
+
+   function removeParticipant(type, index) {
+
+    const item =
+        type === "game"
+            ? getCurrentGame()
+            : groups.find(function(group) {
+                return group.id === currentGroupId;
+            });
+
+    if (!item || !Array.isArray(item.participants)) {
+        return;
+    }
+
+    item.participants.splice(
+        index,
+        1
+    );
+
+    saveData();
+
+    renderParticipants(type);
+
+}
+   
 /* ========================================================
    MODIFIER UNE PARTIE
    ======================================================== */
