@@ -607,6 +607,7 @@ label {
     display: flex;
     gap: 8px;
     align-items: flex-start;
+    margin-top: 8px;
 }
 
 .multi-filter-wrapper {
@@ -3135,6 +3136,32 @@ function toggleMultiFilterMenu(menuId) {
 
 }
 
+document.addEventListener(
+    "click",
+    function(event) {
+
+        if (
+            !event.target.closest(
+                ".multi-filter-wrapper"
+            )
+        ) {
+
+            document
+                .querySelectorAll(
+                    ".multi-filter-menu"
+                )
+                .forEach(function(menu) {
+
+                    menu.classList.remove(
+                        "visible"
+                    );
+
+                });
+
+        }
+
+    }
+);
    
 function toggleCreatorFilter(creator) {
 
@@ -3662,24 +3689,15 @@ let filteredGroups =
    
     filteredGroups.forEach(function(group) {
 
-        const groupGames =
-            games.filter(function(game) {
-
-                const matchesGroup =
-                    game.groupId === group.id;
-
-                const matchesCreator =
-                    selectedCreators.length === 0 ||
-                    selectedCreators.includes(
-                        game.creator
-                    );
-
-                return (
-                    matchesGroup &&
-                    matchesCreator
-                );
-
-            });
+      if (
+    (
+        selectedCreators.length > 0 ||
+        selectedGroups.length > 0
+    ) &&
+    groupGames.length === 0
+) {
+    return;
+}
 
 const div =
     document.createElement("div");
