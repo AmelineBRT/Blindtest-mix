@@ -619,6 +619,37 @@ label {
     fill: currentColor;
 }
 
+.sort-container {
+    display: none;
+
+    margin-top: 8px;
+    margin-left: auto;
+
+    width: 220px;
+
+    background: white;
+
+    padding: 8px;
+
+    border-radius: 8px;
+
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+
+    z-index: 20;
+}
+
+.sort-container.visible {
+    display: block;
+}
+
+.sort-container .filter-section {
+    margin-top: 0;
+}
+
+.sort-container .filter-select {
+    margin: 0;
+}
+   
 .filters-hidden {
     display: none;
 }
@@ -1556,6 +1587,10 @@ label {
 
 </div>
 
+   <div
+    id="sortContainer"
+    class="sort-container">
+</div>
    
     <div
         id="filtersContainer"
@@ -2468,8 +2503,6 @@ function showGames() {
     showScreen("gamesScreen");
 
     renderFilters();
-      renderSort();
-
     renderGames();
 
 }
@@ -2519,7 +2552,6 @@ function toggleGamesView() {
     }
 
     renderGames();
-   renderSort();
 
 }
 
@@ -2554,28 +2586,41 @@ function toggleFilters() {
 
 }
 
+   function toggleSort() {
 
-   function renderSort() {
+    const container =
+        document.getElementById("sortContainer");
+
+    const button =
+        document.getElementById("sortToggleButton");
+
+    if (container.classList.contains("visible")) {
+
+        container.classList.remove("visible");
+
+        button.title =
+            "Afficher le tri";
+
+    } else {
+
+        renderSort();
+
+        container.classList.add("visible");
+
+        button.title =
+            "Masquer le tri";
+
+    }
+
+}
+
+
+ function renderSort() {
 
     const container =
         document.getElementById("sortContainer");
 
     container.innerHTML = "";
-
-    const section =
-        document.createElement("div");
-
-    section.className =
-        "filter-section";
-
-    const label =
-        document.createElement("label");
-
-    label.className =
-        "filter-title";
-
-    label.textContent =
-        "Trier par";
 
     const select =
         document.createElement("select");
@@ -2646,12 +2691,10 @@ function toggleFilters() {
 
         };
 
-    section.appendChild(label);
-    section.appendChild(select);
-
-    container.appendChild(section);
+    container.appendChild(select);
 
 }
+
    
 function renderFilters() {
 
