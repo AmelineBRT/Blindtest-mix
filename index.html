@@ -694,27 +694,7 @@ label {
     margin-bottom: 8px;
 }
 
-.game-card.has-group-header.has-group::after {
-    content: "";
-
-    position: absolute;
-
-    width: 155%;
-    height: 130%;
-
-    left: -60%;
-    top: 13%;
-
-    background: var(--light-group-color);
-
-    border-radius: 50%;
-
-    pointer-events: none;
-
-    z-index: 0;
-}
-   
-   
+.game-card.has-group-header::after,
 .game-card.independent-card::after {
     content: "";
 
@@ -726,11 +706,7 @@ label {
     left: -60%;
     top: 13%;
 
-    background: linear-gradient(
-        to right,
-        #e5e5e5 0%,
-        #d2d2d2 100%
-    );
+    background: var(--light-card-color);
 
     border-radius: 50%;
 
@@ -738,7 +714,6 @@ label {
 
     z-index: 0;
 }
-   
 /* Créateur */
 
 .creator-label {
@@ -3127,7 +3102,10 @@ function createGameCard(game, group = null) {
                     gameGroup.color,
                     0.88
                 );
-
+div.style.setProperty(
+    "--light-card-color",
+    lightGroupColor
+);
 
             /*
              * Variables utilisées par le CSS
@@ -3205,16 +3183,30 @@ function createGameCard(game, group = null) {
     }
 
 
-    if (!gameGroup) {
+if (!gameGroup) {
 
-        div.classList.add(
-            "independent-card"
-        );
+    div.classList.add(
+        "independent-card"
+    );
 
-        div.style.background =
-            "#e5e5e5";
+div.style.background =
+    "linear-gradient(" +
+    "to right, " +
+    "#e5e5e5 0%, " +
+    "#bdbdbd 100%" +
+    "), " +
+    "linear-gradient(" +
+    "to top, " +
+    "#e5e5e5 0%, " +
+    "rgba(255,255,255,0) 100%" +
+    "), " +
+    "#bdbdbd";
 
-    }
+    div.style.setProperty(
+        "--light-card-color",
+        "#e5e5e5"
+    );
+}
 
 
     div.onclick = function() {
