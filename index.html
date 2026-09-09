@@ -442,19 +442,21 @@ button:disabled {
     align-items: center;
     gap: 5px;
 
-    padding: 3px 8px;
+    padding: 6px 12px;
 
     font-size: 11px;
     font-weight: bold;
 
-    min-height: 24px;
+    min-height: 30px;
 
     border-radius: 12px 12px 0 0;
 
     position: relative;
     z-index: 2;
 
-    margin-bottom: -15px;
+    margin-bottom: -1px;
+
+    background: var(--main-card-base-color);
 }
 
    
@@ -4397,6 +4399,11 @@ gameCard.style.background =
 groupHeader.style.color =
     groupTextColor;
 
+groupHeader.style.setProperty(
+    "--main-card-base-color",
+    gameGroup.color
+);
+       
 groupHeader.style.background =
     "transparent";
 
