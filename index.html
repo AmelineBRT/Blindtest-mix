@@ -295,7 +295,7 @@ button:disabled {
 /* =========================================================
    DEGRADE CARTES PARTIES
    ========================================================= */
-.game-card.independent-card::after {
+.game-card.has-group-header.has-group::after {
     content: "";
 
     position: absolute;
@@ -310,10 +310,9 @@ button:disabled {
 
     background:
         radial-gradient(
-            ellipse at 20% 150%,
-            #e5e5e5 0%,
-            #e5e5e5 55%,
-            #bdbdbd 100%
+            ellipse 120% 80% at 0% 100%,
+            var(--light-group-color) 0%,
+            var(--light-group-color) 100%
         );
 
     pointer-events: none;
@@ -3173,7 +3172,7 @@ if (showGroupHeader) {
         );
 
     div.style.background =
-        lightGroupColor;
+        gameGroup.color;
 
     div.style.setProperty(
         "--group-color",
@@ -3184,7 +3183,6 @@ if (showGroupHeader) {
         "--light-group-color",
         lightGroupColor
     );
-
 } else {
         /*
          * Dans "Voir les groupes",
