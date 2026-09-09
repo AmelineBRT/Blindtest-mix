@@ -695,6 +695,36 @@ label {
 }
 
 
+.game-card.has-group-header.has-group::before,
+.game-card.independent-card::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    background:
+        linear-gradient(
+            to right,
+            var(--card-light-color) 0%,
+            rgba(255,255,255,0) 100%
+        ),
+        linear-gradient(
+            to top,
+            var(--card-light-color) 0%,
+            rgba(255,255,255,0) 100%
+        ),
+        var(--card-base-color);
+
+    pointer-events: none;
+
+    z-index: 0;
+}
+
+
 .game-card.has-group-header.has-group::after,
 .game-card.independent-card::after {
     content: "";
@@ -707,7 +737,7 @@ label {
     left: -60%;
     top: 13%;
 
-    background-color: var(--light-card-color);
+    background: var(--card-light-color);
 
     border-radius: 50%;
 
@@ -715,8 +745,6 @@ label {
 
     z-index: 1;
 }
-
-
 
 
    
@@ -3091,53 +3119,34 @@ function createGameCard(game, group = null) {
          * Dégradé uniquement dans
          * "Voir les parties"
          */
-        if (showGroupHeader) {
+      if (showGroupHeader) {
 
-            const lightGroupColor =
-                lightenColor(
-                    gameGroup.color,
-                    0.88
-                );
-           
-div.style.setProperty(
-    "--light-card-color",
-    lightGroupColor
-);
+    const lightGroupColor =
+        lightenColor(
+            gameGroup.color,
+            0.88
+        );
 
-            /*
-             * Variables utilisées par le CSS
-             * de la forme arrondie
-             */
-            div.style.setProperty(
-                "--group-color",
-                gameGroup.color
-            );
+    div.style.setProperty(
+        "--card-base-color",
+        gameGroup.color
+    );
 
-            div.style.setProperty(
-                "--light-group-color",
-                lightGroupColor
-            );
+    div.style.setProperty(
+        "--card-light-color",
+        lightGroupColor
+    );
 
+    div.style.background =
+        gameGroup.color;
 
-            /*
-             * Fond de la carte :
-             *
-             * 1 → dégradé gauche → droite
-             * 2 → dégradé bas → haut
-             * 3 → couleur du groupe en fond
-             */
-            div.style.background =
-                "linear-gradient(" +
-                "to right, " +
-                lightGroupColor + " 0%, " +
-                "rgba(255,255,255,0.10) 100%" +
-                "), " +
-                "linear-gradient(" +
-                "to top, " +
-                lightGroupColor + " 0%, " +
-                "rgba(255,255,255,0) 100%" +
-                "), " +
-                gameGroup.color;
+} else {
+
+    div.style.background =
+        lightenColor(
+            gameGroup.color,
+            0.88
+        );
 
 
         } else {
@@ -3176,21 +3185,25 @@ div.style.setProperty(
     }
 
 
-    if (!gameGroup) {
+if (!gameGroup) {
 
-        div.classList.add(
-            "independent-card"
-        );
+    div.classList.add(
+        "independent-card"
+    );
 
-        div.style.background =
-            "#e5e5e5";
+    div.style.setProperty(
+        "--card-base-color",
+        "#bdbdbd"
+    );
 
-       div.style.setProperty(
-    "--light-card-color",
-    "#e5e5e5"
-);
-       
-    }
+    div.style.setProperty(
+        "--card-light-color",
+        "#e5e5e5"
+    );
+
+    div.style.background =
+        "#bdbdbd";
+}
 
 
     div.onclick =
