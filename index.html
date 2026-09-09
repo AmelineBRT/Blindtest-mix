@@ -99,6 +99,10 @@ body.dark-mode .duplicate-button,
 body.dark-mode .players-toggle,
 body.dark-mode .filter-select,
 body.dark-mode .filter-toggle,
+   body.dark-mode .sort-select {
+    background-color: #555;
+    color: transparent;
+}
 body.dark-mode .view-toggle {
     background: #555;
     color: #eee;
@@ -619,35 +623,34 @@ label {
     fill: currentColor;
 }
 
-.sort-container {
-    display: none;
 
-    margin-top: 8px;
-    margin-left: auto;
+.sort-select {
+    appearance: none;
+    -webkit-appearance: none;
 
-    width: 220px;
+    width: 42px;
+    height: 42px;
 
-    background: white;
+    padding: 9px;
 
-    padding: 8px;
+    margin: 0;
+
+    background: #e5e5e5;
+
+    color: transparent;
+
+    cursor: pointer;
+
+    text-align: center;
 
     border-radius: 8px;
 
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23444' d='M4 5h16v2H4V5zm3 6h10v2H7v-2zm3 6h4v2h-4v-2z'/%3E%3C/svg%3E");
 
-    z-index: 20;
-}
-
-.sort-container.visible {
-    display: block;
-}
-
-.sort-container .filter-section {
-    margin-top: 0;
-}
-
-.sort-container .filter-select {
-    margin: 0;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 21px 21px;
 }
    
 .filters-hidden {
@@ -1573,18 +1576,39 @@ label {
 
     </button>
 
-    <button
-        id="sortToggleButton"
-        class="filter-toggle"
-        onclick="toggleSort()"
-        title="Afficher le tri">
+<select
+    id="sortSelect"
+    class="filter-toggle sort-select"
+    onchange="changeSort(this.value)"
+    title="Trier">
 
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 5h16v2H4V5zm3 6h10v2H7v-2zm3 6h4v2h-4v-2z"></path>
-        </svg>
+    <option value="creation">
+        Ordre de création
+    </option>
 
-    </button>
+    <option value="creation-reverse">
+        Plus récentes d'abord
+    </option>
 
+    <option value="alphabetical">
+        Ordre alphabétique (A → Z)
+    </option>
+
+    <option value="alphabetical-reverse">
+        Ordre alphabétique (Z → A)
+    </option>
+
+    <option value="creator">
+        Par créateur
+    </option>
+
+    <option value="group">
+        Par groupe
+    </option>
+
+</select>
+
+      
 </div>
 
    <div
@@ -2551,6 +2575,61 @@ function toggleGamesView() {
 
     }
 
+   const sortSelect =
+    document.getElementById("sortSelect");
+
+if (gamesView === "games") {
+
+    sortSelect.innerHTML = `
+        <option value="creation">
+            Ordre de création
+        </option>
+
+        <option value="creation-reverse">
+            Plus récentes d'abord
+        </option>
+
+        <option value="alphabetical">
+            Ordre alphabétique (A → Z)
+        </option>
+
+        <option value="alphabetical-reverse">
+            Ordre alphabétique (Z → A)
+        </option>
+
+        <option value="creator">
+            Par créateur
+        </option>
+
+        <option value="group">
+            Par groupe
+        </option>
+    `;
+
+} else {
+
+    sortSelect.innerHTML = `
+        <option value="creation">
+            Ordre de création
+        </option>
+
+        <option value="creation-reverse">
+            Plus récentes d'abord
+        </option>
+
+        <option value="alphabetical">
+            Ordre alphabétique (A → Z)
+        </option>
+
+        <option value="alphabetical-reverse">
+            Ordre alphabétique (Z → A)
+        </option>
+    `;
+
+}
+
+sortSelect.value = sortMode;
+
     renderGames();
 
 }
@@ -2586,6 +2665,14 @@ function toggleFilters() {
 
 }
 
+   function changeSort(value) {
+
+    sortMode = value;
+
+    renderGames();
+
+}
+
    function toggleSort() {
 
     const container =
@@ -2614,86 +2701,6 @@ function toggleFilters() {
 
 }
 
-
- function renderSort() {
-
-    const container =
-        document.getElementById("sortContainer");
-
-    container.innerHTML = "";
-
-    const select =
-        document.createElement("select");
-
-    select.className =
-        "filter-select";
-
-    if (gamesView === "games") {
-
-        select.innerHTML = `
-            <option value="creation">
-                Ordre de création
-            </option>
-
-            <option value="creation-reverse">
-                Plus récentes d'abord
-            </option>
-
-            <option value="alphabetical">
-                Ordre alphabétique (A → Z)
-            </option>
-
-            <option value="alphabetical-reverse">
-                Ordre alphabétique (Z → A)
-            </option>
-
-            <option value="creator">
-                Par créateur
-            </option>
-
-            <option value="group">
-                Par groupe
-            </option>
-        `;
-
-    } else {
-
-        select.innerHTML = `
-            <option value="creation">
-                Ordre de création
-            </option>
-
-            <option value="creation-reverse">
-                Plus récents d'abord
-            </option>
-
-            <option value="alphabetical">
-                Ordre alphabétique (A → Z)
-            </option>
-
-            <option value="alphabetical-reverse">
-                Ordre alphabétique (Z → A)
-            </option>
-        `;
-
-    }
-
-    select.value =
-        sortMode;
-
-    select.onchange =
-        function() {
-
-            sortMode =
-                this.value;
-
-            renderGames();
-
-        };
-
-    container.appendChild(select);
-
-}
 
    
 function renderFilters() {
