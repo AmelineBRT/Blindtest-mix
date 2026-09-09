@@ -298,9 +298,11 @@ button:disabled {
    AUTRES
    ========================================================= */
    
-   .game-main-card {
+.game-main-card {
     position: relative;
     overflow: hidden;
+
+    padding-top: 60px;
 }
 
 .game-main-card::before {
@@ -441,22 +443,14 @@ button:disabled {
     justify-content: flex-end;
     align-items: center;
     gap: 5px;
-
-    padding: 6px 12px;
-
+    padding: 3px 8px;
     font-size: 11px;
     font-weight: bold;
-
-    min-height: 30px;
-
+    min-height: 24px;
     border-radius: 12px 12px 0 0;
-
     position: relative;
     z-index: 2;
-
-    margin-bottom: -1px;
-
-    background: var(--main-card-base-color);
+    margin-bottom: -15px;
 }
 
    
@@ -4405,7 +4399,7 @@ groupHeader.style.setProperty(
 );
        
 groupHeader.style.background =
-    "transparent";
+    gameGroup.color;
 
 groupHeader.style.display =
     "flex";
