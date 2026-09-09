@@ -694,7 +694,8 @@ label {
     margin-bottom: 8px;
 }
 
-.game-card.has-group-header::after,
+
+.game-card.has-group-header.has-group::after,
 .game-card.independent-card::after {
     content: "";
 
@@ -706,14 +707,19 @@ label {
     left: -60%;
     top: 13%;
 
-    background: var(--light-card-color);
+    background-color: var(--light-card-color);
 
     border-radius: 50%;
 
     pointer-events: none;
 
-    z-index: 0;
+    z-index: 1;
 }
+
+
+
+
+   
 /* Créateur */
 
 .creator-label {
