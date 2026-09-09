@@ -4456,29 +4456,40 @@ groupHeader.style.display =
            on remet l'apparence normale
         */
 
-   gameCard.style.setProperty(
-    "--main-card-base-color",
-    "#e8e8e8"
-);
+    gameCard.style.setProperty(
+        "--main-card-base-color",
+        "#e8e8e8"
+    );
 
-gameCard.style.setProperty(
-    "--main-card-light-color",
-    "#fcfcfc"
-);
+    gameCard.style.setProperty(
+        "--main-card-light-color",
+        "#fcfcfc"
+    );
 
-gameCard.style.background =
-    "#e8e8e8";
+    gameCard.style.background =
+        "#e8e8e8";
 
-        groupHeader.innerHTML =
-            "";
+    groupHeader.innerHTML = `
 
-        groupHeader.style.display =
-            "none";
+        <span>
+            Indépendant
+        </span>
 
-       groupHeader.style.background =
-    "";
+        <span>
+            🎭
+        </span>
 
-    }
+    `;
+
+    groupHeader.style.color =
+        "#555555";
+
+    groupHeader.style.background =
+        "transparent";
+
+    groupHeader.style.display =
+        "flex";
+}
 
 
    const gameTitleElement =
