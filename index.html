@@ -3018,7 +3018,66 @@ function renderFilters() {
         groupMenu.className =
             "multi-filter-menu";
 
+const independentLabel =
+    document.createElement("label");
 
+independentLabel.className =
+    "multi-filter-option";
+
+const independentCheckbox =
+    document.createElement("input");
+
+independentCheckbox.type =
+    "checkbox";
+
+independentCheckbox.checked =
+    selectedGroups.includes("");
+
+independentCheckbox.onchange =
+    function() {
+
+        if (this.checked) {
+
+            if (!selectedGroups.includes("")) {
+
+                selectedGroups.push("");
+
+            }
+
+        } else {
+
+            selectedGroups =
+                selectedGroups.filter(
+                    function(item) {
+                        return item !== "";
+                    }
+                );
+
+        }
+
+        renderActiveFilters();
+        renderGames();
+
+    };
+
+const independentText =
+    document.createElement("span");
+
+independentText.textContent =
+    "🎭 Indépendant";
+
+independentLabel.appendChild(
+    independentCheckbox
+);
+
+independentLabel.appendChild(
+    independentText
+);
+
+groupMenu.appendChild(
+    independentLabel
+);
+       
         groups.forEach(function(group) {
 
             const label =
@@ -3271,16 +3330,50 @@ function renderActiveFilters() {
        GROUPES
        ========================= */
 
-    selectedGroups.forEach(function(groupId) {
+selectedGroups.forEach(function(groupId) {
 
-        const group =
-            groups.find(function(g) {
-                return g.id === groupId;
-            });
+    if (groupId === "") {
 
-        if (!group) {
-            return;
-        }
+        hasFilters = true;
+
+        const chip =
+            document.createElement("div");
+
+        chip.className =
+            "active-filter";
+
+        chip.innerHTML =
+            "<span>🎭 Indépendant</span>" +
+            "<button type=\"button\" title=\"Supprimer ce filtre\">×</button>";
+
+        chip.querySelector("button").onclick =
+            function() {
+
+                selectedGroups =
+                    selectedGroups.filter(
+                        function(item) {
+                            return item !== "";
+                        }
+                    );
+
+                renderFilters();
+                renderGames();
+
+            };
+
+        container.appendChild(chip);
+
+        return;
+    }
+
+    const group =
+        groups.find(function(g) {
+            return g.id === groupId;
+        });
+
+    if (!group) {
+        return;
+    }
 
         hasFilters = true;
 
