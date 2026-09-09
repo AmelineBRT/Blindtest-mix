@@ -475,6 +475,8 @@ button:disabled {
 }
 
 .participant-remove {
+    display: none;
+
     width: auto;
     margin: 0;
     padding: 1px 5px;
@@ -483,6 +485,10 @@ button:disabled {
     color: #777;
 
     font-size: 16px;
+}
+
+.participant-remove.visible {
+    display: block;
 }
 
 .participant-add {
@@ -5498,6 +5504,36 @@ function toggleParticipants(type) {
 
 }
 
+   document.addEventListener(
+    "click",
+    function(event) {
+
+        if (
+            !event.target.closest(
+                ".participants-panel"
+            ) &&
+            !event.target.closest(
+                ".game-icon-button"
+            )
+        ) {
+
+            document
+                .querySelectorAll(
+                    ".participants-panel.visible"
+                )
+                .forEach(function(panel) {
+
+                    panel.classList.remove(
+                        "visible"
+                    );
+
+                });
+
+        }
+
+    }
+);
+
    function renderParticipants(type) {
 
     const panel =
@@ -5547,22 +5583,26 @@ function toggleParticipants(type) {
         item.participants.forEach(function(name, index) {
 
             html += `
-                <div class="participant-item">
+    <div
+        class="participant-item"
+        onclick="toggleParticipantDelete('${type}', ${index})"
+    >
 
-                    <span>
-                        ${escapeHTML(name)}
-                    </span>
+        <span class="participant-name">
+            ${escapeHTML(name)}
+        </span>
 
-                    <button
-                        type="button"
-                        class="participant-remove"
-                        onclick="removeParticipant('${type}', ${index})"
-                        title="Supprimer">
-                        ×
-                    </button>
+        <button
+            type="button"
+            class="participant-remove"
+            id="remove-${type}-${index}"
+            onclick="event.stopPropagation(); removeParticipant('${type}', ${index})"
+            title="Supprimer">
+            ×
+        </button>
 
-                </div>
-            `;
+    </div>
+`;
 
         });
 
@@ -5658,6 +5698,39 @@ document.getElementById(
 
 }
 
+function toggleParticipantDelete(type, index) {
+
+    const button =
+        document.getElementById(
+            "remove-" + type + "-" + index
+        );
+
+    if (!button) {
+        return;
+    }
+
+    if (button.classList.contains("visible")) {
+
+        button.classList.remove("visible");
+
+    } else {
+
+        document
+            .querySelectorAll(".participant-remove")
+            .forEach(function(otherButton) {
+
+                otherButton.classList.remove(
+                    "visible"
+                );
+
+            });
+
+        button.classList.add("visible");
+
+    }
+
+}
+   
    function removeParticipant(type, index) {
 
     const item =
