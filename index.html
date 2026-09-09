@@ -3613,70 +3613,132 @@ function renderGroupsView(container) {
             .trim()
             .toLowerCase();
 
-let filteredGroups =
 
-    groups.filter(function(group) {
+    /* ==================================================
+       GROUPES FILTRÉS
+       ================================================== */
 
-        const matchesGroup =
-            selectedGroups.length === 0 ||
-            selectedGroups.includes(
-                group.id
+    let filteredGroups =
+        groups.filter(function(group) {
+
+            const matchesGroup =
+                selectedGroups.length === 0 ||
+                selectedGroups.includes(
+                    group.id
+                );
+
+            const matchesSearch =
+                !search ||
+                group.name
+                    .toLowerCase()
+                    .includes(search);
+
+            return (
+                matchesGroup &&
+                matchesSearch
             );
 
-        const matchesSearch =
-            !search ||
-            group.name
-                .toLowerCase()
-                .includes(search);
+        });
 
-        return (
-            matchesGroup &&
-            matchesSearch
+
+    /* ==================================================
+       TRI DES GROUPES
+       ================================================== */
+
+    if (sortMode === "creation") {
+
+        // ordre d'origine
+
+    } else if (sortMode === "creation-reverse") {
+
+        filteredGroups.reverse();
+
+    } else if (sortMode === "alphabetical") {
+
+        filteredGroups.sort(
+            function(a, b) {
+
+                return a.name.localeCompare(
+                    b.name,
+                    "fr",
+                    {
+                        sensitivity: "base"
+                    }
+                );
+
+            }
         );
 
+    } else if (sortMode === "alphabetical-reverse") {
+
+        filteredGroups.sort(
+            function(a, b) {
+
+                return b.name.localeCompare(
+                    a.name,
+                    "fr",
+                    {
+                        sensitivity: "base"
+                    }
+                );
+
+            }
+        );
+
+    }
+
+
+    /* ==================================================
+       CONSTRUIRE LES GROUPES
+       ================================================== */
+
+    const groupsToDisplay = [];
+
+
+    filteredGroups.forEach(function(group) {
+
+        const groupGames =
+            games.filter(function(game) {
+
+                if (game.groupId !== group.id) {
+                    return false;
+                }
+
+                if (
+                    selectedCreators.length > 0 &&
+                    !selectedCreators.includes(
+                        game.creator
+                    )
+                ) {
+                    return false;
+                }
+
+                return true;
+
+            });
+
+
+        /*
+         * Si un filtre créateur est actif,
+         * on masque les groupes sans partie correspondante.
+         */
+        if (
+            selectedCreators.length > 0 &&
+            groupGames.length === 0
+        ) {
+            return;
+        }
+
+
+        groupsToDisplay.push({
+            group: group,
+            games: groupGames
+        });
+
     });
-   if (sortMode === "creation") {
 
-    // ordre d'origine
 
-} else if (sortMode === "creation-reverse") {
-
-    filteredGroups.reverse();
-
-} else if (sortMode === "alphabetical") {
-
-    filteredGroups.sort(
-        function(a, b) {
-
-            return a.name.localeCompare(
-                b.name,
-                "fr",
-                {
-                    sensitivity: "base"
-                }
-            );
-
-        }
-    );
-
-} else if (sortMode === "alphabetical-reverse") {
-
-    filteredGroups.sort(
-        function(a, b) {
-
-            return b.name.localeCompare(
-                a.name,
-                "fr",
-                {
-                    sensitivity: "base"
-                }
-            );
-
-        }
-    );
-
-}
-    if (filteredGroups.length === 0) {
+    if (groupsToDisplay.length === 0) {
 
         container.innerHTML =
             "<div class='card'>Aucun groupe trouvé.</div>";
@@ -3686,87 +3748,96 @@ let filteredGroups =
     }
 
 
-   
-    filteredGroups.forEach(function(group) {
+    /* ==================================================
+       AFFICHAGE
+       ================================================== */
 
-      if (
-    (
-        selectedCreators.length > 0 ||
-        selectedGroups.length > 0
-    ) &&
-    groupGames.length === 0
-) {
-    return;
-}
+    groupsToDisplay.forEach(function(item) {
 
-const div =
-    document.createElement("div");
+        const group =
+            item.group;
 
-div.className =
-    "group-card clickable-group";
-
-div.onclick =
-    function() {
-
-        showGroup(group.id);
-
-    };
-
-       div.style.setProperty(
-    "--group-color",
-    group.color
-);
-
-div.style.background =
-    "linear-gradient(" +
-    "to bottom, " +
-    group.color + " 0%, " +
-    lightenColor(group.color, 0.88) + " 100%" +
-    ")";
-       
-const groupTextColor =
-    isDarkColor(group.color)
-        ? "#ffffff"
-        : "#222222";
+        const groupGames =
+            item.games;
 
 
-div.innerHTML = `
+        const div =
+            document.createElement("div");
 
-    <div
-        class="group-title"
-        style="color:${groupTextColor} !important;"
-    >
+        div.className =
+            "group-card clickable-group";
 
-        <span>
-            ${escapeHTML(group.name)}
-        </span>
+        div.onclick =
+            function() {
 
-        <span>
-            🎉
-        </span>
+                showGroup(group.id);
 
-    </div>
+            };
 
-    ${
-        group.comment
-        ? `
+
+        div.style.setProperty(
+            "--group-color",
+            group.color
+        );
+
+
+        div.style.background =
+            "linear-gradient(" +
+            "to bottom, " +
+            group.color + " 0%, " +
+            lightenColor(
+                group.color,
+                0.88
+            ) + " 100%" +
+            ")";
+
+
+        const groupTextColor =
+            isDarkColor(group.color)
+                ? "#ffffff"
+                : "#222222";
+
+
+        div.innerHTML = `
+
             <div
-                class="group-comment"
+                class="group-title"
                 style="color:${groupTextColor} !important;"
             >
-                💬 ${escapeHTML(group.comment)}
+
+                <span>
+                    ${escapeHTML(group.name)}
+                </span>
+
+                <span>
+                    🎉
+                </span>
+
             </div>
-        `
-        : ""
-    }
 
-    <div class="group-games"></div>
+            ${
+                group.comment
+                ? `
+                    <div
+                        class="group-comment"
+                        style="color:${groupTextColor} !important;"
+                    >
+                        💬 ${escapeHTML(group.comment)}
+                    </div>
+                `
+                : ""
+            }
 
-`;
+            <div class="group-games"></div>
+
+        `;
+
+
         const gamesContainer =
             div.querySelector(
                 ".group-games"
             );
+
 
         if (groupGames.length === 0) {
 
@@ -3795,12 +3866,14 @@ div.innerHTML = `
 
         }
 
-        container.appendChild(div);
+
+        container.appendChild(
+            div
+        );
 
     });
 
 }
-
 function createGameCard(game, group = null) {
 
     const div =
