@@ -3098,7 +3098,11 @@ function createGameCard(game, group = null) {
                     gameGroup.color,
                     0.88
                 );
-
+           
+div.style.setProperty(
+    "--light-card-color",
+    lightGroupColor
+);
 
             /*
              * Variables utilisées par le CSS
@@ -3181,6 +3185,11 @@ function createGameCard(game, group = null) {
         div.style.background =
             "#e5e5e5";
 
+       div.style.setProperty(
+    "--light-card-color",
+    "#e5e5e5"
+);
+       
     }
 
 
