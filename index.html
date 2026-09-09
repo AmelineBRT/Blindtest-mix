@@ -303,6 +303,58 @@ button:disabled {
     overflow: hidden;
 }
 
+.game-main-card::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    background:
+        linear-gradient(
+            to right,
+            var(--main-card-light-color) 0%,
+            rgba(255,255,255,0.10) 100%
+        ),
+        linear-gradient(
+            to top,
+            var(--main-card-light-color) 0%,
+            rgba(255,255,255,0) 100%
+        ),
+        var(--main-card-base-color);
+
+    pointer-events: none;
+
+    z-index: 0;
+}
+
+.game-main-card::after {
+    content: "";
+
+    position: absolute;
+
+    width: 155%;
+    height: 130%;
+
+    left: -60%;
+    top: 13%;
+
+    background: var(--main-card-light-color);
+
+    border-radius: 50%;
+
+    pointer-events: none;
+
+    z-index: 1;
+}
+
+.game-main-card > * {
+    position: relative;
+    z-index: 2;
+}
    
 .game-top-actions {
     position: absolute;
@@ -4316,15 +4368,18 @@ function showGame() {
                 ? "#ffffff"
                 : "#222222";
 
+gameCard.style.setProperty(
+    "--main-card-base-color",
+    gameGroup.color
+);
+
+gameCard.style.setProperty(
+    "--main-card-light-color",
+    lightColor
+);
 
 gameCard.style.background =
-    "linear-gradient(" +
-    "to bottom, " +
-    gameGroup.color + " 0%, " +
-    gameGroup.color + " 18%, " +
-    lightColor + " 42%, " +
-    lightColor + " 100%" +
-    ")";
+    gameGroup.color;
 
 
         groupHeader.innerHTML = `
@@ -4355,8 +4410,18 @@ groupHeader.style.display =
            on remet l'apparence normale
         */
 
-        gameCard.style.background =
-            "";
+   gameCard.style.setProperty(
+    "--main-card-base-color",
+    "#e8e8e8"
+);
+
+gameCard.style.setProperty(
+    "--main-card-light-color",
+    "#fcfcfc"
+);
+
+gameCard.style.background =
+    "#e8e8e8";
 
         groupHeader.innerHTML =
             "";
