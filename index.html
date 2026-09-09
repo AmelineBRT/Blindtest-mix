@@ -3119,34 +3119,28 @@ function createGameCard(game, group = null) {
          * Dégradé uniquement dans
          * "Voir les parties"
          */
-      if (showGroupHeader) {
+        if (showGroupHeader) {
 
-    const lightGroupColor =
-        lightenColor(
-            gameGroup.color,
-            0.88
-        );
+            const lightGroupColor =
+                lightenColor(
+                    gameGroup.color,
+                    0.88
+                );
 
-    div.style.setProperty(
-        "--card-base-color",
-        gameGroup.color
-    );
 
-    div.style.setProperty(
-        "--card-light-color",
-        lightGroupColor
-    );
+            div.style.setProperty(
+                "--card-base-color",
+                gameGroup.color
+            );
 
-    div.style.background =
-        gameGroup.color;
+            div.style.setProperty(
+                "--card-light-color",
+                lightGroupColor
+            );
 
-} else {
 
-    div.style.background =
-        lightenColor(
-            gameGroup.color,
-            0.88
-        );
+            div.style.background =
+                gameGroup.color;
 
 
         } else {
@@ -3154,7 +3148,7 @@ function createGameCard(game, group = null) {
             /*
              * Dans "Voir les groupes",
              * on garde la couleur claire
-             * du groupe sans nouveau dégradé.
+             * du groupe.
              */
             div.style.background =
                 lightenColor(
@@ -3185,25 +3179,29 @@ function createGameCard(game, group = null) {
     }
 
 
-if (!gameGroup) {
+    /*
+     * Partie indépendante
+     */
+    if (!gameGroup) {
 
-    div.classList.add(
-        "independent-card"
-    );
+        div.classList.add(
+            "independent-card"
+        );
 
-    div.style.setProperty(
-        "--card-base-color",
-        "#bdbdbd"
-    );
+        div.style.setProperty(
+            "--card-base-color",
+            "#bdbdbd"
+        );
 
-    div.style.setProperty(
-        "--card-light-color",
-        "#e5e5e5"
-    );
+        div.style.setProperty(
+            "--card-light-color",
+            "#e5e5e5"
+        );
 
-    div.style.background =
-        "#bdbdbd";
-}
+        div.style.background =
+            "#bdbdbd";
+
+    }
 
 
     div.onclick =
@@ -3316,6 +3314,10 @@ if (!gameGroup) {
     return div;
 
 }
+
+
+
+
 
    
    /* ========================================================
