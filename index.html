@@ -595,10 +595,6 @@ label {
     gap: 6px;
 }
 
-.search-filter-row {
-    position: relative;
-}
-
 .sort-container {
     display: none;
 
@@ -1577,6 +1573,11 @@ label {
         </button>
 
     </div>
+
+   <div
+    id="sortContainer"
+    class="sort-container">
+</div>
 
 <button
     id="sortToggleButton"
@@ -2588,7 +2589,7 @@ function toggleFilters() {
 
 }
 
- function toggleSort() {
+function toggleSort() {
 
     const container =
         document.getElementById("sortContainer");
