@@ -3134,15 +3134,16 @@ if (showGroupHeader) {
 div.style.background =
     "linear-gradient(" +
     "to right, " +
-    lightGroupColor + " 0%, " +
-    gameGroup.color + " 100%" +
+    "color-mix(in srgb, " + gameGroup.color + " 20%, white) 0%, " +
+    "gameGroup.color 100%" +
     "), " +
     "linear-gradient(" +
     "to top, " +
-    "rgba(255,255,255,0.35) 0%, " +
-    "rgba(255,255,255,0) 100%" +
+    "transparent 0%, " +
+    "rgba(255,255,255,0.35) 100%" +
     ")";
 
+   
     div.style.setProperty(
         "--group-color",
         gameGroup.color
