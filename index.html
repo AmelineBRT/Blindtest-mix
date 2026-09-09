@@ -3070,16 +3070,6 @@ function createGameCard(game, group = null) {
             : "#222222";
 
 
-    /*
-       Si "group" est fourni, cela signifie que
-       la carte est affichée DANS un encadré de groupe.
-
-       Dans ce cas :
-       → pas de bandeau
-       → pas de dégradé
-       → uniquement le fond éclairci
-    */
-
     const showGroupHeader =
         group === null;
 
@@ -3102,10 +3092,7 @@ function createGameCard(game, group = null) {
                     gameGroup.color,
                     0.88
                 );
-div.style.setProperty(
-    "--light-card-color",
-    lightGroupColor
-);
+
 
             /*
              * Variables utilisées par le CSS
@@ -3126,25 +3113,21 @@ div.style.setProperty(
              * Fond de la carte :
              *
              * 1 → dégradé gauche → droite
-             *     clair → couleur groupe
-             *
              * 2 → dégradé bas → haut
-             *     clair → transparent
-             *
              * 3 → couleur du groupe en fond
              */
-div.style.background =
-    "linear-gradient(" +
-    "to right, " +
-    "#e5e5e5 0%, " +
-    "rgba(229,229,229,0) 100%" +
-    "), " +
-    "linear-gradient(" +
-    "to top, " +
-    "#e5e5e5 0%, " +
-    "rgba(229,229,229,0) 100%" +
-    "), " +
-    "#bdbdbd";
+            div.style.background =
+                "linear-gradient(" +
+                "to right, " +
+                lightGroupColor + " 0%, " +
+                "rgba(255,255,255,0.10) 100%" +
+                "), " +
+                "linear-gradient(" +
+                "to top, " +
+                lightGroupColor + " 0%, " +
+                "rgba(255,255,255,0) 100%" +
+                "), " +
+                gameGroup.color;
 
 
         } else {
@@ -3183,48 +3166,39 @@ div.style.background =
     }
 
 
-if (!gameGroup) {
+    if (!gameGroup) {
 
-    div.classList.add(
-        "independent-card"
-    );
+        div.classList.add(
+            "independent-card"
+        );
 
-div.style.background =
-    "linear-gradient(" +
-    "to right, " +
-    "#e5e5e5 0%, " +
-    "#bdbdbd 100%" +
-    "), " +
-    "linear-gradient(" +
-    "to top, " +
-    "#e5e5e5 0%, " +
-    "rgba(255,255,255,0) 100%" +
-    "), " +
-    "#bdbdbd";
+        div.style.background =
+            "#e5e5e5";
 
-    div.style.setProperty(
-        "--light-card-color",
-        "#e5e5e5"
-    );
-}
+    }
 
 
-    div.onclick = function() {
+    div.onclick =
+        function() {
 
-        if (group !== null) {
+            if (group !== null) {
 
-            gameReturnContext = "group";
-            currentGroupId = group.id;
+                gameReturnContext =
+                    "group";
 
-        } else {
+                currentGroupId =
+                    group.id;
 
-            gameReturnContext = "games";
+            } else {
 
-        }
+                gameReturnContext =
+                    "games";
 
-        openGame(game.id);
+            }
 
-    };
+            openGame(game.id);
+
+        };
 
 
     const passwordIcon =
