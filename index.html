@@ -698,8 +698,8 @@ label {
 
     position: absolute;
 
-    width: 75%;
-    height: 90%;
+    width: 90%;
+    height: 75%;
 
     left: 0;
     bottom: 0;
@@ -3131,9 +3131,16 @@ if (showGroupHeader) {
             0.88
         );
    
-div.style.background =
+   div.style.background =
     "linear-gradient(" +
     "to right, " +
+    lightGroupColor + " 0%, " +
+    gameGroup.color + " 100%" +
+    ")";
+
+   div.style.background =
+    "linear-gradient(" +
+    "to bottom, " +
     lightGroupColor + " 0%, " +
     gameGroup.color + " 100%" +
     ")";
