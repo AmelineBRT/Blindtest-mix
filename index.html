@@ -5617,18 +5617,19 @@ function toggleParticipants(type) {
 
         <div class="participant-add">
 
-            <input
-                id="${type}ParticipantInput"
-                type="text"
-                placeholder="Nom du participant">
+<input
+    id="${type}ParticipantInput"
+    type="text"
+    placeholder="Nom du participant"
+    onclick="event.stopPropagation()">
 
-            <button
-                type="button"
-                onclick="addParticipant('${type}')">
+<button
+    type="button"
+    onclick="event.stopPropagation(); addParticipant('${type}')">
 
-                ＋ Ajouter
+    ＋ Ajouter
 
-            </button>
+</button>
 
         </div>
     `;
