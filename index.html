@@ -5,7 +5,7 @@
 <meta name="viewport" 
    content="width=device-width, initial-scale=1.0">
 
-<title>Blindtest Mix</title>
+<title>Blindtest Mix</titaddParticipant(le>
 
 <style>
 
@@ -421,14 +421,28 @@ button:disabled {
 .participants-panel {
     display: none;
 
-    margin-top: 12px;
+    position: absolute;
+
+    top: 58px;
+    right: 10px;
+
+    width: min(300px, calc(100% - 20px));
+
     padding: 10px;
 
-    background: rgba(255,255,255,0.65);
+    background: rgba(255,255,255,0.96);
 
     border-radius: 8px;
 
+    box-shadow: 0 3px 10px rgba(0,0,0,0.18);
+
     font-size: 13px;
+
+    z-index: 20;
+}
+
+.participants-panel.visible {
+    display: block;
 }
 
 .participants-panel.visible {
@@ -2621,6 +2635,20 @@ function loadData() {
 
 if (!Array.isArray(game.participants)) {
     game.participants = [];
+}
+
+if (
+    game.creator &&
+    !game.participants.some(function(participant) {
+        return participant.toLowerCase() ===
+               game.creator.toLowerCase();
+    })
+) {
+
+    game.participants.unshift(
+        game.creator
+    );
+
 }
            
             game.rounds.forEach(function(round) {
@@ -4965,17 +4993,20 @@ function createGame() {
 
     }
 
-    const game = {
+const game = {
 
-        id: Date.now().toString(),
-        name: name,
-        creator: creator,
-        groupId: groupId,
-        password: password,
-        email: email,
-        rounds: []
+    id: Date.now().toString(),
+    name: name,
+    creator: creator,
+    groupId: groupId,
+    password: password,
+    email: email,
+    participants: [
+        creator
+    ],
+    rounds: []
 
-    };
+};
 
     games.push(game);
 
@@ -5496,9 +5527,9 @@ function toggleParticipants(type) {
     }
 
     let html = `
-        <div class="participants-title">
-            👥 Participants
-        </div>
+<div class="participants-title">
+    👥 Personnes ayant déjà participé
+</div>
 
         <div class="participant-list">
     `;
@@ -5587,15 +5618,39 @@ function toggleParticipants(type) {
         return;
     }
 
-    if (!Array.isArray(item.participants)) {
-        item.participants = [];
-    }
+   if (!Array.isArray(item.participants)) {
+    item.participants = [];
+}
 
-    item.participants.push(name);
+const alreadyExists =
+    item.participants.some(function(participant) {
 
-    saveData();
+        return participant.toLowerCase() ===
+               name.toLowerCase();
 
-    renderParticipants(type);
+    });
+
+if (alreadyExists) {
+
+    alert(
+        '"' + name + '" existe déjà parmi les participants.'
+    );
+
+    input.focus();
+
+    return;
+
+}
+
+item.participants.push(name);
+
+saveData();
+
+renderParticipants(type);
+
+document.getElementById(
+    type + "ParticipantInput"
+).focus();
 
     document.getElementById(
         type + "ParticipantInput"
