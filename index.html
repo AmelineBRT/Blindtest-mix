@@ -358,11 +358,7 @@ button:disabled {
     z-index: 2;
 }
 
-.game-main-card .game-top-actions {
-    position: absolute;
-    z-index: 2;
-}
-   
+  
 .game-top-actions {
     position: absolute;
     top: 10px;
@@ -382,7 +378,14 @@ button:disabled {
     position: absolute;
     top: 25px;
     right: 10px;
-    z-index: 2;
+    z-index: 10;
+    pointer-events: auto;
+}
+
+   #gameMainCard .game-icon-button {
+    position: relative;
+    z-index: 11;
+    pointer-events: auto;
 }
    
 .game-icon-button {
