@@ -595,6 +595,40 @@ label {
     gap: 6px;
 }
 
+.search-filter-row {
+    position: relative;
+}
+
+.sort-container {
+    display: none;
+
+    position: absolute;
+
+    top: 48px;
+    right: 0;
+
+    width: 220px;
+
+    background: white;
+
+    padding: 10px;
+
+    border-radius: 8px;
+
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+
+    z-index: 20;
+}
+
+.sort-container.visible {
+    display: block;
+}
+
+.sort-container .filter-section {
+    margin-top: 0;
+}
+
+   
 .search-input {
     flex: 1;
     margin-bottom: 0;
@@ -1550,7 +1584,9 @@ label {
     onclick="toggleSort()"
     title="Afficher le tri">
 
-    ↕️
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 5h16v2H4V5zm3 6h10v2H7v-2zm3 6h4v2h-4v-2z"></path>
+    </svg>
 
 </button>
    
@@ -1559,10 +1595,6 @@ label {
         class="filters-hidden">
     </div>
 
-   <div
-    id="sortContainer"
-    class="filters-hidden">
-</div>
 
     <div
         id="activeFilters"
@@ -2556,7 +2588,7 @@ function toggleFilters() {
 
 }
 
-   function toggleSort() {
+ function toggleSort() {
 
     const container =
         document.getElementById("sortContainer");
@@ -2564,23 +2596,21 @@ function toggleFilters() {
     const button =
         document.getElementById("sortToggleButton");
 
-    if (container.classList.contains("filters-hidden")) {
+    if (container.classList.contains("visible")) {
 
-        container.classList.remove("filters-hidden");
-        container.classList.add("filters-visible");
-
-        button.title =
-            "Masquer le tri";
-
-        renderSort();
-
-    } else {
-
-        container.classList.remove("filters-visible");
-        container.classList.add("filters-hidden");
+        container.classList.remove("visible");
 
         button.title =
             "Afficher le tri";
+
+    } else {
+
+        renderSort();
+
+        container.classList.add("visible");
+
+        button.title =
+            "Masquer le tri";
 
     }
 
