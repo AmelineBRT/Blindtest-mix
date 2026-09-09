@@ -3113,105 +3113,131 @@ function createGameCard(game, group = null) {
         group === null;
 
 
-  if (gameGroup) {
-
-    div.classList.add(
-        "has-group"
-    );
-
-    /*
-     * Dégradé uniquement dans
-     * "Voir les parties"
-     */
-if (showGroupHeader) {
-
-    const lightGroupColor =
-        lightenColor(
-            gameGroup.color,
-            0.88
-        );
-   
-div.style.background =
-    "linear-gradient(" +
-    "to right, " +
-    "color-mix(in srgb, " + gameGroup.color + " 20%, white) 0%, " +
-    "gameGroup.color 100%" +
-    "), " +
-    "linear-gradient(" +
-    "to top, " +
-    "transparent 0%, " +
-    "rgba(255,255,255,0.35) 100%" +
-    ")";
-
-   
-    div.style.setProperty(
-        "--group-color",
-        gameGroup.color
-    );
-
-    div.style.setProperty(
-        "--light-group-color",
-        lightGroupColor
-    );
-} else {
-        /*
-         * Dans "Voir les groupes",
-         * on garde la couleur claire
-         * du groupe sans nouveau dégradé.
-         */
-        div.style.background =
-            lightenColor(
-                gameGroup.color,
-                0.88
-            );
-
-    }
-
-    div.style.color =
-        "#222222";
-
-    if (showGroupHeader) {
+    if (gameGroup) {
 
         div.classList.add(
-            "has-group-header"
+            "has-group"
         );
 
-        div.style.setProperty(
-            "--group-color",
-            gameGroup.color
-        );
+
+        /*
+         * Dégradé uniquement dans
+         * "Voir les parties"
+         */
+        if (showGroupHeader) {
+
+            const lightGroupColor =
+                lightenColor(
+                    gameGroup.color,
+                    0.88
+                );
+
+
+            /*
+             * Variables utilisées par le CSS
+             * de la forme arrondie
+             */
+            div.style.setProperty(
+                "--group-color",
+                gameGroup.color
+            );
+
+            div.style.setProperty(
+                "--light-group-color",
+                lightGroupColor
+            );
+
+
+            /*
+             * Fond de la carte :
+             *
+             * 1 → dégradé gauche → droite
+             *     clair → couleur groupe
+             *
+             * 2 → dégradé bas → haut
+             *     clair → transparent
+             *
+             * 3 → couleur du groupe en fond
+             */
+            div.style.background =
+                "linear-gradient(" +
+                "to right, " +
+                lightGroupColor + " 0%, " +
+                "rgba(255,255,255,0) 100%" +
+                "), " +
+                "linear-gradient(" +
+                "to top, " +
+                lightGroupColor + " 0%, " +
+                "rgba(255,255,255,0) 100%" +
+                "), " +
+                gameGroup.color;
+
+
+        } else {
+
+            /*
+             * Dans "Voir les groupes",
+             * on garde la couleur claire
+             * du groupe sans nouveau dégradé.
+             */
+            div.style.background =
+                lightenColor(
+                    gameGroup.color,
+                    0.88
+                );
+
+        }
+
+
+        div.style.color =
+            "#222222";
+
+
+        if (showGroupHeader) {
+
+            div.classList.add(
+                "has-group-header"
+            );
+
+            div.style.setProperty(
+                "--group-color",
+                gameGroup.color
+            );
+
+        }
 
     }
 
-}
-if (!gameGroup) {
 
-    div.classList.add(
-        "independent-card"
-    );
+    if (!gameGroup) {
 
-    div.style.background =
-        "#e5e5e5";
+        div.classList.add(
+            "independent-card"
+        );
 
-}
-
-
-div.onclick = function() {
-
-    if (group !== null) {
-
-        gameReturnContext = "group";
-        currentGroupId = group.id;
-
-    } else {
-
-        gameReturnContext = "games";
+        div.style.background =
+            "#e5e5e5";
 
     }
 
-    openGame(game.id);
 
-};
+    div.onclick = function() {
+
+        if (group !== null) {
+
+            gameReturnContext = "group";
+            currentGroupId = group.id;
+
+        } else {
+
+            gameReturnContext = "games";
+
+        }
+
+        openGame(game.id);
+
+    };
+
 
     const passwordIcon =
         game.password
@@ -3296,10 +3322,10 @@ div.onclick = function() {
 
     `;
 
+
     return div;
 
-} j'ai ça pour le moment
-
+}
 
    
    /* ========================================================
