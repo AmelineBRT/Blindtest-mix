@@ -1521,28 +1521,40 @@ label {
 
 <div class="filter-container">
 
-    <div class="search-filter-row">
+   <div class="search-filter-row">
 
-        <input
-            id="gameSearch"
-            class="search-input"
-            type="text"
-            placeholder="🔍 Rechercher..."
-            oninput="renderGames()">
+    <input
+        id="gameSearch"
+        class="search-input"
+        type="text"
+        placeholder="🔍 Rechercher..."
+        oninput="renderGames()">
 
-        <button
-            id="filterToggleButton"
-            class="filter-toggle"
-            onclick="toggleFilters()"
-            title="Afficher les filtres">
+    <button
+        id="filterToggleButton"
+        class="filter-toggle"
+        onclick="toggleFilters()"
+        title="Afficher les filtres">
 
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"></path>
-            </svg>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"></path>
+        </svg>
 
-        </button>
+    </button>
 
-    </div>
+    <button
+        id="sortToggleButton"
+        class="filter-toggle"
+        onclick="toggleSort()"
+        title="Afficher le tri">
+
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 5h16v2H4V5zm3 6h10v2H7v-2zm3 6h4v2h-4v-2z"></path>
+        </svg>
+
+    </button>
+
+</div>
 
 <select
     id="sortSelect"
