@@ -1209,6 +1209,7 @@ label {
    ========================================================= */
 
 .round-card {
+    position: relative;
     background: white;
     border-radius: 12px;
     padding: 16px;
@@ -1219,7 +1220,6 @@ label {
 .round-card {
     cursor: grab;
     user-select: none;
-    touch-action: none;
 }
 
 .round-card.is-dragging {
@@ -1251,15 +1251,31 @@ label {
 }
 
 .round-order-buttons {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+
     display: flex;
     flex-direction: row;
-    gap: 4px;
-    flex-shrink: 0;
+    gap: 2px;
+
+    z-index: 2;
 }
 
 .round-order-buttons button {
-    padding: 7px 11px;
+    width: 28px;
+    height: 28px;
+
+    padding: 0;
     margin: 0;
+
+    font-size: 14px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: transparent;
 }
 
 
@@ -1272,19 +1288,23 @@ label {
 }
 
 .round-edit-button {
-    width: 100%;
-    background: #720038;
-    color: white;
-}
-
-  .round-edit-button {
     flex: 1;
 }
 
 .round-edit-line .play-round-button {
     flex: 0 0 auto;
     margin-left: 0 !important;
-} 
+}
+
+   .round-edit-line .round-edit-button {
+    width: auto;
+    flex: 1 1 auto;
+}
+
+.round-edit-line .play-round-button {
+    width: auto;
+    flex: 0 0 auto;
+}
 
 /* Ligne actions */
 
@@ -6644,17 +6664,6 @@ div.dataset.roundId = round.id;
 
 </div>
 
-            <div class="round-actions">
-
-                <button
-                    class="play-round-button"
-                    onclick="startSpecificRound('${round.id}')">
-
-                    🎮 Jouer
-
-                </button>
-
-            </div>
 
         `;
 
