@@ -2427,35 +2427,12 @@ label {
             placeholder="🔍 Rechercher une partie..."
             oninput="renderDuplicateGames()">
 
-        <label for="duplicateCreatorFilter">
-            Filtrer par créateur
-        </label>
+        </div>
 
-        <select
-            id="duplicateCreatorFilter"
-            onchange="renderDuplicateGames()">
-
-            <option value="">
-                Tous les créateurs
-            </option>
-
-        </select>
-
-       <label for="duplicateGroupFilter">
-    Filtrer par groupe
-</label>
-
-<select
-    id="duplicateGroupFilter"
-    onchange="renderDuplicateGames()">
-
-    <option value="">
-        Tous les groupes
-    </option>
-
-</select>
-
-    </div>
+   <div
+    id="duplicateFilterRow"
+    class="multi-filter-row">
+</div>
 
 </div>
 
@@ -2650,6 +2627,10 @@ let selectedCreators = [];
 let selectedGroups = [];
 let sortMode = "creation";
 let selectedParticipants = [];
+
+let duplicateSelectedCreators = [];
+let duplicateSelectedGroups = [];
+let duplicateSelectedParticipants = [];
 
 /* ========================================================
    MODE SOMBRE
@@ -7066,26 +7047,70 @@ function showDuplicateRound(roundId) {
         "duplicateCreatorFilter"
     ).value = "";
 
-    updateDuplicateCreatorFilter();
+   duplicateSelectedCreators = [];
+duplicateSelectedGroups = [];
+duplicateSelectedParticipants = [];
 
-    updateDuplicateGroupFilter();
-
-    renderDuplicateGames();
+renderDuplicateFilters();
+renderDuplicateGames();
 
     showScreen("duplicateRoundScreen");
 
 }
 
 
-function updateDuplicateCreatorFilter() {
+function renderDuplicateFilters() {
 
-    const select =
+    const container =
         document.getElementById(
-            "duplicateCreatorFilter"
+            "duplicateFilterRow"
         );
 
-    const currentValue =
-        select.value;
+    container.innerHTML = "";
+
+
+    /* ==================================================
+       BOUTON CRÉATEUR
+       ================================================== */
+
+    const creatorWrapper =
+        document.createElement("div");
+
+    creatorWrapper.className =
+        "multi-filter-wrapper";
+
+    const creatorButton =
+        document.createElement("button");
+
+    creatorButton.type =
+        "button";
+
+    creatorButton.className =
+        "multi-filter-button";
+
+    creatorButton.textContent =
+        "💡 Créateur ▼";
+
+    creatorButton.onclick =
+        function(event) {
+
+            event.stopPropagation();
+
+            toggleMultiFilterMenu(
+                "duplicateCreatorFilterMenu"
+            );
+
+        };
+
+    const creatorMenu =
+        document.createElement("div");
+
+    creatorMenu.id =
+        "duplicateCreatorFilterMenu";
+
+    creatorMenu.className =
+        "multi-filter-menu";
+
 
     const creators =
         [...new Set(
@@ -7094,56 +7119,475 @@ function updateDuplicateCreatorFilter() {
                     return game.creator;
                 })
                 .filter(Boolean)
-        )];
+        )].sort(
+            function(a, b) {
+                return a.localeCompare(
+                    b,
+                    "fr",
+                    {
+                        sensitivity: "base"
+                    }
+                );
+            }
+        );
 
-    select.innerHTML =
-        '<option value="">Tous les créateurs</option>';
 
-    creators
-        .sort()
-        .forEach(function(creator) {
+    creators.forEach(function(creator) {
 
-            const option =
-                document.createElement("option");
+        const label =
+            document.createElement("label");
 
-            option.value = creator;
+        label.className =
+            "multi-filter-option";
 
-            option.textContent = creator;
+        const checkbox =
+            document.createElement("input");
 
-            select.appendChild(option);
+        checkbox.type =
+            "checkbox";
+
+        checkbox.checked =
+            duplicateSelectedCreators.includes(
+                creator
+            );
+
+        checkbox.onchange =
+            function() {
+
+                if (this.checked) {
+
+                    if (
+                        !duplicateSelectedCreators.includes(
+                            creator
+                        )
+                    ) {
+
+                        duplicateSelectedCreators.push(
+                            creator
+                        );
+
+                    }
+
+                } else {
+
+                    duplicateSelectedCreators =
+                        duplicateSelectedCreators.filter(
+                            function(item) {
+                                return item !== creator;
+                            }
+                        );
+
+                }
+
+                renderDuplicateFilters();
+                renderDuplicateGames();
+
+            };
+
+        const text =
+            document.createElement("span");
+
+        text.textContent =
+            "💡 " + creator;
+
+        label.appendChild(
+            checkbox
+        );
+
+        label.appendChild(
+            text
+        );
+
+        creatorMenu.appendChild(
+            label
+        );
+
+    });
+
+
+    creatorWrapper.appendChild(
+        creatorButton
+    );
+
+    creatorWrapper.appendChild(
+        creatorMenu
+    );
+
+    container.appendChild(
+        creatorWrapper
+    );
+
+
+    /* ==================================================
+       BOUTON GROUPE
+       ================================================== */
+
+    if (groups.length > 0) {
+
+        const groupWrapper =
+            document.createElement("div");
+
+        groupWrapper.className =
+            "multi-filter-wrapper";
+
+        const groupButton =
+            document.createElement("button");
+
+        groupButton.type =
+            "button";
+
+        groupButton.className =
+            "multi-filter-button";
+
+        groupButton.textContent =
+            "🎉 Groupe ▼";
+
+        groupButton.onclick =
+            function(event) {
+
+                event.stopPropagation();
+
+                toggleMultiFilterMenu(
+                    "duplicateGroupFilterMenu"
+                );
+
+            };
+
+        const groupMenu =
+            document.createElement("div");
+
+        groupMenu.id =
+            "duplicateGroupFilterMenu";
+
+        groupMenu.className =
+            "multi-filter-menu";
+
+
+        const independentLabel =
+            document.createElement("label");
+
+        independentLabel.className =
+            "multi-filter-option";
+
+        const independentCheckbox =
+            document.createElement("input");
+
+        independentCheckbox.type =
+            "checkbox";
+
+        independentCheckbox.checked =
+            duplicateSelectedGroups.includes("");
+
+        independentCheckbox.onchange =
+            function() {
+
+                if (this.checked) {
+
+                    if (
+                        !duplicateSelectedGroups.includes("")
+                    ) {
+
+                        duplicateSelectedGroups.push("");
+
+                    }
+
+                } else {
+
+                    duplicateSelectedGroups =
+                        duplicateSelectedGroups.filter(
+                            function(item) {
+                                return item !== "";
+                            }
+                        );
+
+                }
+
+                renderDuplicateFilters();
+                renderDuplicateGames();
+
+            };
+
+        const independentText =
+            document.createElement("span");
+
+        independentText.textContent =
+            "🎭 Indépendant";
+
+        independentLabel.appendChild(
+            independentCheckbox
+        );
+
+        independentLabel.appendChild(
+            independentText
+        );
+
+        groupMenu.appendChild(
+            independentLabel
+        );
+
+
+        groups.forEach(function(group) {
+
+            const label =
+                document.createElement("label");
+
+            label.className =
+                "multi-filter-option";
+
+            const checkbox =
+                document.createElement("input");
+
+            checkbox.type =
+                "checkbox";
+
+            checkbox.checked =
+                duplicateSelectedGroups.includes(
+                    group.id
+                );
+
+            checkbox.onchange =
+                function() {
+
+                    if (this.checked) {
+
+                        if (
+                            !duplicateSelectedGroups.includes(
+                                group.id
+                            )
+                        ) {
+
+                            duplicateSelectedGroups.push(
+                                group.id
+                            );
+
+                        }
+
+                    } else {
+
+                        duplicateSelectedGroups =
+                            duplicateSelectedGroups.filter(
+                                function(item) {
+                                    return item !== group.id;
+                                }
+                            );
+
+                    }
+
+                    renderDuplicateFilters();
+                    renderDuplicateGames();
+
+                };
+
+            const text =
+                document.createElement("span");
+
+            text.textContent =
+                "🎉 " + group.name;
+
+            label.appendChild(
+                checkbox
+            );
+
+            label.appendChild(
+                text
+            );
+
+            groupMenu.appendChild(
+                label
+            );
 
         });
 
-    select.value = currentValue;
 
-}
-
-function updateDuplicateGroupFilter() {
-
-    const select =
-        document.getElementById(
-            "duplicateGroupFilter"
+        groupWrapper.appendChild(
+            groupButton
         );
 
-    select.innerHTML = `
-        <option value="">
-            Tous les groupes
-        </option>
-    `;
+        groupWrapper.appendChild(
+            groupMenu
+        );
 
-    groups.forEach(function(group) {
+        container.appendChild(
+            groupWrapper
+        );
 
-        const option =
-            document.createElement("option");
+    }
 
-        option.value = group.id;
 
-        option.textContent =
-            "🎉 " + group.name;
+    /* ==================================================
+       BOUTON PARTICIPANTS
+       ================================================== */
 
-        select.appendChild(option);
+    const participantWrapper =
+        document.createElement("div");
+
+    participantWrapper.className =
+        "multi-filter-wrapper";
+
+    const participantButton =
+        document.createElement("button");
+
+    participantButton.type =
+        "button";
+
+    participantButton.className =
+        "multi-filter-button";
+
+    participantButton.textContent =
+        "👥 Participants ▼";
+
+    participantButton.onclick =
+        function(event) {
+
+            event.stopPropagation();
+
+            toggleMultiFilterMenu(
+                "duplicateParticipantFilterMenu"
+            );
+
+        };
+
+    const participantMenu =
+        document.createElement("div");
+
+    participantMenu.id =
+        "duplicateParticipantFilterMenu";
+
+    participantMenu.className =
+        "multi-filter-menu";
+
+
+    const participants =
+        [...new Map(
+            games
+                .flatMap(function(game) {
+                    return Array.isArray(game.participants)
+                        ? game.participants
+                        : [];
+                })
+                .concat(
+                    groups.flatMap(function(group) {
+                        return Array.isArray(group.participants)
+                            ? group.participants
+                            : [];
+                    })
+                )
+                .map(function(name) {
+                    return [
+                        name.toLowerCase(),
+                        name
+                    ];
+                })
+        ).values()]
+        .sort(function(a, b) {
+
+            return a.localeCompare(
+                b,
+                "fr",
+                {
+                    sensitivity: "base"
+                }
+            );
+
+        });
+
+
+    participants.forEach(function(participant) {
+
+        const label =
+            document.createElement("label");
+
+        label.className =
+            "multi-filter-option";
+
+        const checkbox =
+            document.createElement("input");
+
+        checkbox.type =
+            "checkbox";
+
+        checkbox.checked =
+            duplicateSelectedParticipants.some(
+                function(item) {
+
+                    return item.toLowerCase() ===
+                           participant.toLowerCase();
+
+                }
+            );
+
+        checkbox.onchange =
+            function() {
+
+                if (this.checked) {
+
+                    if (
+                        !duplicateSelectedParticipants.some(
+                            function(item) {
+                                return item.toLowerCase() ===
+                                       participant.toLowerCase();
+                            }
+                        )
+                    ) {
+
+                        duplicateSelectedParticipants.push(
+                            participant
+                        );
+
+                    }
+
+                } else {
+
+                    duplicateSelectedParticipants =
+                        duplicateSelectedParticipants.filter(
+                            function(item) {
+
+                                return item.toLowerCase() !==
+                                       participant.toLowerCase();
+
+                            }
+                        );
+
+                }
+
+                renderDuplicateFilters();
+                renderDuplicateGames();
+
+            };
+
+
+        const text =
+            document.createElement("span");
+
+        text.textContent =
+            "👥 " + participant;
+
+        label.appendChild(
+            checkbox
+        );
+
+        label.appendChild(
+            text
+        );
+
+        participantMenu.appendChild(
+            label
+        );
 
     });
+
+
+    participantWrapper.appendChild(
+        participantButton
+    );
+
+    participantWrapper.appendChild(
+        participantMenu
+    );
+
+    container.appendChild(
+        participantWrapper
+    );
 
 }
    
@@ -7161,15 +7605,6 @@ const search =
         .trim()
         .toLowerCase();
 
-const creatorFilter =
-    document.getElementById(
-        "duplicateCreatorFilter"
-    ).value;
-
-const groupFilter =
-    document.getElementById(
-        "duplicateGroupFilter"
-    ).value;
 
 container.innerHTML = "";
 
@@ -7180,13 +7615,35 @@ container.innerHTML = "";
             return false;
         }
 
-      const matchesCreator =
-    !creatorFilter ||
-    game.creator === creatorFilter;
+     const matchesCreator =
+    duplicateSelectedCreators.length === 0 ||
+    duplicateSelectedCreators.includes(
+        game.creator
+    );
 
 const matchesGroup =
-    !groupFilter ||
-    game.groupId === groupFilter;
+    duplicateSelectedGroups.length === 0 ||
+    duplicateSelectedGroups.includes(
+        game.groupId || ""
+    );
+
+const matchesParticipants =
+    duplicateSelectedParticipants.length === 0 ||
+    duplicateSelectedParticipants.some(
+        function(participant) {
+
+            return Array.isArray(game.participants) &&
+                   game.participants.some(
+                       function(gameParticipant) {
+
+                           return gameParticipant.toLowerCase() ===
+                                  participant.toLowerCase();
+
+                       }
+                   );
+
+        }
+    );
 
 const matchesSearch =
     !search ||
@@ -7196,6 +7653,7 @@ const matchesSearch =
 
 return matchesCreator &&
        matchesGroup &&
+       matchesParticipants &&
        matchesSearch;
 
     });
