@@ -5273,19 +5273,41 @@ function createGame() {
 
     }
 
-const game = {
+let participants = [creator];
 
+if (groupId) {
+    const group = groups.find(function(group) {
+        return group.id === groupId;
+    });
+
+    if (group && Array.isArray(group.participants)) {
+        group.participants.forEach(function(name) {
+
+            const alreadyExists =
+                participants.some(function(participant) {
+
+                    return participant.toLowerCase() ===
+                           name.toLowerCase();
+
+                });
+
+            if (!alreadyExists) {
+                participants.push(name);
+            }
+
+        });
+    }
+}
+
+const game = {
     id: Date.now().toString(),
     name: name,
     creator: creator,
     groupId: groupId,
     password: password,
     email: email,
-    participants: [
-        creator
-    ],
+    participants: participants,
     rounds: []
-
 };
 
     games.push(game);
