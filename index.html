@@ -8872,40 +8872,56 @@ function setupRoundDrag() {
             "pointermove",
             function(event) {
 
+                /*
+                 * Tant que l'appui long n'est pas terminé,
+                 * on ne déplace pas la carte.
+                 *
+                 * Le navigateur peut donc faire défiler
+                 * la page normalement.
+                 */
                 if (!isDragging) {
                     return;
                 }
 
                 event.preventDefault();
 
-const screenHeight =
-    window.innerHeight;
 
-const scrollZone = 80;
-
-if (
-    event.clientY >
-    screenHeight - scrollZone
-) {
-
-    window.scrollBy(
-        0,
-        10
-    );
-
-} else if (
-    event.clientY <
-    scrollZone
-) {
-
-    window.scrollBy(
-        0,
-        -10
-    );
-
-}
                 currentY =
                     event.clientY;
+
+
+                /* =====================================
+                   AUTO-DÉFILEMENT
+                   ===================================== */
+
+                const screenHeight =
+                    window.innerHeight;
+
+                const scrollZone =
+                    80;
+
+
+                if (
+                    event.clientY >
+                    screenHeight - scrollZone
+                ) {
+
+                    window.scrollBy(
+                        0,
+                        10
+                    );
+
+                } else if (
+                    event.clientY <
+                    scrollZone
+                ) {
+
+                    window.scrollBy(
+                        0,
+                        -10
+                    );
+
+                }
 
 
                 /* La carte suit le doigt */
@@ -8915,6 +8931,10 @@ if (
                         (currentY - startY)
                     ) + "px";
 
+
+                /* =====================================
+                   RECHERCHE DE LA NOUVELLE POSITION
+                   ===================================== */
 
                 const otherCards =
                     Array.from(
@@ -9132,6 +9152,8 @@ if (
     });
 
 }
+
+   
 /* ========================================================
    COMPTEUR DE MUSIQUES
    ======================================================== */
