@@ -8768,6 +8768,7 @@ function setupRoundDrag() {
         let originalTop = 0;
         let placeholder = null;
         let pointerId = null;
+        let movedBeforeLongPress = false;
 
 
         card.addEventListener(
@@ -8789,13 +8790,22 @@ function setupRoundDrag() {
                 startY =
                     event.clientY;
 
+                movedBeforeLongPress = false;
                 isDragging = false;
 
 
                 pressTimer =
                     setTimeout(function() {
 
+                        /* Si le doigt a déjà bougé,
+                           ce n'est pas un drag */
+                        if (movedBeforeLongPress) {
+                            return;
+                        }
+
+
                         isDragging = true;
+
 
                         const rect =
                             card.getBoundingClientRect();
@@ -8872,16 +8882,29 @@ function setupRoundDrag() {
             "pointermove",
             function(event) {
 
-                /*
-                 * Tant que l'appui long n'est pas terminé,
-                 * on ne déplace pas la carte.
-                 *
-                 * Le navigateur peut donc faire défiler
-                 * la page normalement.
-                 */
+                /* Avant les 800 ms :
+                   si le doigt bouge, on annule
+                   le futur déplacement de la carte.
+                   Le navigateur peut donc faire défiler. */
                 if (!isDragging) {
+
+                    if (
+                        Math.abs(
+                            event.clientY - startY
+                        ) > 8
+                    ) {
+
+                        movedBeforeLongPress = true;
+
+                        clearTimeout(
+                            pressTimer
+                        );
+
+                    }
+
                     return;
                 }
+
 
                 event.preventDefault();
 
