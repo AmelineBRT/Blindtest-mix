@@ -8878,7 +8878,32 @@ function setupRoundDrag() {
 
                 event.preventDefault();
 
+const screenHeight =
+    window.innerHeight;
 
+const scrollZone = 80;
+
+if (
+    event.clientY >
+    screenHeight - scrollZone
+) {
+
+    window.scrollBy(
+        0,
+        10
+    );
+
+} else if (
+    event.clientY <
+    scrollZone
+) {
+
+    window.scrollBy(
+        0,
+        -10
+    );
+
+}
                 currentY =
                     event.clientY;
 
