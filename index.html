@@ -6551,27 +6551,25 @@ function renderRounds() {
 
                 </div>
 
-                <div class="round-order-buttons">
+<div class="round-order-buttons">
 
-                    <button
-                        class="light"
-                        onclick="moveRoundUp('${round.id}')"
-                        ${index === 0 ? "disabled" : ""}>
+    <button
+        class="duplicate-button"
+        onclick="showDuplicateRound('${round.id}')"
+        title="Dupliquer">
 
-                        ↑
+        📋
+    </button>
 
-                    </button>
+    <button
+        class="delete-round-button"
+        onclick="deleteRound('${round.id}')"
+        title="Supprimer">
 
-                    <button
-                        class="light"
-                        onclick="moveRoundDown('${round.id}')"
-                        ${index === game.rounds.length - 1 ? "disabled" : ""}>
+        🗑️
+    </button>
 
-                        ↓
-
-                    </button>
-
-                </div>
+</div>
 
             </div>
 
@@ -6616,22 +6614,6 @@ function renderRounds() {
             </div>
 
             <div class="round-actions">
-
-                <button
-                    class="duplicate-button"
-                    onclick="showDuplicateRound('${round.id}')">
-
-                    📋 Dupliquer
-
-                </button>
-
-                <button
-                    class="delete-round-button"
-                    onclick="deleteRound('${round.id}')">
-
-                    🗑️ Supprimer
-
-                </button>
 
                 <button
                     class="play-round-button"
