@@ -2441,6 +2441,20 @@ label {
 
         </select>
 
+       <label for="duplicateGroupFilter">
+    Filtrer par groupe
+</label>
+
+<select
+    id="duplicateGroupFilter"
+    onchange="renderDuplicateGames()">
+
+    <option value="">
+        Tous les groupes
+    </option>
+
+</select>
+
     </div>
 
 </div>
@@ -7054,6 +7068,8 @@ function showDuplicateRound(roundId) {
 
     updateDuplicateCreatorFilter();
 
+    updateDuplicateGroupFilter();
+
     renderDuplicateGames();
 
     showScreen("duplicateRoundScreen");
@@ -7102,7 +7118,35 @@ function updateDuplicateCreatorFilter() {
 
 }
 
+function updateDuplicateGroupFilter() {
 
+    const select =
+        document.getElementById(
+            "duplicateGroupFilter"
+        );
+
+    select.innerHTML = `
+        <option value="">
+            Tous les groupes
+        </option>
+    `;
+
+    groups.forEach(function(group) {
+
+        const option =
+            document.createElement("option");
+
+        option.value = group.id;
+
+        option.textContent =
+            "🎉 " + group.name;
+
+        select.appendChild(option);
+
+    });
+
+}
+   
 function renderDuplicateGames() {
 
     const container =
@@ -7110,37 +7154,53 @@ function renderDuplicateGames() {
             "duplicateGamesList"
         );
 
-    const search =
-        document
-            .getElementById("duplicateSearch")
-            .value
-            .trim()
-            .toLowerCase();
+const search =
+    document
+        .getElementById("duplicateSearch")
+        .value
+        .trim()
+        .toLowerCase();
 
-    const creatorFilter =
-        document.getElementById(
-            "duplicateCreatorFilter"
-        ).value;
+const creatorFilter =
+    document.getElementById(
+        "duplicateCreatorFilter"
+    ).value;
 
-    container.innerHTML = "";
+const groupFilter =
+    document.getElementById(
+        "duplicateGroupFilter"
+    ).value;
+
+container.innerHTML = "";
 
     const filteredGames =
-        games.filter(function(game) {
+    games.filter(function(game) {
 
-            const matchesCreator =
-                !creatorFilter ||
-                game.creator === creatorFilter;
+        if (game.id === duplicateSourceGameId) {
+            return false;
+        }
 
-            const matchesSearch =
-                !search ||
-                game.name
-                    .toLowerCase()
-                    .includes(search);
+      const matchesCreator =
+    !creatorFilter ||
+    game.creator === creatorFilter;
 
-            return matchesCreator && matchesSearch;
+const matchesGroup =
+    !groupFilter ||
+    game.groupId === groupFilter;
 
-        });
+const matchesSearch =
+    !search ||
+    game.name
+        .toLowerCase()
+        .includes(search);
 
+return matchesCreator &&
+       matchesGroup &&
+       matchesSearch;
+
+    });
+
+   
     if (filteredGames.length === 0) {
 
         container.innerHTML =
