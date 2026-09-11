@@ -1216,6 +1216,17 @@ label {
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
+.round-card {
+    cursor: grab;
+    user-select: none;
+}
+
+.round-card.is-dragging {
+    opacity: 0.6;
+    transform: scale(1.02);
+    cursor: grabbing;
+}
+   
 .round-header {
     display: flex;
     justify-content: space-between;
@@ -6491,10 +6502,11 @@ function renderRounds() {
 
     game.rounds.forEach(function(round, index) {
 
-        const div =
-            document.createElement("div");
+   const div =
+    document.createElement("div");
 
-        div.className = "round-card";
+div.className = "round-card";
+div.dataset.roundId = round.id;
 
         const realTracks =
             round.tracks.filter(function(track) {
@@ -6630,6 +6642,8 @@ function renderRounds() {
         container.appendChild(div);
 
     });
+
+          setupRoundDrag();
 
 }
 
@@ -7663,6 +7677,229 @@ function updateTrackPlayingState(index, state) {
 
 }
 
+   /* =========================================================
+   DÉPLACEMENT DES MANCHES PAR APPUI LONG
+   ========================================================= */
+
+let draggedRound = null;
+let dragTimer = null;
+let isDraggingRound = false;
+let dragStartY = 0;
+
+
+function setupRoundDrag() {
+
+    const container =
+        document.getElementById("roundsList");
+
+    const cards =
+        container.querySelectorAll(".round-card");
+
+    cards.forEach(function(card) {
+
+        card.addEventListener(
+            "pointerdown",
+            function(event) {
+
+                /* Ne pas déclencher le déplacement
+                   lorsqu'on appuie sur un bouton */
+                if (
+                    event.target.closest("button") ||
+                    event.target.closest("input") ||
+                    event.target.closest("select")
+                ) {
+                    return;
+                }
+
+                draggedRound = card;
+                dragStartY = event.clientY;
+                isDraggingRound = false;
+
+                dragTimer = setTimeout(function() {
+
+                    isDraggingRound = true;
+
+                    card.classList.add(
+                        "is-dragging"
+                    );
+
+                    card.setPointerCapture(
+                        event.pointerId
+                    );
+
+                }, 500);
+
+            }
+        );
+
+
+        card.addEventListener(
+            "pointermove",
+            function(event) {
+
+                if (!draggedRound) {
+                    return;
+                }
+
+                if (!isDraggingRound) {
+
+                    if (
+                        Math.abs(
+                            event.clientY -
+                            dragStartY
+                        ) > 10
+                    ) {
+                        clearTimeout(
+                            dragTimer
+                        );
+
+                        draggedRound = null;
+                    }
+
+                    return;
+                }
+
+                event.preventDefault();
+
+                const cards =
+                    Array.from(
+                        container.querySelectorAll(
+                            ".round-card:not(.is-dragging)"
+                        )
+                    );
+
+                let inserted = false;
+
+                cards.forEach(function(otherCard) {
+
+                    if (inserted) {
+                        return;
+                    }
+
+                    const rect =
+                        otherCard.getBoundingClientRect();
+
+                    const middle =
+                        rect.top +
+                        rect.height / 2;
+
+                    if (
+                        event.clientY <
+                        middle
+                    ) {
+
+                        container.insertBefore(
+                            draggedRound,
+                            otherCard
+                        );
+
+                        inserted = true;
+                    }
+
+                });
+
+                if (!inserted) {
+
+                    container.appendChild(
+                        draggedRound
+                    );
+
+                }
+
+            }
+        );
+
+
+        card.addEventListener(
+            "pointerup",
+            function(event) {
+
+                clearTimeout(
+                    dragTimer
+                );
+
+                if (
+                    isDraggingRound
+                ) {
+
+                    event.preventDefault();
+
+                    card.classList.remove(
+                        "is-dragging"
+                    );
+
+                    const game =
+                        getCurrentGame();
+
+                    const newOrder =
+                        Array.from(
+                            container.querySelectorAll(
+                                ".round-card"
+                            )
+                        ).map(function(card) {
+
+                            return card.dataset.roundId;
+
+                        });
+
+                    const reorderedRounds = [];
+
+                    newOrder.forEach(function(id) {
+
+                        const round =
+                            game.rounds.find(
+                                function(round) {
+                                    return round.id === id;
+                                }
+                            );
+
+                        if (round) {
+                            reorderedRounds.push(
+                                round
+                            );
+                        }
+
+                    });
+
+                    game.rounds =
+                        reorderedRounds;
+
+                    saveData();
+
+                    renderRounds();
+
+                    setupRoundDrag();
+
+                }
+
+                draggedRound = null;
+                isDraggingRound = false;
+
+            }
+        );
+
+
+        card.addEventListener(
+            "pointercancel",
+            function() {
+
+                clearTimeout(
+                    dragTimer
+                );
+
+                card.classList.remove(
+                    "is-dragging"
+                );
+
+                draggedRound = null;
+                isDraggingRound = false;
+
+            }
+        );
+
+    });
+
+}
 
 /* ========================================================
    COMPTEUR DE MUSIQUES
