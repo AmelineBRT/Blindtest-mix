@@ -418,7 +418,7 @@ button:disabled {
 }
 
    .participant-creator {
-    color: #777;
+    color: #999;
     cursor: default;
 }
 
@@ -478,6 +478,7 @@ button:disabled {
     border-radius: 6px;
 }
 
+   
 .participant-remove {
     display: none;
 
@@ -493,6 +494,8 @@ button:disabled {
 
 .participant-remove.visible {
     display: block;
+    color: #8b2f3f;
+    font-weight: bold;
 }
 
 .participant-add {
@@ -2566,6 +2569,7 @@ let gamesView = "games";
 let selectedCreators = [];
 let selectedGroups = [];
 let sortMode = "creation";
+let selectedParticipants = [];
 
 /* ========================================================
    MODE SOMBRE
@@ -3305,7 +3309,190 @@ groupMenu.appendChild(
         );
 
     }
+/* ==================================================
+   BOUTON PARTICIPANTS
+   ================================================== */
 
+const participantWrapper =
+    document.createElement("div");
+
+participantWrapper.className =
+    "multi-filter-wrapper";
+
+const participantButton =
+    document.createElement("button");
+
+participantButton.type =
+    "button";
+
+participantButton.className =
+    "multi-filter-button";
+
+participantButton.textContent =
+    "Participants ▼";
+
+participantButton.onclick =
+    function(event) {
+
+        event.stopPropagation();
+
+        toggleMultiFilterMenu(
+            "participantFilterMenu"
+        );
+
+    };
+
+const participantMenu =
+    document.createElement("div");
+
+participantMenu.id =
+    "participantFilterMenu";
+
+participantMenu.className =
+    "multi-filter-menu";
+
+
+const participants =
+    [...new Map(
+        games
+            .flatMap(function(game) {
+                return Array.isArray(game.participants)
+                    ? game.participants
+                    : [];
+            })
+            .concat(
+                groups.flatMap(function(group) {
+                    return Array.isArray(group.participants)
+                        ? group.participants
+                        : [];
+                })
+            )
+            .map(function(name) {
+                return [
+                    name.toLowerCase(),
+                    name
+                ];
+            })
+    ).values()]
+    .sort(function(a, b) {
+
+        return a.localeCompare(
+            b,
+            "fr",
+            {
+                sensitivity: "base"
+            }
+        );
+
+    });
+
+
+if (participants.length === 0) {
+
+    participantMenu.innerHTML =
+        "<div class='multi-filter-empty'>" +
+        "Aucun participant disponible." +
+        "</div>";
+
+} else {
+
+    participants.forEach(function(participant) {
+
+        const label =
+            document.createElement("label");
+
+        label.className =
+            "multi-filter-option";
+
+        const checkbox =
+            document.createElement("input");
+
+        checkbox.type =
+            "checkbox";
+
+        checkbox.checked =
+            selectedParticipants.some(
+                function(item) {
+
+                    return item.toLowerCase() ===
+                           participant.toLowerCase();
+
+                }
+            );
+
+        checkbox.onchange =
+            function() {
+
+                if (this.checked) {
+
+                    if (
+                        !selectedParticipants.some(
+                            function(item) {
+                                return item.toLowerCase() ===
+                                       participant.toLowerCase();
+                            }
+                        )
+                    ) {
+
+                        selectedParticipants.push(
+                            participant
+                        );
+
+                    }
+
+                } else {
+
+                    selectedParticipants =
+                        selectedParticipants.filter(
+                            function(item) {
+
+                                return item.toLowerCase() !==
+                                       participant.toLowerCase();
+
+                            }
+                        );
+
+                }
+
+                renderActiveFilters();
+                renderGames();
+
+            };
+
+
+        const text =
+            document.createElement("span");
+
+        text.textContent =
+            "👥 " + participant;
+
+        label.appendChild(
+            checkbox
+        );
+
+        label.appendChild(
+            text
+        );
+
+        participantMenu.appendChild(
+            label
+        );
+
+    });
+
+}
+
+participantWrapper.appendChild(
+    participantButton
+);
+
+participantWrapper.appendChild(
+    participantMenu
+);
+
+filterRow.appendChild(
+    participantWrapper
+);
 
     container.appendChild(
         filterRow
@@ -3554,6 +3741,50 @@ selectedGroups.forEach(function(groupId) {
     });
 
 
+/* =========================
+   PARTICIPANTS
+   ========================= */
+
+selectedParticipants.forEach(
+    function(participant) {
+
+        hasFilters = true;
+
+        const chip =
+            document.createElement("div");
+
+        chip.className =
+            "active-filter";
+
+        chip.innerHTML =
+            "<span>👥 " +
+            escapeHTML(participant) +
+            "</span>" +
+            "<button type=\"button\" title=\"Supprimer ce filtre\">×</button>";
+
+        chip.querySelector("button").onclick =
+            function() {
+
+                selectedParticipants =
+                    selectedParticipants.filter(
+                        function(item) {
+
+                            return item.toLowerCase() !==
+                                   participant.toLowerCase();
+
+                        }
+                    );
+
+                renderFilters();
+                renderGames();
+
+            };
+
+        container.appendChild(chip);
+
+    }
+);
+   
     /* =========================
        BOUTON RÉINITIALISER
        ========================= */
@@ -3611,6 +3842,24 @@ function getFilteredGames() {
                 game.groupId
             );
 
+       const matchesParticipant =
+    selectedParticipants.length === 0 ||
+    !selectedParticipants.some(
+        function(selectedParticipant) {
+
+            return Array.isArray(game.participants) &&
+                game.participants.some(
+                    function(participant) {
+
+                        return participant.toLowerCase() ===
+                               selectedParticipant.toLowerCase();
+
+                    }
+                );
+
+        }
+    );
+
         const matchesSearch =
             !search ||
             game.name
@@ -3620,11 +3869,12 @@ function getFilteredGames() {
                 .toLowerCase()
                 .includes(search);
 
-        return (
-            matchesCreator &&
-            matchesGroup &&
-            matchesSearch
-        );
+return (
+    matchesCreator &&
+    matchesGroup &&
+    matchesParticipant &&
+    matchesSearch
+);
 
     });
 
@@ -3634,6 +3884,7 @@ function getFilteredGames() {
 
     selectedCreators = [];
     selectedGroups = [];
+    selectedParticipants = [];
 
     document.getElementById("gameSearch").value = "";
 
@@ -3865,6 +4116,24 @@ function renderGroupsView(container) {
                     group.id
                 );
 
+const matchesParticipant =
+    selectedParticipants.length === 0 ||
+    !selectedParticipants.some(
+        function(selectedParticipant) {
+
+            return Array.isArray(group.participants) &&
+                group.participants.some(
+                    function(participant) {
+
+                        return participant.toLowerCase() ===
+                               selectedParticipant.toLowerCase();
+
+                    }
+                );
+
+        }
+    );
+           
 const matchesSearch =
     !search ||
     group.name
@@ -3888,6 +4157,7 @@ const matchesSearch =
 
 return (
     matchesGroup &&
+    matchesParticipant &&
     matchesSearch
 );
 
@@ -5584,53 +5854,53 @@ function toggleParticipants(type) {
 
     } else {
 
-        item.participants.forEach(function(name, index) {
+item.participants.forEach(function(name, index) {
+
+    const isCreator =
+        type === "game" &&
+        item.creator &&
+        name.toLowerCase() ===
+        item.creator.toLowerCase();
 
     html += `
-    <div
-        class="participant-item"
-        ${
-            type === "game" &&
-            item.creator &&
-            name.toLowerCase() === item.creator.toLowerCase()
-                ? ""
-                : `onclick="toggleParticipantDelete('${type}', ${index})"`
-        }
-    >
-
-        <span
-            class="participant-name ${
-                type === "game" &&
-                item.creator &&
-                name.toLowerCase() === item.creator.toLowerCase()
-                    ? "participant-creator"
-                    : ""
-            }"
+        <div
+            class="participant-item"
+            ${
+                isCreator
+                    ? ""
+                    : `onclick="toggleParticipantDelete('${type}', ${index})"`
+            }
         >
-            ${escapeHTML(name)}
-        </span>
 
-        ${
-            type === "game" &&
-            item.creator &&
-            name.toLowerCase() === item.creator.toLowerCase()
-                ? ""
-                : `
-                    <button
-                        type="button"
-                        class="participant-remove"
-                        id="remove-${type}-${index}"
-                        onclick="event.stopPropagation(); removeParticipant('${type}', ${index})"
-                        title="Supprimer">
-                        ×
-                    </button>
-                `
-        }
+            <span
+                class="participant-name ${
+                    isCreator
+                        ? "participant-creator"
+                        : ""
+                }"
+            >
+                ${escapeHTML(name)}
+            </span>
 
-    </div>
-`;
+            ${
+                isCreator
+                    ? ""
+                    : `
+                        <button
+                            type="button"
+                            class="participant-remove"
+                            id="remove-${type}-${index}"
+                            onclick="event.stopPropagation(); removeParticipant('${type}', ${index})"
+                            title="Supprimer">
+                            ×
+                        </button>
+                    `
+            }
 
-        });
+        </div>
+    `;
+
+});
 
     }
 
@@ -5771,9 +6041,18 @@ function toggleParticipantDelete(type, index) {
         return;
     }
 
-    if (button.classList.contains("visible")) {
+    const item =
+        button.closest(".participant-item");
+
+    if (
+        button.classList.contains("visible")
+    ) {
 
         button.classList.remove("visible");
+
+        if (item) {
+            item.classList.remove("selected");
+        }
 
     } else {
 
@@ -5787,7 +6066,21 @@ function toggleParticipantDelete(type, index) {
 
             });
 
+        document
+            .querySelectorAll(".participant-item")
+            .forEach(function(otherItem) {
+
+                otherItem.classList.remove(
+                    "selected"
+                );
+
+            });
+
         button.classList.add("visible");
+
+        if (item) {
+            item.classList.add("selected");
+        }
 
     }
 
