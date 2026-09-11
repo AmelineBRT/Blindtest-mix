@@ -2985,7 +2985,7 @@ function renderFilters() {
         "multi-filter-button";
 
     creatorButton.textContent =
-        "Créateur ▼";
+        "💡 Créateur ▼";
 
     creatorButton.onclick =
         function(event) {
@@ -3092,7 +3092,7 @@ function renderFilters() {
                 document.createElement("span");
 
             text.textContent =
-                creator;
+                "💡 " + creator;
 
             label.appendChild(
                 checkbox
@@ -3145,7 +3145,7 @@ function renderFilters() {
             "multi-filter-button";
 
         groupButton.textContent =
-            "Groupe ▼";
+            "🎉 Groupe ▼";
 
         groupButton.onclick =
             function(event) {
@@ -3329,7 +3329,7 @@ participantButton.className =
     "multi-filter-button";
 
 participantButton.textContent =
-    "Participants ▼";
+    "👥 " + Participants ▼";
 
 participantButton.onclick =
     function(event) {
@@ -3633,7 +3633,7 @@ function renderActiveFilters() {
             "active-filter";
 
         chip.innerHTML =
-            "<span>👤 " +
+            "<span>💡 " +
             escapeHTML(creator) +
             "</span>" +
             "<button type=\"button\" title=\"Supprimer ce filtre\">×</button>";
