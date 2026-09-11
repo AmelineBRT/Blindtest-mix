@@ -1603,6 +1603,15 @@ label {
 
 @media (max-width: 600px) {
 
+   @media (max-width: 380px) {
+
+    .multi-filter-button {
+        padding: 6px 4px;
+        font-size: 11px;
+    }
+
+}
+
     main {
         padding: 10px;
     }
@@ -1690,6 +1699,19 @@ label {
         align-items: stretch;
     }
 
+    .multi-filter-row {
+        flex-wrap: nowrap;
+        gap: 5px;
+    }
+
+    .multi-filter-button {
+        flex: 1 1 0;
+        min-width: 0;
+        padding: 7px 6px;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+   
 }
 
 </style>
@@ -1863,7 +1885,7 @@ label {
     <input
         id="groupColor"
         type="color"
-        value="#ff0000">
+        value="#B8DCD7">
 
 </div>
 
@@ -1910,7 +1932,7 @@ label {
         <input
             id="editGroupColor"
             type="color"
-            value="#ff0000">
+            value="#B8DCD7">
 
     </div>
 
