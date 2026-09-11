@@ -1257,7 +1257,7 @@ label {
 
     display: flex;
     flex-direction: row;
-    gap: 2px;
+    gap: 5px;
 
     z-index: 2;
 }
@@ -7725,12 +7725,17 @@ function setupRoundDrag() {
 
     cards.forEach(function(card) {
 
+        let pressTimer = null;
+        let isDragging = false;
+        let startY = 0;
+        let pointerId = null;
+
+
         card.addEventListener(
             "pointerdown",
             function(event) {
 
-                /* Ne pas déclencher le déplacement
-                   lorsqu'on appuie sur un bouton */
+                /* Les boutons restent utilisables normalement */
                 if (
                     event.target.closest("button") ||
                     event.target.closest("input") ||
@@ -7739,23 +7744,30 @@ function setupRoundDrag() {
                     return;
                 }
 
-                draggedRound = card;
-                dragStartY = event.clientY;
-                isDraggingRound = false;
+                pointerId =
+                    event.pointerId;
 
-                dragTimer = setTimeout(function() {
+                startY =
+                    event.clientY;
 
-                    isDraggingRound = true;
+                isDragging = false;
 
-                    card.classList.add(
-                        "is-dragging"
-                    );
+                pressTimer =
+                    setTimeout(function() {
 
-                    card.setPointerCapture(
-                        event.pointerId
-                    );
+                        isDragging = true;
 
-                }, 500);
+                        card.classList.add(
+                            "is-dragging"
+                        );
+
+                        try {
+                            card.setPointerCapture(
+                                pointerId
+                            );
+                        } catch (error) {}
+
+                    }, 500);
 
             }
         );
@@ -7765,25 +7777,12 @@ function setupRoundDrag() {
             "pointermove",
             function(event) {
 
-                if (!draggedRound) {
-                    return;
-                }
-
-                if (!isDraggingRound) {
-
-                    if (
-                        Math.abs(
-                            event.clientY -
-                            dragStartY
-                        ) > 10
-                    ) {
-                        clearTimeout(
-                            dragTimer
-                        );
-
-                        draggedRound = null;
-                    }
-
+                /*
+                 * Avant l'appui long :
+                 * on laisse le doigt faire défiler
+                 * normalement la page.
+                 */
+                if (!isDragging) {
                     return;
                 }
 
@@ -7792,17 +7791,27 @@ function setupRoundDrag() {
                 const cards =
                     Array.from(
                         container.querySelectorAll(
-                            ".round-card:not(.is-dragging)"
+                            ".round-card"
                         )
                     );
 
-                let inserted = false;
+                const otherCards =
+                    cards.filter(function(otherCard) {
 
-                cards.forEach(function(otherCard) {
+                        return otherCard !== card;
 
-                    if (inserted) {
-                        return;
-                    }
+                    });
+
+                let targetCard = null;
+
+                for (
+                    let i = 0;
+                    i < otherCards.length;
+                    i++
+                ) {
+
+                    const otherCard =
+                        otherCards[i];
 
                     const rect =
                         otherCard.getBoundingClientRect();
@@ -7816,20 +7825,26 @@ function setupRoundDrag() {
                         middle
                     ) {
 
-                        container.insertBefore(
-                            draggedRound,
-                            otherCard
-                        );
+                        targetCard =
+                            otherCard;
 
-                        inserted = true;
+                        break;
                     }
 
-                });
+                }
 
-                if (!inserted) {
+
+                if (targetCard) {
+
+                    container.insertBefore(
+                        card,
+                        targetCard
+                    );
+
+                } else {
 
                     container.appendChild(
-                        draggedRound
+                        card
                     );
 
                 }
@@ -7843,65 +7858,67 @@ function setupRoundDrag() {
             function(event) {
 
                 clearTimeout(
-                    dragTimer
+                    pressTimer
                 );
 
-                if (
-                    isDraggingRound
-                ) {
+                if (!isDragging) {
+                    return;
+                }
 
-                    event.preventDefault();
+                event.preventDefault();
 
-                    card.classList.remove(
-                        "is-dragging"
-                    );
+                isDragging = false;
 
-                    const game =
-                        getCurrentGame();
+                card.classList.remove(
+                    "is-dragging"
+                );
 
-                    const newOrder =
-                        Array.from(
-                            container.querySelectorAll(
-                                ".round-card"
-                            )
-                        ).map(function(card) {
 
-                            return card.dataset.roundId;
+                const game =
+                    getCurrentGame();
 
-                        });
+                const orderedIds =
+                    Array.from(
+                        container.querySelectorAll(
+                            ".round-card"
+                        )
+                    ).map(function(card) {
 
-                    const reorderedRounds = [];
-
-                    newOrder.forEach(function(id) {
-
-                        const round =
-                            game.rounds.find(
-                                function(round) {
-                                    return round.id === id;
-                                }
-                            );
-
-                        if (round) {
-                            reorderedRounds.push(
-                                round
-                            );
-                        }
+                        return card.dataset.roundId;
 
                     });
 
-                    game.rounds =
-                        reorderedRounds;
 
-                    saveData();
+                const newRounds = [];
 
-                    renderRounds();
+                orderedIds.forEach(function(id) {
 
-                    setupRoundDrag();
+                    const round =
+                        game.rounds.find(
+                            function(round) {
 
-                }
+                                return round.id === id;
 
-                draggedRound = null;
-                isDraggingRound = false;
+                            }
+                        );
+
+                    if (round) {
+
+                        newRounds.push(
+                            round
+                        );
+
+                    }
+
+                });
+
+
+                game.rounds =
+                    newRounds;
+
+                saveData();
+
+                renderRounds();
 
             }
         );
@@ -7912,15 +7929,14 @@ function setupRoundDrag() {
             function() {
 
                 clearTimeout(
-                    dragTimer
+                    pressTimer
                 );
+
+                isDragging = false;
 
                 card.classList.remove(
                     "is-dragging"
                 );
-
-                draggedRound = null;
-                isDraggingRound = false;
 
             }
         );
