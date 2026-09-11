@@ -8763,6 +8763,9 @@ function setupRoundDrag() {
         let pressTimer = null;
         let isDragging = false;
         let startY = 0;
+        let currentY = 0;
+        let originalTop = 0;
+        let placeholder = null;
         let pointerId = null;
 
 
@@ -8787,19 +8790,75 @@ function setupRoundDrag() {
 
                 isDragging = false;
 
+
                 pressTimer =
                     setTimeout(function() {
 
                         isDragging = true;
 
+                        const rect =
+                            card.getBoundingClientRect();
+
+                        originalTop =
+                            rect.top;
+
+                        currentY =
+                            event.clientY;
+
+
+                        /* Crée un espace à la place de la carte */
+                        placeholder =
+                            document.createElement("div");
+
+                        placeholder.style.height =
+                            rect.height + "px";
+
+                        placeholder.style.marginBottom =
+                            getComputedStyle(card).marginBottom;
+
+                        placeholder.style.visibility =
+                            "hidden";
+
+                        placeholder.className =
+                            "round-card-placeholder";
+
+
+                        card.parentNode.insertBefore(
+                            placeholder,
+                            card
+                        );
+
+
+                        /* La carte devient flottante */
+                        card.style.position =
+                            "fixed";
+
+                        card.style.left =
+                            rect.left + "px";
+
+                        card.style.top =
+                            rect.top + "px";
+
+                        card.style.width =
+                            rect.width + "px";
+
+                        card.style.zIndex =
+                            "1000";
+
+                        card.style.pointerEvents =
+                            "none";
+
                         card.classList.add(
                             "is-dragging"
                         );
 
+
                         try {
+
                             card.setPointerCapture(
                                 pointerId
                             );
+
                         } catch (error) {}
 
                     }, 500);
@@ -8812,32 +8871,42 @@ function setupRoundDrag() {
             "pointermove",
             function(event) {
 
-                /*
-                 * Avant l'appui long :
-                 * on laisse le doigt faire défiler
-                 * normalement la page.
-                 */
                 if (!isDragging) {
                     return;
                 }
 
                 event.preventDefault();
 
-                const cards =
+
+                currentY =
+                    event.clientY;
+
+
+                /* La carte suit le doigt */
+                card.style.top =
+                    (
+                        originalTop +
+                        (currentY - startY)
+                    ) + "px";
+
+
+                const otherCards =
                     Array.from(
                         container.querySelectorAll(
                             ".round-card"
                         )
-                    );
+                    ).filter(function(otherCard) {
 
-                const otherCards =
-                    cards.filter(function(otherCard) {
-
-                        return otherCard !== card;
+                        return (
+                            otherCard !== card &&
+                            otherCard !== placeholder
+                        );
 
                     });
 
+
                 let targetCard = null;
+
 
                 for (
                     let i = 0;
@@ -8855,8 +8924,9 @@ function setupRoundDrag() {
                         rect.top +
                         rect.height / 2;
 
+
                     if (
-                        event.clientY <
+                        currentY <
                         middle
                     ) {
 
@@ -8864,6 +8934,7 @@ function setupRoundDrag() {
                             otherCard;
 
                         break;
+
                     }
 
                 }
@@ -8872,14 +8943,14 @@ function setupRoundDrag() {
                 if (targetCard) {
 
                     container.insertBefore(
-                        card,
+                        placeholder,
                         targetCard
                     );
 
                 } else {
 
                     container.appendChild(
-                        card
+                        placeholder
                     );
 
                 }
@@ -8896,21 +8967,50 @@ function setupRoundDrag() {
                     pressTimer
                 );
 
+
                 if (!isDragging) {
                     return;
                 }
 
+
                 event.preventDefault();
 
+
                 isDragging = false;
+
+
+                /* Remet la carte dans sa position normale */
+                card.style.position = "";
+                card.style.left = "";
+                card.style.top = "";
+                card.style.width = "";
+                card.style.zIndex = "";
+                card.style.pointerEvents = "";
+
 
                 card.classList.remove(
                     "is-dragging"
                 );
 
 
+                /* Place la carte à la place du placeholder */
+                if (placeholder) {
+
+                    container.insertBefore(
+                        card,
+                        placeholder
+                    );
+
+                    placeholder.remove();
+
+                    placeholder = null;
+
+                }
+
+
                 const game =
                     getCurrentGame();
+
 
                 const orderedIds =
                     Array.from(
@@ -8926,6 +9026,7 @@ function setupRoundDrag() {
 
                 const newRounds = [];
 
+
                 orderedIds.forEach(function(id) {
 
                     const round =
@@ -8936,6 +9037,7 @@ function setupRoundDrag() {
 
                             }
                         );
+
 
                     if (round) {
 
@@ -8950,6 +9052,7 @@ function setupRoundDrag() {
 
                 game.rounds =
                     newRounds;
+
 
                 saveData();
 
@@ -8967,7 +9070,31 @@ function setupRoundDrag() {
                     pressTimer
                 );
 
+
+                if (placeholder) {
+
+                    container.insertBefore(
+                        card,
+                        placeholder
+                    );
+
+                    placeholder.remove();
+
+                    placeholder = null;
+
+                }
+
+
+                card.style.position = "";
+                card.style.left = "";
+                card.style.top = "";
+                card.style.width = "";
+                card.style.zIndex = "";
+                card.style.pointerEvents = "";
+
+
                 isDragging = false;
+
 
                 card.classList.remove(
                     "is-dragging"
@@ -8979,7 +9106,6 @@ function setupRoundDrag() {
     });
 
 }
-
 /* ========================================================
    COMPTEUR DE MUSIQUES
    ======================================================== */
