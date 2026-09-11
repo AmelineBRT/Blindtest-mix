@@ -1219,6 +1219,7 @@ label {
 .round-card {
     cursor: grab;
     user-select: none;
+    touch-action: none;
 }
 
 .round-card.is-dragging {
@@ -1265,6 +1266,8 @@ label {
 /* Bouton modifier seul */
 
 .round-edit-line {
+    display: flex;
+    gap: 5px;
     margin-top: 12px;
 }
 
@@ -1274,6 +1277,14 @@ label {
     color: white;
 }
 
+  .round-edit-button {
+    flex: 1;
+}
+
+.round-edit-line .play-round-button {
+    flex: 0 0 auto;
+    margin-left: 0 !important;
+} 
 
 /* Ligne actions */
 
@@ -1290,17 +1301,17 @@ label {
 }
 
 .duplicate-button {
-    background: #e5e5e5;
-    color: #444;
-    padding: 7px 10px;
-    font-size: 13px;
+    background: transparent;
+    color: #777;
+    padding: 4px 6px;
+    font-size: 16px;
 }
 
 .delete-round-button {
-    background: #B73434;
-    color: white;
-    padding: 7px 10px;
-    font-size: 13px;
+    background: transparent;
+    color: #B73434;
+    padding: 4px 6px;
+    font-size: 16px;
 }
 
 .play-round-button {
@@ -6613,17 +6624,25 @@ div.dataset.roundId = round.id;
                 : ""
             }
 
-            <div class="round-edit-line">
+<div class="round-edit-line">
 
-                <button
-                    class="round-edit-button"
-                    onclick="editRound('${round.id}')">
+    <button
+        class="round-edit-button"
+        onclick="editRound('${round.id}')">
 
-                    ✏️ Modifier
+        ✏️ Modifier
 
-                </button>
+    </button>
 
-            </div>
+    <button
+        class="play-round-button"
+        onclick="startSpecificRound('${round.id}')">
+
+        🎮 Jouer
+
+    </button>
+
+</div>
 
             <div class="round-actions">
 
