@@ -5586,24 +5586,46 @@ function toggleParticipants(type) {
 
         item.participants.forEach(function(name, index) {
 
-            html += `
+    html += `
     <div
         class="participant-item"
-        onclick="toggleParticipantDelete('${type}', ${index})"
+        ${
+            type === "game" &&
+            item.creator &&
+            name.toLowerCase() === item.creator.toLowerCase()
+                ? ""
+                : `onclick="toggleParticipantDelete('${type}', ${index})"`
+        }
     >
 
-        <span class="participant-name">
+        <span
+            class="participant-name ${
+                type === "game" &&
+                item.creator &&
+                name.toLowerCase() === item.creator.toLowerCase()
+                    ? "participant-creator"
+                    : ""
+            }"
+        >
             ${escapeHTML(name)}
         </span>
 
-        <button
-            type="button"
-            class="participant-remove"
-            id="remove-${type}-${index}"
-            onclick="event.stopPropagation(); removeParticipant('${type}', ${index})"
-            title="Supprimer">
-            ×
-        </button>
+        ${
+            type === "game" &&
+            item.creator &&
+            name.toLowerCase() === item.creator.toLowerCase()
+                ? ""
+                : `
+                    <button
+                        type="button"
+                        class="participant-remove"
+                        id="remove-${type}-${index}"
+                        onclick="event.stopPropagation(); removeParticipant('${type}', ${index})"
+                        title="Supprimer">
+                        ×
+                    </button>
+                `
+        }
 
     </div>
 `;
@@ -5735,14 +5757,6 @@ renderParticipants(type);
 document.getElementById(
     type + "ParticipantInput"
 ).focus();
-
-document.getElementById(
-    type + "ParticipantInput"
-).focus();
-
-    document.getElementById(
-        type + "ParticipantInput"
-    ).focus();
 
 }
 
