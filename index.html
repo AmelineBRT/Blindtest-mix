@@ -1257,7 +1257,7 @@ label {
 
     display: flex;
     flex-direction: row;
-    gap: 5px;
+    gap: 10px;
 
     z-index: 2;
 }
@@ -7295,6 +7295,15 @@ function cancelDuplicateRound() {
 function deleteRound(roundId) {
 
     if (!confirm("⚠️ Voulez-vous vraiment supprimer cette manche de la partie ?\n\nCette action est définitive.")) {
+        return;
+    }
+
+    const confirmation = prompt(
+        'Pour confirmer la suppression, écrivez "SUPPRIMER" en majuscules :'
+    );
+
+    if (confirmation !== "SUPPRIMER") {
+        alert("Suppression annulée.");
         return;
     }
 
