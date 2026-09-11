@@ -2418,7 +2418,9 @@ label {
         Sélectionne une ou plusieurs parties dans lesquelles tu souhaites copier cette manche.
     </p>
 
-    <div class="filter-container">
+   <div class="filter-container">
+
+    <div class="search-filter-row">
 
         <input
             id="duplicateSearch"
@@ -2427,11 +2429,57 @@ label {
             placeholder="🔍 Rechercher une partie..."
             oninput="renderDuplicateGames()">
 
-        </div>
+        <button
+            id="duplicateFilterToggleButton"
+            class="filter-toggle"
+            onclick="toggleDuplicateFilters()"
+            title="Afficher les filtres">
 
-   <div
-    id="duplicateFilterRow"
-    class="multi-filter-row">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"></path>
+            </svg>
+
+        </button>
+
+        <select
+            id="duplicateSortSelect"
+            class="filter-toggle sort-select"
+            onchange="changeDuplicateSort(this.value)"
+            title="Trier">
+
+            <option value="creation">
+                Ordre de création
+            </option>
+
+            <option value="creation-reverse">
+                Plus récentes d'abord
+            </option>
+
+            <option value="alphabetical">
+                Ordre alphabétique (A → Z)
+            </option>
+
+            <option value="alphabetical-reverse">
+                Ordre alphabétique (Z → A)
+            </option>
+
+            <option value="creator">
+                Par créateur
+            </option>
+
+            <option value="group">
+                Par groupe
+            </option>
+
+        </select>
+
+    </div>
+
+    <div
+        id="duplicateFilterRow"
+        class="multi-filter-row filters-hidden">
+    </div>
+
 </div>
 
 </div>
@@ -2631,6 +2679,7 @@ let selectedParticipants = [];
 let duplicateSelectedCreators = [];
 let duplicateSelectedGroups = [];
 let duplicateSelectedParticipants = [];
+   let duplicateSortMode = "creation";
 
 /* ========================================================
    MODE SOMBRE
@@ -7043,13 +7092,30 @@ function showDuplicateRound(roundId) {
         "duplicateSearch"
     ).value = "";
 
+    duplicateSelectedCreators = [];
+    duplicateSelectedGroups = [];
+    duplicateSelectedParticipants = [];
 
-   duplicateSelectedCreators = [];
-duplicateSelectedGroups = [];
-duplicateSelectedParticipants = [];
+    duplicateSortMode = "creation";
 
-renderDuplicateFilters();
-renderDuplicateGames();
+    document.getElementById(
+        "duplicateSortSelect"
+    ).value = "creation";
+
+    document.getElementById(
+        "duplicateFilterRow"
+    ).classList.remove(
+        "filters-visible"
+    );
+
+    document.getElementById(
+        "duplicateFilterRow"
+    ).classList.add(
+        "filters-hidden"
+    );
+
+    renderDuplicateFilters();
+    renderDuplicateGames();
 
     showScreen("duplicateRoundScreen");
 
@@ -7587,6 +7653,31 @@ function renderDuplicateFilters() {
     );
 
 }
+
+function toggleDuplicateFilters() {
+
+    const container =
+        document.getElementById(
+            "duplicateFilterRow"
+        );
+
+    container.classList.toggle(
+        "filters-hidden"
+    );
+
+    container.classList.toggle(
+        "filters-visible"
+    );
+
+}
+
+   function changeDuplicateSort(mode) {
+
+    duplicateSortMode = mode;
+
+    renderDuplicateGames();
+
+}
    
 function renderDuplicateGames() {
 
@@ -7595,122 +7686,308 @@ function renderDuplicateGames() {
             "duplicateGamesList"
         );
 
-const search =
-    document
-        .getElementById("duplicateSearch")
-        .value
-        .trim()
-        .toLowerCase();
+    const search =
+        document
+            .getElementById("duplicateSearch")
+            .value
+            .trim()
+            .toLowerCase();
 
 
-container.innerHTML = "";
+    container.innerHTML = "";
+
 
     const filteredGames =
-    games.filter(function(game) {
+        games
+            .filter(function(game) {
 
-        if (game.id === duplicateSourceGameId) {
-            return false;
+                /* ==========================================
+                   NE PAS AFFICHER LA PARTIE ACTUELLE
+                   ========================================== */
+
+                if (
+                    game.id ===
+                    duplicateSourceGameId
+                ) {
+                    return false;
+                }
+
+
+                /* ==========================================
+                   RECHERCHE
+                   ========================================== */
+
+                const matchesSearch =
+                    !search ||
+                    game.name
+                        .toLowerCase()
+                        .includes(search);
+
+
+                /* ==========================================
+                   CRÉATEUR
+                   ========================================== */
+
+                const matchesCreator =
+                    duplicateSelectedCreators.length === 0 ||
+                    duplicateSelectedCreators.includes(
+                        game.creator
+                    );
+
+
+                /* ==========================================
+                   GROUPE
+                   ========================================== */
+
+                const gameGroupId =
+                    game.groupId || "";
+
+                const matchesGroup =
+                    duplicateSelectedGroups.length === 0 ||
+                    duplicateSelectedGroups.includes(
+                        gameGroupId
+                    );
+
+
+                /* ==========================================
+                   PARTICIPANTS
+                   ========================================== */
+
+                const gameParticipants =
+                    Array.isArray(game.participants)
+                        ? game.participants
+                        : [];
+
+                const matchesParticipants =
+                    duplicateSelectedParticipants.length === 0 ||
+                    duplicateSelectedParticipants.some(
+                        function(selectedParticipant) {
+
+                            return gameParticipants.some(
+                                function(participant) {
+
+                                    return (
+                                        participant
+                                            .toLowerCase() ===
+                                        selectedParticipant
+                                            .toLowerCase()
+                                    );
+
+                                }
+                            );
+
+                        }
+                    );
+
+
+                return (
+                    matchesSearch &&
+                    matchesCreator &&
+                    matchesGroup &&
+                    matchesParticipants
+                );
+
+            });
+
+
+    /* ================================================
+       TRI
+       ================================================ */
+
+    filteredGames.sort(
+        function(a, b) {
+
+            if (
+                duplicateSortMode ===
+                "alphabetical"
+            ) {
+
+                return a.name.localeCompare(
+                    b.name,
+                    "fr",
+                    {
+                        sensitivity: "base"
+                    }
+                );
+
+            }
+
+
+            if (
+                duplicateSortMode ===
+                "alphabetical-reverse"
+            ) {
+
+                return b.name.localeCompare(
+                    a.name,
+                    "fr",
+                    {
+                        sensitivity: "base"
+                    }
+                );
+
+            }
+
+
+            if (
+                duplicateSortMode ===
+                "creator"
+            ) {
+
+                return a.creator.localeCompare(
+                    b.creator,
+                    "fr",
+                    {
+                        sensitivity: "base"
+                    }
+                );
+
+            }
+
+
+            if (
+                duplicateSortMode ===
+                "group"
+            ) {
+
+                const groupA =
+                    groups.find(
+                        function(group) {
+                            return group.id ===
+                                   a.groupId;
+                        }
+                    );
+
+                const groupB =
+                    groups.find(
+                        function(group) {
+                            return group.id ===
+                                   b.groupId;
+                        }
+                    );
+
+                const nameA =
+                    groupA
+                        ? groupA.name
+                        : "Indépendant";
+
+                const nameB =
+                    groupB
+                        ? groupB.name
+                        : "Indépendant";
+
+                return nameA.localeCompare(
+                    nameB,
+                    "fr",
+                    {
+                        sensitivity: "base"
+                    }
+                );
+
+            }
+
+
+            if (
+                duplicateSortMode ===
+                "creation-reverse"
+            ) {
+
+                return (
+                    games.indexOf(b) -
+                    games.indexOf(a)
+                );
+
+            }
+
+
+            /* Ordre de création */
+
+            return (
+                games.indexOf(a) -
+                games.indexOf(b)
+            );
+
         }
-
-     const matchesCreator =
-    duplicateSelectedCreators.length === 0 ||
-    duplicateSelectedCreators.includes(
-        game.creator
     );
 
-const matchesGroup =
-    duplicateSelectedGroups.length === 0 ||
-    duplicateSelectedGroups.includes(
-        game.groupId || ""
-    );
 
-const matchesParticipants =
-    duplicateSelectedParticipants.length === 0 ||
-    duplicateSelectedParticipants.some(
-        function(participant) {
+    /* ================================================
+       AUCUNE PARTIE
+       ================================================ */
 
-            return Array.isArray(game.participants) &&
-                   game.participants.some(
-                       function(gameParticipant) {
-
-                           return gameParticipant.toLowerCase() ===
-                                  participant.toLowerCase();
-
-                       }
-                   );
-
-        }
-    );
-
-const matchesSearch =
-    !search ||
-    game.name
-        .toLowerCase()
-        .includes(search);
-
-return matchesCreator &&
-       matchesGroup &&
-       matchesParticipants &&
-       matchesSearch;
-
-    });
-
-   
-    if (filteredGames.length === 0) {
+    if (
+        filteredGames.length === 0
+    ) {
 
         container.innerHTML =
-            "<div class='card'>Aucune partie trouvée.</div>";
+            "<div class='card'>" +
+            "Aucune partie trouvée." +
+            "</div>";
 
         return;
 
     }
 
-    filteredGames.forEach(function(game) {
 
-        const div =
-            document.createElement("div");
+    /* ================================================
+       AFFICHAGE
+       ================================================ */
 
-        div.className =
-            "duplicate-game-card";
+    filteredGames.forEach(
+        function(game) {
 
-        div.innerHTML = `
+            const div =
+                document.createElement("div");
 
-            <label class="duplicate-game-label">
+            div.className =
+                "duplicate-game-card";
 
-                <input
-                    type="checkbox"
-                    class="duplicate-target"
-                    value="${game.id}"
-                    ${game.id === duplicateSourceGameId ? "disabled" : ""}>
 
-                <div class="duplicate-game-info">
+            div.innerHTML = `
 
-                    <div class="duplicate-game-name">
-                        🎶 ${escapeHTML(game.name)}
+                <label
+                    class="duplicate-game-label">
+
+                    <input
+                        type="checkbox"
+                        class="duplicate-target"
+                        value="${game.id}">
+
+                    <div
+                        class="duplicate-game-info">
+
+                        <div
+                            class="duplicate-game-name">
+
+                            🎶
+                            ${escapeHTML(game.name)}
+
+                        </div>
+
+                        <div
+                            class="duplicate-game-creator">
+
+                            Créé par
+                            ${escapeHTML(game.creator)}
+                            •
+                            ${game.rounds.length}
+                            manche(s)
+
+                        </div>
+
                     </div>
 
-                    <div class="duplicate-game-creator">
-                        Créé par ${escapeHTML(game.creator)}
-                        • ${game.rounds.length} manche(s)
-                        ${
-                            game.id === duplicateSourceGameId
-                            ? " • Partie actuelle"
-                            : ""
-                        }
-                    </div>
+                </label>
 
-                </div>
+            `;
 
-            </label>
 
-        `;
+            container.appendChild(div);
 
-        container.appendChild(div);
-
-    });
+        }
+    );
 
 }
-
 
 function confirmDuplicateRound() {
 
