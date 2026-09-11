@@ -5472,25 +5472,22 @@ function showForgotPassword(gameId) {
    ======================================================== */
 
 function maskEmail(email) {
-
     const parts = email.split("@");
 
     if (parts.length !== 2) {
-        return "******.com";
+        return "******";
     }
 
     const username = parts[0];
-
-    const visible =
-        Math.min(2, username.length);
+    const domain = parts[1];
+    const visible = Math.min(2, username.length);
 
     return (
         username.substring(0, visible) +
-        "**************.com"
+        "**************@" +
+        domain
     );
-
 }
-
 
 /* ========================================================
    RÉCUPÉRER MOT DE PASSE
