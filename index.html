@@ -2683,6 +2683,9 @@ let duplicateSourceGameId = null;
 let recoveryGameId = null;
 let currentGroupId = null;
 let gameReturnContext = "games";
+
+   let isBrowserBack = false;
+let isAppNavigation = false;
    
 let players = [];
 let playersVisible = false;
@@ -2863,7 +2866,48 @@ function showScreen(screenId) {
         .getElementById(screenId)
         .classList.add("active");
 
+
+    /*
+     * Ajoute l'écran à l'historique du navigateur
+     * uniquement lorsqu'on navigue normalement
+     * dans l'application.
+     */
+    if (!isBrowserBack && !isAppNavigation) {
+
+        history.pushState(
+            {
+                screen: screenId
+            },
+            "",
+            "#" + screenId
+        );
+
+    }
+
 }
+
+   window.addEventListener("popstate", function(event) {
+
+    isBrowserBack = true;
+
+    if (
+        event.state &&
+        event.state.screen
+    ) {
+
+        showScreen(
+            event.state.screen
+        );
+
+    } else {
+
+        showGames();
+
+    }
+
+    isBrowserBack = false;
+
+});
 
 
 /* ========================================================
@@ -9577,8 +9621,15 @@ function escapeAttribute(text) {
    ======================================================== */
 
 loadTheme();
-
 loadData();
+
+history.replaceState(
+    {
+        screen: "gamesScreen"
+    },
+    "",
+    "#" + "gamesScreen"
+);
 
 showGames();
 
