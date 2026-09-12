@@ -3136,14 +3136,39 @@ function quitApp() {
    ÉCRAN DES PARTIES
    ======================================================== */
 
+history.pushState(
+    null,
+    "",
+    location.href
+);
+
 history.replaceState(
     {
         screen: "gamesScreen",
+        gameId: null,
+        groupId: null,
+        roundId: null,
         view: "games"
     },
     "",
-    "#gamesScreen"
+    "#" + "gamesScreen"
 );
+
+history.pushState(
+    {
+        screen: "gamesScreen",
+        gameId: null,
+        groupId: null,
+        roundId: null,
+        view: "games"
+    },
+    "",
+    "#" + "gamesScreen"
+);
+
+isBrowserBack = true;
+showGames();
+isBrowserBack = false;
 
 function showGroups() {
 
