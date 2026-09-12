@@ -8886,24 +8886,28 @@ function setupRoundDrag() {
                    si le doigt bouge, on annule
                    le futur déplacement de la carte.
                    Le navigateur peut donc faire défiler. */
-                if (!isDragging) {
+             if (!isDragging) {
 
-                    if (
-                        Math.abs(
-                            event.clientY - startY
-                        ) > 15
-                    ) {
+    /*
+     * On ne considère pas les petits mouvements
+     * comme un défilement volontaire.
+     */
+    if (
+        Math.abs(
+            event.clientY - startY
+        ) > 30
+    ) {
 
-                        movedBeforeLongPress = true;
+        movedBeforeLongPress = true;
 
-                        clearTimeout(
-                            pressTimer
-                        );
+        clearTimeout(
+            pressTimer
+        );
 
-                    }
+    }
 
-                    return;
-                }
+    return;
+}
 
 
                 event.preventDefault();
