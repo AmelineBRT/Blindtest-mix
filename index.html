@@ -1220,7 +1220,7 @@ label {
 .round-card {
     cursor: grab;
     user-select: none;
-    touch-action: none;
+    touch-action: pan-y;
 }
 
 .round-card.is-dragging {
@@ -8805,6 +8805,8 @@ function setupRoundDrag() {
 
 
                         isDragging = true;
+                       document.documentElement.style.overflow = "hidden";
+                        document.body.style.overflow = "hidden";
 
 
                         const rect =
@@ -8932,35 +8934,6 @@ currentY =
                    AUTO-DÉFILEMENT
                    ===================================== */
 
-                const screenHeight =
-                    window.innerHeight;
-
-                const scrollZone =
-                    80;
-
-
-           if (
-    event.clientY >
-    screenHeight - scrollZone
-) {
-
-    window.scrollBy(
-        0,
-        3
-    );
-
-} else if (
-    event.clientY <
-    scrollZone
-) {
-
-    window.scrollBy(
-        0,
-        -3
-    );
-
-}
-
 
                 /* La carte suit le doigt */
                 card.style.top =
@@ -9061,7 +9034,8 @@ currentY =
 
 
                 isDragging = false;
-
+                  document.documentElement.style.overflow = "";
+                  document.body.style.overflow = "";
 
                 /* Remet la carte dans sa position normale */
                 card.style.position = "";
@@ -9178,7 +9152,8 @@ currentY =
 
 
                 isDragging = false;
-
+               document.documentElement.style.overflow = "";
+               document.body.style.overflow = "";
 
                 card.classList.remove(
                     "is-dragging"
