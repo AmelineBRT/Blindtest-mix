@@ -2874,15 +2874,19 @@ function showScreen(screenId) {
      */
     if (!isBrowserBack && !isAppNavigation) {
 
-        history.pushState(
-            {
-                screen: screenId
-            },
-            "",
-            "#" + screenId
-        );
+    history.pushState(
+        {
+            screen: screenId,
+            gameId: currentGameId,
+            groupId: currentGroupId,
+            roundId: currentRoundId,
+            view: gamesView
+        },
+        "",
+        "#" + screenId
+    );
 
-    }
+}
 
 }
 
@@ -2895,12 +2899,25 @@ window.addEventListener("popstate", function(event) {
         event.state.screen
     ) {
 
+        currentGameId =
+            event.state.gameId || null;
+
+        currentGroupId =
+            event.state.groupId || null;
+
+        currentRoundId =
+            event.state.roundId || null;
+
+        gamesView =
+            event.state.view || "games";
+
+
         if (
             event.state.screen === "gamesScreen"
         ) {
 
             if (
-                event.state.view === "groups"
+                gamesView === "groups"
             ) {
 
                 showGroups();
@@ -2908,6 +2925,26 @@ window.addEventListener("popstate", function(event) {
             } else {
 
                 showGames();
+
+            }
+
+        } else if (
+            event.state.screen === "gameScreen"
+        ) {
+
+            showGame();
+
+        } else if (
+            event.state.screen === "groupScreen"
+        ) {
+
+            if (currentGroupId) {
+
+                showGroup(currentGroupId);
+
+            } else {
+
+                showGroups();
 
             }
 
@@ -2921,6 +2958,10 @@ window.addEventListener("popstate", function(event) {
 
     } else {
 
+        currentGameId = null;
+        currentGroupId = null;
+        currentRoundId = null;
+
         showGames();
 
     }
@@ -2928,7 +2969,6 @@ window.addEventListener("popstate", function(event) {
     isBrowserBack = false;
 
 });
-
 /* ========================================================
    ÉCRAN DES PARTIES
    ======================================================== */
@@ -9631,13 +9671,21 @@ loadData();
 
 history.replaceState(
     {
-        screen: "gamesScreen"
+        screen: "gamesScreen",
+        gameId: null,
+        groupId: null,
+        roundId: null,
+        view: "games"
     },
     "",
     "#" + "gamesScreen"
 );
 
+isBrowserBack = true;
+
 showGames();
+
+isBrowserBack = false;
 
 </script>
 
