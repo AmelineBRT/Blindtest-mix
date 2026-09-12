@@ -3136,25 +3136,7 @@ function quitApp() {
    ÉCRAN DES PARTIES
    ======================================================== */
 
-history.pushState(
-    null,
-    "",
-    location.href
-);
-
 history.replaceState(
-    {
-        screen: "gamesScreen",
-        gameId: null,
-        groupId: null,
-        roundId: null,
-        view: "games"
-    },
-    "",
-    "#" + "gamesScreen"
-);
-
-history.pushState(
     {
         screen: "gamesScreen",
         gameId: null,
