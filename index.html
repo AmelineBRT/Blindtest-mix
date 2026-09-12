@@ -1323,6 +1323,14 @@ label {
     min-height: 40px;
 }
 
+.round-drag-button {
+    background: transparent;
+    color: #333;
+    padding: 4px 6px;
+    font-size: 20px;
+    font-weight: bold;
+}
+   
 .duplicate-button {
     background: transparent;
     color: #777;
@@ -6649,11 +6657,21 @@ div.dataset.roundId = round.id;
 <div class="round-order-buttons">
 
     <button
+        class="round-drag-button"
+        type="button"
+        title="Déplacer">
+
+        ↕
+        
+    </button>
+
+    <button
         class="duplicate-button"
         onclick="showDuplicateRound('${round.id}')"
         title="Dupliquer">
 
         📋
+
     </button>
 
     <button
@@ -8761,6 +8779,14 @@ function setupRoundDrag() {
 
     cards.forEach(function(card) {
 
+        const dragButton =
+            card.querySelector(".round-drag-button");
+
+        if (!dragButton) {
+            return;
+        }
+
+
         let pressTimer = null;
         let isDragging = false;
         let startY = 0;
@@ -8768,21 +8794,19 @@ function setupRoundDrag() {
         let originalTop = 0;
         let placeholder = null;
         let pointerId = null;
-        let movedBeforeLongPress = false;
+        let autoScrollAnimation = null;
+        let autoScrollSpeed = 0;
 
 
-        card.addEventListener(
+        /* =====================================
+           APPUI SUR LE BOUTON DÉPLACER
+           ===================================== */
+
+        dragButton.addEventListener(
             "pointerdown",
             function(event) {
 
-                /* Les boutons restent utilisables normalement */
-                if (
-                    event.target.closest("button") ||
-                    event.target.closest("input") ||
-                    event.target.closest("select")
-                ) {
-                    return;
-                }
+                event.preventDefault();
 
                 pointerId =
                     event.pointerId;
@@ -8790,39 +8814,33 @@ function setupRoundDrag() {
                 startY =
                     event.clientY;
 
-                movedBeforeLongPress = false;
+                currentY =
+                    event.clientY;
+
                 isDragging = false;
 
 
                 pressTimer =
                     setTimeout(function() {
 
-                        /* Si le doigt a déjà bougé,
-                           ce n'est pas un drag */
-                        if (movedBeforeLongPress) {
-                            return;
-                        }
-
-
                         isDragging = true;
-                       document.documentElement.style.overflow = "hidden";
-                        document.body.style.overflow = "hidden";
 
 
                         const rect =
                             card.getBoundingClientRect();
 
-                     originalTop =
-    rect.top;
+                        originalTop =
+                            rect.top;
 
-startY =
-    event.clientY;
+                        startY =
+                            event.clientY;
 
-currentY =
-    event.clientY;
+                        currentY =
+                            event.clientY;
 
 
                         /* Crée un espace à la place de la carte */
+
                         placeholder =
                             document.createElement("div");
 
@@ -8846,6 +8864,7 @@ currentY =
 
 
                         /* La carte devient flottante */
+
                         card.style.position =
                             "fixed";
 
@@ -8864,65 +8883,51 @@ currentY =
                         card.style.pointerEvents =
                             "none";
 
+
                         card.classList.add(
                             "is-dragging"
                         );
 
 
+                        /*
+                         * À partir de maintenant,
+                         * le scroll natif est bloqué.
+                         */
+
+                        document.documentElement.style.overflow =
+                            "hidden";
+
+                        document.body.style.overflow =
+                            "hidden";
+
+
                         try {
 
-                            card.setPointerCapture(
+                            dragButton.setPointerCapture(
                                 pointerId
                             );
 
                         } catch (error) {}
 
-                    }, 800);
+                    }, 500);
 
             }
         );
 
 
-        card.addEventListener(
+        /* =====================================
+           DÉPLACEMENT
+           ===================================== */
+
+        dragButton.addEventListener(
             "pointermove",
             function(event) {
 
-                /* Avant les 800 ms :
-                   si le doigt bouge, on annule
-                   le futur déplacement de la carte.
-                   Le navigateur peut donc faire défiler. */
-         if (!isDragging) {
+                if (!isDragging) {
+                    return;
+                }
 
-    const movement =
-        event.clientY - startY;
 
-    /*
-     * Avant les 800 ms :
-     * on laisse le doigt faire défiler
-     * la page manuellement.
-     */
-    if (Math.abs(movement) > 5) {
-
-        movedBeforeLongPress = true;
-
-        clearTimeout(
-            pressTimer
-        );
-
-        window.scrollBy(
-            0,
-            -movement
-        );
-
-        startY =
-            event.clientY;
-
-    }
-
-    return;
-}
-
-               
                 event.preventDefault();
 
 
@@ -8934,8 +8939,115 @@ currentY =
                    AUTO-DÉFILEMENT
                    ===================================== */
 
+                const screenHeight =
+                    window.innerHeight;
 
-                /* La carte suit le doigt */
+                const scrollZone =
+                    100;
+
+
+                if (
+                    currentY <
+                    scrollZone
+                ) {
+
+                    const distance =
+                        scrollZone - currentY;
+
+                    autoScrollSpeed =
+                        -Math.min(
+                            15,
+                            Math.max(
+                                2,
+                                distance / 5
+                            )
+                        );
+
+                } else if (
+                    currentY >
+                    screenHeight - scrollZone
+                ) {
+
+                    const distance =
+                        currentY -
+                        (screenHeight - scrollZone);
+
+                    autoScrollSpeed =
+                        Math.min(
+                            15,
+                            Math.max(
+                                2,
+                                distance / 5
+                            )
+                        );
+
+                } else {
+
+                    autoScrollSpeed =
+                        0;
+
+                }
+
+
+                if (
+                    autoScrollSpeed !== 0 &&
+                    !autoScrollAnimation
+                ) {
+
+                    function autoScroll() {
+
+                        if (!isDragging) {
+                            autoScrollAnimation = null;
+                            return;
+                        }
+
+
+                        if (
+                            autoScrollSpeed !== 0
+                        ) {
+
+                            window.scrollBy(
+                                0,
+                                autoScrollSpeed
+                            );
+
+                        }
+
+
+                        autoScrollAnimation =
+                            requestAnimationFrame(
+                                autoScroll
+                            );
+
+                    }
+
+
+                    autoScrollAnimation =
+                        requestAnimationFrame(
+                            autoScroll
+                        );
+
+                }
+
+
+                if (
+                    autoScrollSpeed === 0 &&
+                    autoScrollAnimation
+                ) {
+
+                    cancelAnimationFrame(
+                        autoScrollAnimation
+                    );
+
+                    autoScrollAnimation = null;
+
+                }
+
+
+                /* =====================================
+                   LA CARTE SUIT LE DOIGT
+                   ===================================== */
+
                 card.style.top =
                     (
                         originalTop +
@@ -8944,7 +9056,7 @@ currentY =
 
 
                 /* =====================================
-                   RECHERCHE DE LA NOUVELLE POSITION
+                   RECHERCHE DE LA POSITION
                    ===================================== */
 
                 const otherCards =
@@ -9016,7 +9128,11 @@ currentY =
         );
 
 
-        card.addEventListener(
+        /* =====================================
+           FIN DU DÉPLACEMENT
+           ===================================== */
+
+        dragButton.addEventListener(
             "pointerup",
             function(event) {
 
@@ -9034,10 +9150,35 @@ currentY =
 
 
                 isDragging = false;
-                  document.documentElement.style.overflow = "";
-                  document.body.style.overflow = "";
 
-                /* Remet la carte dans sa position normale */
+
+                /* Arrête l'auto-scroll */
+
+                if (autoScrollAnimation) {
+
+                    cancelAnimationFrame(
+                        autoScrollAnimation
+                    );
+
+                    autoScrollAnimation =
+                        null;
+
+                }
+
+                autoScrollSpeed = 0;
+
+
+                /* Réactive le scroll natif */
+
+                document.documentElement.style.overflow =
+                    "";
+
+                document.body.style.overflow =
+                    "";
+
+
+                /* Remet la carte normalement */
+
                 card.style.position = "";
                 card.style.left = "";
                 card.style.top = "";
@@ -9051,7 +9192,8 @@ currentY =
                 );
 
 
-                /* Place la carte à la place du placeholder */
+                /* Place la carte à la nouvelle position */
+
                 if (placeholder) {
 
                     container.insertBefore(
@@ -9120,13 +9262,38 @@ currentY =
         );
 
 
-        card.addEventListener(
+        /* =====================================
+           ANNULATION
+           ===================================== */
+
+        dragButton.addEventListener(
             "pointercancel",
             function() {
 
                 clearTimeout(
                     pressTimer
                 );
+
+
+                if (autoScrollAnimation) {
+
+                    cancelAnimationFrame(
+                        autoScrollAnimation
+                    );
+
+                    autoScrollAnimation =
+                        null;
+
+                }
+
+                autoScrollSpeed = 0;
+
+
+                document.documentElement.style.overflow =
+                    "";
+
+                document.body.style.overflow =
+                    "";
 
 
                 if (placeholder) {
@@ -9152,8 +9319,7 @@ currentY =
 
 
                 isDragging = false;
-               document.documentElement.style.overflow = "";
-               document.body.style.overflow = "";
+
 
                 card.classList.remove(
                     "is-dragging"
