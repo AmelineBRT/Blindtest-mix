@@ -1770,7 +1770,129 @@ label {
     }
    
 }
+/* ==================================================
+   FENÊTRE DE SORTIE DE BLINDTEST MIX
+   ================================================== */
 
+.leave-app-modal {
+
+    position: fixed;
+
+    inset: 0;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    z-index: 9999;
+
+}
+
+
+.leave-app-modal.active {
+
+    display: flex;
+
+}
+
+
+.leave-app-box {
+
+    width: min(
+        420px,
+        100%
+    );
+
+    padding: 28px 24px 22px;
+
+    background: #ffffff;
+
+    border-radius: 22px;
+
+    box-shadow:
+        0 10px 35px rgba(0, 0, 0, 0.25);
+
+    text-align: center;
+
+}
+
+
+.leave-app-message {
+
+    font-size: 17px;
+
+    line-height: 1.5;
+
+    color: #333;
+
+    margin-bottom: 24px;
+
+}
+
+
+.leave-app-message strong {
+
+    display: inline-block;
+
+    font-size: 19px;
+
+    margin-bottom: 8px;
+
+}
+
+
+.leave-app-buttons {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+}
+
+
+.leave-app-buttons button {
+
+    width: 100%;
+
+    padding: 13px 16px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+}
+
+
+.leave-app-stay {
+
+    background: #e8e8e8;
+
+    color: #222;
+
+}
+
+
+.leave-app-quit {
+
+    background: #f3f3f3;
+
+    color: #555;
+
+}
+   
 </style>
 </head>
 
@@ -2894,81 +3016,122 @@ window.addEventListener("popstate", function(event) {
 
     isBrowserBack = true;
 
+
+    /*
+     * Si on revient avant la première page
+     * de Blindtest Mix, on demande confirmation.
+     */
+
+  if (
+    !event.state ||
+    !event.state.screen
+) {
+
+    history.pushState(
+        {
+            screen: "gamesScreen",
+            gameId: null,
+            groupId: null,
+            roundId: null,
+            view: gamesView
+        },
+        "",
+        "#gamesScreen"
+    );
+
+
+    document
+        .getElementById("leaveAppModal")
+        .classList.add("active");
+
+
+    isBrowserBack = false;
+
+    return;
+
+}
+
+    currentGameId =
+        event.state.gameId || null;
+
+    currentGroupId =
+        event.state.groupId || null;
+
+    currentRoundId =
+        event.state.roundId || null;
+
+    gamesView =
+        event.state.view || "games";
+
+
     if (
-        event.state &&
-        event.state.screen
+        event.state.screen === "gamesScreen"
     ) {
 
-        currentGameId =
-            event.state.gameId || null;
-
-        currentGroupId =
-            event.state.groupId || null;
-
-        currentRoundId =
-            event.state.roundId || null;
-
-        gamesView =
-            event.state.view || "games";
-
-
         if (
-            event.state.screen === "gamesScreen"
+            gamesView === "groups"
         ) {
 
-            if (
-                gamesView === "groups"
-            ) {
-
-                showGroups();
-
-            } else {
-
-                showGames();
-
-            }
-
-        } else if (
-            event.state.screen === "gameScreen"
-        ) {
-
-            showGame();
-
-        } else if (
-            event.state.screen === "groupScreen"
-        ) {
-
-            if (currentGroupId) {
-
-                showGroup(currentGroupId);
-
-            } else {
-
-                showGroups();
-
-            }
+            showGroups();
 
         } else {
 
-            showScreen(
-                event.state.screen
-            );
+            showGames();
+
+        }
+
+    } else if (
+        event.state.screen === "gameScreen"
+    ) {
+
+        showGame();
+
+    } else if (
+        event.state.screen === "groupScreen"
+    ) {
+
+        if (currentGroupId) {
+
+            showGroup(currentGroupId);
+
+        } else {
+
+            showGroups();
 
         }
 
     } else {
 
-        currentGameId = null;
-        currentGroupId = null;
-        currentRoundId = null;
-
-        showGames();
+        showScreen(
+            event.state.screen
+        );
 
     }
+
 
     isBrowserBack = false;
 
 });
+
+function stayOnApp() {
+
+    document
+        .getElementById("leaveAppModal")
+        .classList.remove("active");
+
+}
+
+
+function quitApp() {
+
+    document
+        .getElementById("leaveAppModal")
+        .classList.remove("active");
+
+    history.go(-2);
+
+}
+   
 /* ========================================================
    ÉCRAN DES PARTIES
    ======================================================== */
@@ -9710,5 +9873,54 @@ isBrowserBack = false;
 
 </script>
 
+<!-- ==================================================
+     FENÊTRE DE SORTIE DE BLINDTEST MIX
+     ================================================== -->
+
+<div
+    id="leaveAppModal"
+    class="leave-app-modal"
+>
+
+    <div class="leave-app-box">
+
+        <div class="leave-app-message">
+
+            <strong>
+                🥹 Tu nous quittes vraiment ?
+            </strong>
+
+            <br>
+
+            J'espère que tu auras passé un bon moment
+            sur Blindtest Mix.
+
+        </div>
+
+
+        <div class="leave-app-buttons">
+
+            <button
+                type="button"
+                class="leave-app-stay"
+                onclick="stayOnApp()"
+            >
+                🥳 Rester sur Blindtest Mix
+            </button>
+
+            <button
+                type="button"
+                class="leave-app-quit"
+                onclick="quitApp()"
+            >
+                🤧 Bye bye
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+   
 </body>
 </html>
