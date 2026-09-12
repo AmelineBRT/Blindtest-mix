@@ -2886,7 +2886,7 @@ function showScreen(screenId) {
 
 }
 
-   window.addEventListener("popstate", function(event) {
+window.addEventListener("popstate", function(event) {
 
     isBrowserBack = true;
 
@@ -2895,9 +2895,29 @@ function showScreen(screenId) {
         event.state.screen
     ) {
 
-        showScreen(
-            event.state.screen
-        );
+        if (
+            event.state.screen === "gamesScreen"
+        ) {
+
+            if (
+                event.state.view === "groups"
+            ) {
+
+                showGroups();
+
+            } else {
+
+                showGames();
+
+            }
+
+        } else {
+
+            showScreen(
+                event.state.screen
+            );
+
+        }
 
     } else {
 
@@ -2909,22 +2929,20 @@ function showScreen(screenId) {
 
 });
 
-
 /* ========================================================
    ÉCRAN DES PARTIES
    ======================================================== */
 
-function showGames() {
+history.replaceState(
+    {
+        screen: "gamesScreen",
+        view: "games"
+    },
+    "",
+    "#gamesScreen"
+);
 
-    showScreen("gamesScreen");
-
-    renderFilters();
-
-    renderGames();
-
-}
-
-   function showGroups() {
+function showGroups() {
 
     gamesView = "groups";
 
@@ -2944,7 +2962,6 @@ function showGames() {
     renderGames();
 
 }
-
 /* ========================================================
    BASCULER PARTIES / GROUPES
    ======================================================== */
@@ -5339,7 +5356,7 @@ groupCard.style.background =
 
 function goBackFromGroup() {
 
-    showGroups();
+    history.back();
 
 }
 
@@ -5583,23 +5600,12 @@ function openGame(id) {
 /* ========================================================
    BOUTON DE RETOUR EN ARRIERE
    ======================================================== */
-   function goBackFromGame() {
+ function goBackFromGame() {
 
-    if (
-        gameReturnContext === "group" &&
-        currentGroupId
-    ) {
-
-        showGroup(currentGroupId);
-
-    } else {
-
-        showGames();
-
-    }
+    history.back();
 
 }
-
+   
 /* ========================================================
    MOT DE PASSE OUBLIÉ
    ======================================================== */
@@ -5727,7 +5733,7 @@ function cancelPasswordRecovery() {
 
     recoveryGameId = null;
 
-    showGames();
+    history.back();
 
 }
 
@@ -8333,7 +8339,7 @@ function cancelDuplicateRound() {
     currentGameId =
         duplicateSourceGameId;
 
-    showGame();
+    history.back();
 
 }
 
