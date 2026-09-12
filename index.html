@@ -3002,6 +3002,29 @@ function showGroups() {
     renderGames();
 
 }
+
+   function showGames() {
+
+    gamesView = "games";
+
+    document.getElementById(
+        "gamesViewTitle"
+    ).textContent =
+        "🎶 Mes parties";
+
+    document.getElementById(
+        "gamesViewToggle"
+    ).textContent =
+        "🎉 Voir les groupes";
+
+    showScreen("gamesScreen");
+
+    renderFilters();
+    renderGames();
+
+}
+
+   
 /* ========================================================
    BASCULER PARTIES / GROUPES
    ======================================================== */
