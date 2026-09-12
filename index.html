@@ -6665,11 +6665,6 @@ div.dataset.roundId = round.id;
         type="button"
         title="Déplacer">
 
-        <button
-    class="round-drag-button"
-    type="button"
-    title="Déplacer">
-
     <svg
         viewBox="0 0 24 24"
         width="20"
@@ -6799,65 +6794,6 @@ function toggleTrackList(roundId, button) {
             "▼ Masquer les morceaux";
 
     }
-
-}
-
-
-/* ========================================================
-   DÉPLACER MANCHES
-   ======================================================== */
-
-function moveRoundUp(roundId) {
-
-    const game = getCurrentGame();
-
-    const index =
-        game.rounds.findIndex(function(round) {
-            return round.id === roundId;
-        });
-
-    if (index <= 0) {
-        return;
-    }
-
-    const temp = game.rounds[index - 1];
-
-    game.rounds[index - 1] =
-        game.rounds[index];
-
-    game.rounds[index] = temp;
-
-    saveData();
-    renderRounds();
-
-}
-
-
-function moveRoundDown(roundId) {
-
-    const game = getCurrentGame();
-
-    const index =
-        game.rounds.findIndex(function(round) {
-            return round.id === roundId;
-        });
-
-    if (
-        index === -1 ||
-        index >= game.rounds.length - 1
-    ) {
-        return;
-    }
-
-    const temp = game.rounds[index + 1];
-
-    game.rounds[index + 1] =
-        game.rounds[index];
-
-    game.rounds[index] = temp;
-
-    saveData();
-    renderRounds();
 
 }
 
@@ -8789,12 +8725,6 @@ function updateTrackPlayingState(index, state) {
    /* =========================================================
    DÉPLACEMENT DES MANCHES PAR APPUI LONG
    ========================================================= */
-
-let draggedRound = null;
-let dragTimer = null;
-let isDraggingRound = false;
-let dragStartY = 0;
-
 
 function setupRoundDrag() {
 
