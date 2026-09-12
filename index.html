@@ -1220,7 +1220,7 @@ label {
 .round-card {
     cursor: grab;
     user-select: none;
-    touch-action: pan-y;
+    touch-action: none;
 }
 
 .round-card.is-dragging {
@@ -8889,17 +8889,17 @@ currentY =
                    si le doigt bouge, on annule
                    le futur déplacement de la carte.
                    Le navigateur peut donc faire défiler. */
-             if (!isDragging) {
+         if (!isDragging) {
+
+    const movement =
+        event.clientY - startY;
 
     /*
-     * On ne considère pas les petits mouvements
-     * comme un défilement volontaire.
+     * Avant les 800 ms :
+     * on laisse le doigt faire défiler
+     * la page manuellement.
      */
-    if (
-        Math.abs(
-            event.clientY - startY
-        ) > 30
-    ) {
+    if (Math.abs(movement) > 5) {
 
         movedBeforeLongPress = true;
 
@@ -8907,12 +8907,20 @@ currentY =
             pressTimer
         );
 
+        window.scrollBy(
+            0,
+            -movement
+        );
+
+        startY =
+            event.clientY;
+
     }
 
     return;
 }
 
-
+               
                 event.preventDefault();
 
 
