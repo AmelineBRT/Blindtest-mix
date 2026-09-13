@@ -3105,17 +3105,17 @@ window.addEventListener("popstate", function(event) {
      * Blindtest Mix.
      */
 
-    history.pushState(
-        {
-            screen: "gamesScreen",
-            gameId: null,
-            groupId: null,
-            roundId: null,
-            view: gamesView
-        },
-        "",
-        "#gamesScreen"
-    );
+history.replaceState(
+    {
+        screen: "gamesScreen",
+        gameId: null,
+        groupId: null,
+        roundId: null,
+        view: gamesView
+    },
+    "",
+    "#gamesScreen"
+);
 
     document
         .getElementById("leaveAppModal")
