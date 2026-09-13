@@ -1931,7 +1931,7 @@ label {
 
     flex: 2;
 
-    background: #a98ac7;
+    background: #720038;
 
     color: white;
 
@@ -1944,7 +1944,7 @@ label {
 
     flex: 1;
 
-    background: #159b9b;
+    background: #09463E;
 
     color: white;
 
@@ -3290,8 +3290,7 @@ function toggleGamesView() {
         "#gamesScreen"
     );
 
-    const title =
-
+   
     const title =
         document.getElementById(
             "gamesViewTitle"
@@ -9934,30 +9933,6 @@ function escapeAttribute(text) {
 }
 
 
-/* ========================================================
-   DÉMARRAGE
-   ======================================================== */
-
-loadTheme();
-loadData();
-
-history.replaceState(
-    {
-        screen: "gamesScreen",
-        gameId: null,
-        groupId: null,
-        roundId: null,
-        view: "games"
-    },
-    "",
-    "#" + "gamesScreen"
-);
-
-isBrowserBack = true;
-
-showGames();
-
-isBrowserBack = false;
 
 </script>
 
