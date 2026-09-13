@@ -3095,17 +3095,17 @@ window.addEventListener("popstate", function(event) {
             event.state.screen === "gamesScreen"
         ) {
 
-            if (
-                gamesView === "groups"
-            ) {
+        if (
+    event.state.view === "groups"
+) {
 
-                showGroups();
+    showGroups();
 
-            } else {
+} else {
 
-                showGames();
+    showGames();
 
-            }
+}
 
         } else if (
             event.state.screen === "gameScreen"
