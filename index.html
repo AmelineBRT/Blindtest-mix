@@ -3244,19 +3244,7 @@ function toggleGamesView() {
 
     }
 
-    history.pushState(
-        {
-            screen: "gamesScreen",
-            gameId: null,
-            groupId: null,
-            roundId: null,
-            view: gamesView
-        },
-        "",
-        "#gamesScreen"
-    );
-
-   
+  
     const title =
         document.getElementById(
             "gamesViewTitle"
