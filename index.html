@@ -3078,30 +3078,30 @@ window.addEventListener("popstate", function(event) {
 
         }
 
-    } else {
+ } else {
 
-        /*
-         * L'utilisateur essaie de quitter
-         * Blindtest Mix.
-         */
+    /*
+     * L'utilisateur essaie de quitter
+     * Blindtest Mix.
+     */
 
-        history.pushState(
-            {
-                screen: "gamesScreen",
-                gameId: null,
-                groupId: null,
-                roundId: null,
-                view: gamesView
-            },
-            "",
-            "#gamesScreen"
-        );
+    history.pushState(
+        {
+            screen: "gamesScreen",
+            gameId: null,
+            groupId: null,
+            roundId: null,
+            view: gamesView
+        },
+        "",
+        "#gamesScreen"
+    );
 
-        document
-            .getElementById("leaveAppModal")
-            .classList.add("active");
+    document
+        .getElementById("leaveAppModal")
+        .classList.add("active");
 
-    }
+}
 
     isBrowserBack = false;
 
@@ -3132,6 +3132,14 @@ function quitApp() {
    ======================================================== */
 
 history.replaceState(
+    {
+        exitSentinel: true
+    },
+    "",
+    location.href
+);
+
+history.pushState(
     {
         screen: "gamesScreen",
         gameId: null,
