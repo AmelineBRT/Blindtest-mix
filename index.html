@@ -314,18 +314,15 @@ button:disabled {
 
    /* Retour en arrière*/
 .back-arrow-button {
-
     width: 42px;
-
     height: 30px;
 
     position: absolute;
 
-top: 15px;
-left: 20px;
+    top: 25px;
+    left: 10px;
 
     margin: 0;
-
     padding: 4px 6px;
 
     background: transparent;
@@ -336,7 +333,14 @@ left: 20px;
 
     justify-content: flex-start;
 
+    z-index: 10;
+    pointer-events: auto;
 }
+
+   #gameMainCard .back-arrow-button {
+    position: absolute;
+}
+   
 
 .back-arrow-icon {
     width: 30px;
