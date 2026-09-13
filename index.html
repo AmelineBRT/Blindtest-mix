@@ -328,9 +328,7 @@ button:disabled {
     background: transparent;
 
     display: flex;
-
     align-items: center;
-
     justify-content: flex-start;
 
     z-index: 10;
@@ -413,12 +411,6 @@ button:disabled {
     z-index: 2;
 }
 
-#gameMainCard .game-card-content .back-arrow-button {
-    position: fixed;
-    top: 25px;
-    left: 10px;
-    z-index: 10;
-}
   
 .game-top-actions {
     position: absolute;
@@ -2436,24 +2428,17 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
         </div>
 
-        <div class="game-card-content">
-
-            <h2 id="gameTitle"></h2>
-
-            <p id="gameCreatorDisplay"></p>
-
-<div
-    id="gameParticipantsPanel"
-    class="participants-panel">
-</div>
-           
-            <button
-                class="primary"
-                onclick="showCreateRound()">
-                ＋ Ajouter une manche
-            </button>
-
-            <button
+      <button
+    id="gameBackButton"
+    class="back-arrow-button"
+    onclick="goBackFromGame()"
+    title="Retour"
+>
+    <svg class="back-arrow-icon">
+        <use href="#back-arrow-icon"></use>
+    </svg>
+</button>
+          </div>
                 class="blue"
                 onclick="startGameDirect()">
                 🎮 Jouer la partie
