@@ -3226,14 +3226,18 @@ function showGroups() {
     ).textContent =
         "🎶 Voir les parties";
 
+    isAppNavigation = true;
+
     showScreen("gamesScreen");
+
+    isAppNavigation = false;
 
     renderFilters();
     renderGames();
 
 }
 
-   function showGames() {
+function showGames() {
 
     gamesView = "games";
 
@@ -3247,13 +3251,16 @@ function showGroups() {
     ).textContent =
         "🎉 Voir les groupes";
 
+    isAppNavigation = true;
+
     showScreen("gamesScreen");
+
+    isAppNavigation = false;
 
     renderFilters();
     renderGames();
 
 }
-
    
 /* ========================================================
    BASCULER PARTIES / GROUPES
