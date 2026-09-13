@@ -335,9 +335,7 @@ button:disabled {
     pointer-events: auto;
 }
 
-   #gameMainCard .back-arrow-button {
-    position: absolute;
-}
+
    
 
 .back-arrow-icon {
@@ -2392,26 +2390,24 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
 <section id="gameScreen" class="screen">
 
-        <div
-            id="gameScreenGroupHeader"
-            class="game-screen-group-header">
-        </div>
-   
+    <div
+        id="gameScreenGroupHeader"
+        class="game-screen-group-header">
+    </div>
+
     <div
         id="gameMainCard"
         class="card game-main-card">
 
-
-
         <div class="game-top-actions">
 
-<button
-    class="game-icon-button"
-    onclick="toggleParticipants('game')"
-    title="Afficher les participants">
-    👥
-</button>
-           
+            <button
+                class="game-icon-button"
+                onclick="toggleParticipants('game')"
+                title="Afficher les participants">
+                👥
+            </button>
+
             <button
                 class="game-icon-button"
                 onclick="shareCurrentGame()"
@@ -2428,35 +2424,40 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
         </div>
 
-      <button
-    id="gameBackButton"
-    class="back-arrow-button"
-    onclick="goBackFromGame()"
-    title="Retour"
->
-    <svg class="back-arrow-icon">
-        <use href="#back-arrow-icon"></use>
-    </svg>
-</button>
-          </div>
+        <div class="game-card-content">
+
+            <h2 id="gameTitle"></h2>
+
+            <p id="gameCreatorDisplay"></p>
+
+            <div
+                id="gameParticipantsPanel"
+                class="participants-panel">
+            </div>
+
+            <button
+                class="primary"
+                onclick="showCreateRound()">
+                ＋ Ajouter une manche
+            </button>
+
+            <button
                 class="blue"
                 onclick="startGameDirect()">
                 🎮 Jouer la partie
             </button>
 
-<button
-    id="gameBackButton"
-    class="back-arrow-button"
-    onclick="goBackFromGame()"
-    title="Retour"
->
- <!-- flèche retour -->
-    <svg class="back-arrow-icon">
-    <use href="#back-arrow-icon"></use>
-</svg>
-</button>
-
         </div>
+
+        <button
+            id="gameBackButton"
+            class="back-arrow-button"
+            onclick="goBackFromGame()"
+            title="Retour">
+            <svg class="back-arrow-icon">
+                <use href="#back-arrow-icon"></use>
+            </svg>
+        </button>
 
     </div>
 
@@ -2464,6 +2465,7 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
 </section>
 
+   
 <section id="groupScreen" class="screen">
 
     <div
