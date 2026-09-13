@@ -3129,6 +3129,18 @@ function stayOnApp() {
         .getElementById("leaveAppModal")
         .classList.remove("active");
 
+    history.pushState(
+        {
+            screen: "gamesScreen",
+            gameId: null,
+            groupId: null,
+            roundId: null,
+            view: gamesView
+        },
+        "",
+        "#gamesScreen"
+    );
+
 }
 
 
