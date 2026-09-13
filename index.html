@@ -1809,17 +1809,7 @@ label {
     width: min(500px, 100%);
     padding: 30px 26px 24px;
 
-   background:
-    linear-gradient(
-        to right,
-        #eadbe5 0%,
-        #09463E 100%
-    ),
-    linear-gradient(
-        to top,
-        #eadbe5 0%,
-        #09463E 100%
-    );
+background: #ffffff;
 
     border-radius: 24px;
 
@@ -3243,11 +3233,26 @@ function toggleGamesView() {
 
         gamesView = "groups";
 
+        history.pushState(
+            {
+                screen: "gamesScreen",
+                gameId: null,
+                groupId: null,
+                roundId: null,
+                view: "groups"
+            },
+            "",
+            "#gamesScreen"
+        );
+
     } else {
 
-        gamesView = "games";
+        history.back();
+
+        return;
 
     }
+
 
   
     const title =
@@ -9902,9 +9907,13 @@ function escapeAttribute(text) {
 <div
     id="leaveAppModal"
     class="leave-app-modal"
+    onclick="stayOnApp()"
 >
 
-    <div class="leave-app-box">
+   <div
+    class="leave-app-box"
+    onclick="event.stopPropagation()"
+>
 
         <div class="leave-app-message">
 
@@ -9921,7 +9930,15 @@ function escapeAttribute(text) {
 
 
         <div class="leave-app-buttons">
-
+           
+            <button
+                type="button"
+                class="leave-app-quit"
+                onclick="quitApp()"
+            >
+                🤧 Bye bye
+            </button>
+           
             <button
                 type="button"
                 class="leave-app-stay"
@@ -9930,13 +9947,7 @@ function escapeAttribute(text) {
                 🥳 Rester sur Blindtest Mix
             </button>
 
-            <button
-                type="button"
-                class="leave-app-quit"
-                onclick="quitApp()"
-            >
-                🤧 Bye bye
-            </button>
+         
 
         </div>
 
