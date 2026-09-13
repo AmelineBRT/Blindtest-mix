@@ -311,6 +311,25 @@ button:disabled {
     color: #4b3500;
 }
 
+
+   /* Retour en arrière*/
+   
+   .back-arrow-button {
+    width: 42px;
+    height: 30px;
+    margin: 10px 0 0 0;
+    padding: 4px 6px;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.back-arrow-button svg {
+    width: 30px;
+    height: 18px;
+    display: block;
+}
    
 /* =========================================================
    AUTRES
@@ -1682,6 +1701,11 @@ label {
         margin: 4px 0;
     }
 
+   .back-arrow-button {
+    width: 42px;
+    margin: 10px 0 0 0;
+}
+
     .theme-toggle,
     .view-toggle,
     .filter-option,
@@ -2087,9 +2111,64 @@ background: #ffffff;
         💾 Créer le groupe
     </button>
 
-    <button class="secondary" onclick="showGames()">
-        ← Retour
-    </button>
+<button
+    class="back-arrow-button"
+    onclick="showGames()"
+    title="Retour"
+>
+    <!-- flèche retour -->
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 1536 888"
+        width="30"
+        height="18"
+        preserveAspectRatio="none"
+    >
+        <defs>
+            <linearGradient
+                id="silverBackArrow"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="0%"
+            >
+                <stop offset="0%" stop-color="#777777" />
+                <stop offset="50%" stop-color="#bdbdbd" />
+                <stop offset="100%" stop-color="#eeeeee" />
+            </linearGradient>
+        </defs>
+
+        <path
+            fill="url(#silverBackArrow)"
+            d="
+                M1108 16
+                C1190 27 1274 52 1340 96
+                C1400 136 1435 181 1444 225
+                C1453 273 1438 322 1406 369
+                C1367 425 1302 474 1215 522
+                C1119 574 1014 606 898 630
+                C760 659 615 680 479 694
+                L497 750
+                C505 774 501 797 487 812
+                C478 822 464 824 449 818
+                L55 591
+                C43 584 43 566 51 553
+                L456 310
+                C472 301 490 308 496 322
+                C500 332 497 347 492 360
+                L458 428
+                C594 439 745 444 881 434
+                C1012 425 1127 405 1221 369
+                C1287 344 1330 313 1342 272
+                C1355 230 1334 187 1291 150
+                C1247 111 1181 72 1103 35
+                C1097 32 1095 25 1098 21
+                C1100 17 1104 15 1108 16
+                Z
+            "
+        />
+    </svg>
+</button>
 
 </div>
 
@@ -2146,13 +2225,7 @@ background: #ffffff;
 
     </button>
 
-    <button
-        class="secondary"
-        onclick="showGroups()">
-
-        ← Retour
-
-    </button>
+onclick="showGroups()"
 
 </div>
 
@@ -2242,9 +2315,7 @@ background: #ffffff;
         💾 Créer la partie
     </button>
 
-    <button class="secondary" onclick="showGames()">
-        ← Retour
-    </button>
+   onclick="showGroups()"
 
 </div>
 
@@ -2316,12 +2387,65 @@ background: #ffffff;
                 🎮 Jouer la partie
             </button>
 
-            <button
-                id="gameBackButton"
-                class="secondary"
-                onclick="goBackFromGame()">
-                ← Retour
-            </button>
+<button
+    id="gameBackButton"
+    class="back-arrow-button"
+    onclick="goBackFromGame()"
+    title="Retour"
+>
+ <!-- flèche retour -->
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 1536 888"
+        width="30"
+        height="18"
+        preserveAspectRatio="none"
+    >
+        <defs>
+            <linearGradient
+                id="silverBackArrow"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="0%"
+            >
+                <stop offset="0%" stop-color="#777777" />
+                <stop offset="50%" stop-color="#bdbdbd" />
+                <stop offset="100%" stop-color="#eeeeee" />
+            </linearGradient>
+        </defs>
+
+        <path
+            fill="url(#silverBackArrow)"
+            d="
+                M1108 16
+                C1190 27 1274 52 1340 96
+                C1400 136 1435 181 1444 225
+                C1453 273 1438 322 1406 369
+                C1367 425 1302 474 1215 522
+                C1119 574 1014 606 898 630
+                C760 659 615 680 479 694
+                L497 750
+                C505 774 501 797 487 812
+                C478 822 464 824 449 818
+                L55 591
+                C43 584 43 566 51 553
+                L456 310
+                C472 301 490 308 496 322
+                C500 332 497 347 492 360
+                L458 428
+                C594 439 745 444 881 434
+                C1012 425 1127 405 1221 369
+                C1287 344 1330 313 1342 272
+                C1355 230 1334 187 1291 150
+                C1247 111 1181 72 1103 35
+                C1097 32 1095 25 1098 21
+                C1100 17 1104 15 1108 16
+                Z
+            "
+        />
+    </svg>
+</button>
 
         </div>
 
@@ -2381,11 +2505,7 @@ background: #ffffff;
             ＋ 🎶 Nouvelle partie
         </button>
 
-<button
-    class="secondary"
-    onclick="goBackFromGroup()">
-    ← Retour
-</button>
+onclick="showGame()"
 
     </div>
 
@@ -2467,9 +2587,7 @@ background: #ffffff;
         🗑️ Supprimer cette partie
     </button>
 
-    <button class="secondary" onclick="showGame()">
-        ← Retour
-    </button>
+onclick="showGame()"
 
 </div>
 
@@ -2497,9 +2615,7 @@ background: #ffffff;
         💾 Créer la manche
     </button>
 
-    <button class="secondary" onclick="showGame()">
-        ← Retour
-    </button>
+onclick="showGame()"
 
 </div>
 
@@ -2545,9 +2661,7 @@ background: #ffffff;
         💾 Enregistrer la manche
     </button>
 
-    <button class="secondary" onclick="showGame()">
-        ← Retour
-    </button>
+onclick="showGame()"
 
 </div>
 
@@ -2647,9 +2761,64 @@ background: #ffffff;
         📋 Dupliquer dans les parties sélectionnées
     </button>
 
-    <button class="secondary" onclick="cancelDuplicateRound()">
-        ← Annuler
-    </button>
+<button
+    class="back-arrow-button"
+    onclick="cancelDuplicateRound()"
+    title="Annuler"
+>
+    <!-- flèche retour -->
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 1536 888"
+        width="30"
+        height="18"
+        preserveAspectRatio="none"
+    >
+        <defs>
+            <linearGradient
+                id="silverBackArrow"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="0%"
+            >
+                <stop offset="0%" stop-color="#777777" />
+                <stop offset="50%" stop-color="#bdbdbd" />
+                <stop offset="100%" stop-color="#eeeeee" />
+            </linearGradient>
+        </defs>
+
+        <path
+            fill="url(#silverBackArrow)"
+            d="
+                M1108 16
+                C1190 27 1274 52 1340 96
+                C1400 136 1435 181 1444 225
+                C1453 273 1438 322 1406 369
+                C1367 425 1302 474 1215 522
+                C1119 574 1014 606 898 630
+                C760 659 615 680 479 694
+                L497 750
+                C505 774 501 797 487 812
+                C478 822 464 824 449 818
+                L55 591
+                C43 584 43 566 51 553
+                L456 310
+                C472 301 490 308 496 322
+                C500 332 497 347 492 360
+                L458 428
+                C594 439 745 444 881 434
+                C1012 425 1127 405 1221 369
+                C1287 344 1330 313 1342 272
+                C1355 230 1334 187 1291 150
+                C1247 111 1181 72 1103 35
+                C1097 32 1095 25 1098 21
+                C1100 17 1104 15 1108 16
+                Z
+            "
+        />
+    </svg>
+</button>
 
 </div>
 
@@ -2683,9 +2852,7 @@ background: #ffffff;
         Vérifier mon adresse
     </button>
 
-    <button class="secondary" onclick="cancelPasswordRecovery()">
-        ← Retour
-    </button>
+onclick="showGame()"
 
 </div>
 
@@ -7000,11 +7167,11 @@ div.dataset.roundId = round.id;
     preserveAspectRatio="none"
 >
   <path
-    fill="#777"
+    fill="#999"
    d="M714 84 L980 350 L837 350 Q829 350 829 362 L829 901 Q829 913 817 913 L611 913 Q599 913 599 901 L599 362 Q599 350 587 350 L447 350 Z"  />
 
   <path
-    fill="#777"
+    fill="#999"
     d="M535 1309 L270 1038 L408 1038 Q420 1038 420 1026 L420 502 Q420 490 432 490 L558 490 Q570 490 570 502 L570 921 Q570 943 592 955 L650 960 L650 1026 Q650 1038 662 1038 L800 1038 Z"
     />
 </svg>
