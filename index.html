@@ -3016,103 +3016,98 @@ window.addEventListener("popstate", function(event) {
 
     isBrowserBack = true;
 
-
-    /*
-     * Si on revient avant la première page
-     * de Blindtest Mix, on demande confirmation.
-     */
-
-  if (
-    !event.state ||
-    !event.state.screen
-) {
-
-    history.pushState(
-        {
-            screen: "gamesScreen",
-            gameId: null,
-            groupId: null,
-            roundId: null,
-            view: gamesView
-        },
-        "",
-        "#gamesScreen"
-    );
-
-
-    document
-        .getElementById("leaveAppModal")
-        .classList.add("active");
-
-
-    isBrowserBack = false;
-
-    return;
-
-}
-
-    currentGameId =
-        event.state.gameId || null;
-
-    currentGroupId =
-        event.state.groupId || null;
-
-    currentRoundId =
-        event.state.roundId || null;
-
-    gamesView =
-        event.state.view || "games";
-
-
     if (
-        event.state.screen === "gamesScreen"
+        event.state &&
+        event.state.screen
     ) {
+
+        currentGameId =
+            event.state.gameId || null;
+
+        currentGroupId =
+            event.state.groupId || null;
+
+        currentRoundId =
+            event.state.roundId || null;
+
+        gamesView =
+            event.state.view || "games";
+
 
         if (
-            gamesView === "groups"
+            event.state.screen === "gamesScreen"
         ) {
 
-            showGroups();
+            if (
+                gamesView === "groups"
+            ) {
+
+                showGroups();
+
+            } else {
+
+                showGames();
+
+            }
+
+        } else if (
+            event.state.screen === "gameScreen"
+        ) {
+
+            showGame();
+
+        } else if (
+            event.state.screen === "groupScreen"
+        ) {
+
+            if (currentGroupId) {
+
+                showGroup(currentGroupId);
+
+            } else {
+
+                showGroups();
+
+            }
 
         } else {
 
-            showGames();
-
-        }
-
-    } else if (
-        event.state.screen === "gameScreen"
-    ) {
-
-        showGame();
-
-    } else if (
-        event.state.screen === "groupScreen"
-    ) {
-
-        if (currentGroupId) {
-
-            showGroup(currentGroupId);
-
-        } else {
-
-            showGroups();
+            showScreen(
+                event.state.screen
+            );
 
         }
 
     } else {
 
-        showScreen(
-            event.state.screen
+        /*
+         * L'utilisateur essaie de quitter
+         * Blindtest Mix.
+         */
+
+        history.pushState(
+            {
+                screen: "gamesScreen",
+                gameId: null,
+                groupId: null,
+                roundId: null,
+                view: gamesView
+            },
+            "",
+            "#gamesScreen"
         );
 
-    }
+        document
+            .getElementById("leaveAppModal")
+            .classList.add("active");
 
+    }
 
     isBrowserBack = false;
 
 });
 
+   
 function stayOnApp() {
 
     document
