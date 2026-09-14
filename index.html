@@ -443,11 +443,28 @@ button:disabled {
 }
 
    #editRoundScreen .back-arrow-button {
-    top: -5px;
-    left: 0px;
+    top: -20px;
+    left: -10px;
 }
 
-#duplicateRoundScreen .back-arrow-button {
+  
+   #gameMainCard .back-arrow-button {
+    position: absolute;
+    top: -20px;
+    left: -10px;
+    z-index: 10;
+    pointer-events: auto;
+}
+
+   #groupMainCard .back-arrow-button {
+    position: absolute;
+    top: -20px;
+    left: -10px;
+    z-index: 10;
+    pointer-events: auto;
+}
+
+   #duplicateRoundScreen .back-arrow-button {
     position: static;
     width: 42px;
     height: 30px;
@@ -456,22 +473,6 @@ button:disabled {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-}
-   
-   #gameMainCard .back-arrow-button {
-    position: absolute;
-    top: -5px;
-    left: 0px;
-    z-index: 10;
-    pointer-events: auto;
-}
-
-   #groupMainCard .back-arrow-button {
-    position: absolute;
-    top: -5px;
-    left: 0px;
-    z-index: 10;
-    pointer-events: auto;
 }
    
 .game-icon-button {
