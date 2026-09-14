@@ -3186,9 +3186,51 @@ async function loadGamesFromCloud() {
             await response.json();
 
 
+        onlineGames.forEach(function(game) {
+
+            const alreadyExists =
+                games.some(function(localGame) {
+
+                    return localGame.id === game.id;
+
+                });
+
+
+            if (!alreadyExists) {
+
+                games.push({
+
+                    id: game.id,
+
+                    name: game.nom,
+
+                    creator: game.createur,
+
+                    groupId: game.groupe_id || "",
+
+                    password: game.mot_de_passe || "",
+
+                    email: game.email_recuperation || "",
+
+                    participants: [
+                        game.createur
+                    ],
+
+                    rounds: []
+
+                });
+
+            }
+
+        });
+
+
+        saveData();
+
+
         console.log(
-            "Parties récupérées depuis D1 :",
-            onlineGames
+            "Parties en ligne ajoutées à Blindtest Mix :",
+            onlineGames.length
         );
 
 
