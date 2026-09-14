@@ -7884,7 +7884,7 @@ async function saveTracksFromInputs(round) {
 
 }
 
-function saveRound() {
+async function saveRound() {
 
     const game = getCurrentGame();
 
@@ -7913,7 +7913,7 @@ function saveRound() {
 
     round.name = newName;
 
-    saveTracksFromInputs(round);
+    await saveTracksFromInputs(round);
 
     saveData();
 
