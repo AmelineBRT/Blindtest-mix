@@ -7814,7 +7814,12 @@ async function saveTracksFromInputs(round) {
 
             const track = round.tracks[index];
 
-
+if (
+    !track.title &&
+    !track.url
+) {
+    continue;
+}
             const response =
                 await fetch(
                     "https://blindtestmix.amelinebrt.workers.dev/tracks",
