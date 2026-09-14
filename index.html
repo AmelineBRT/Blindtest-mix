@@ -5894,7 +5894,8 @@ function toggleEmailRequirement() {
 }
 
 
-function createGame() {
+```javascript
+async function createGame() {
 
     const name =
         document.getElementById("gameName").value.trim();
@@ -5939,52 +5940,151 @@ function createGame() {
 
     }
 
-let participants = [creator];
 
-if (groupId) {
-    const group = groups.find(function(group) {
-        return group.id === groupId;
-    });
+    let participants = [creator];
 
-    if (group && Array.isArray(group.participants)) {
-        group.participants.forEach(function(name) {
 
-            const alreadyExists =
-                participants.some(function(participant) {
+    if (groupId) {
 
-                    return participant.toLowerCase() ===
-                           name.toLowerCase();
-
-                });
-
-            if (!alreadyExists) {
-                participants.push(name);
-            }
-
+        const group = groups.find(function(group) {
+            return group.id === groupId;
         });
+
+
+        if (group && Array.isArray(group.participants)) {
+
+            group.participants.forEach(function(name) {
+
+                const alreadyExists =
+                    participants.some(function(participant) {
+
+                        return participant.toLowerCase() ===
+                               name.toLowerCase();
+
+                    });
+
+
+                if (!alreadyExists) {
+
+                    participants.push(name);
+
+                }
+
+            });
+
+        }
+
     }
-}
 
-const game = {
-    id: Date.now().toString(),
-    name: name,
-    creator: creator,
-    groupId: groupId,
-    password: password,
-    email: email,
-    participants: participants,
-    rounds: []
-};
 
+    const game = {
+
+        id: Date.now().toString(),
+
+        name: name,
+
+        creator: creator,
+
+        groupId: groupId,
+
+        password: password,
+
+        email: email,
+
+        participants: participants,
+
+        rounds: []
+
+    };
+
+
+    /*
+     * Sauvegarde locale
+     */
     games.push(game);
 
     saveData();
 
-    currentGameId = game.id;
+
+    /*
+     * Sauvegarde en ligne dans Cloudflare D1
+     */
+    try {
+
+        const response =
+            await fetch(
+                "https://blindtestmix.amelinebrt.workers.dev/parties",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        id: game.id,
+
+                        nom: game.name,
+
+                        createur: game.creator,
+
+                        groupe_id:
+                            game.groupId || null,
+
+                        mot_de_passe:
+                            game.password || null,
+
+                        email_recuperation:
+                            game.email || null
+
+                    })
+
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Erreur lors de l'enregistrement en ligne."
+            );
+
+        }
+
+
+        const result =
+            await response.json();
+
+
+        console.log(
+            "Partie enregistrée en ligne :",
+            result
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Erreur sauvegarde D1 :",
+            error
+        );
+
+
+        alert(
+            "La partie a été créée sur cet appareil, mais elle n'a pas pu être enregistrée en ligne."
+        );
+
+    }
+
+
+    currentGameId =
+        game.id;
 
     showGame();
 
 }
+```
 
 
 /* ========================================================
