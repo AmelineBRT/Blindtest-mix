@@ -7769,7 +7769,7 @@ function addTrack() {
 }
 
 
-function saveTracksFromInputs(round) {
+async function saveTracksFromInputs(round) {
 
     round.tracks.forEach(function(track, index) {
 
@@ -7789,8 +7789,100 @@ function saveTracksFromInputs(round) {
 
     });
 
-}
 
+    /*
+     * Sauvegarde locale
+     */
+
+    saveData();
+
+
+    /*
+     * Sauvegarde des pistes dans Cloudflare D1
+     */
+
+    const game = getCurrentGame();
+
+
+    try {
+
+        for (
+            let index = 0;
+            index < round.tracks.length;
+            index++
+        ) {
+
+            const track = round.tracks[index];
+
+
+            const response =
+                await fetch(
+                    "https://blindtestmix.amelinebrt.workers.dev/tracks",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            id:
+                                round.id + "-track-" + index,
+
+                            manche_id:
+                                round.id,
+
+                            titre:
+                                track.title || null,
+
+                            url:
+                                track.url || null,
+
+                            ordre:
+                                index + 1
+
+                        })
+
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Erreur lors de l'enregistrement d'une piste."
+                );
+
+            }
+
+
+            const result =
+                await response.json();
+
+
+            console.log(
+                "Piste enregistrée en ligne :",
+                result
+            );
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Erreur sauvegarde pistes D1 :",
+            error
+        );
+
+        alert(
+            "Les pistes ont été enregistrées sur cet appareil, mais elles n'ont pas pu être enregistrées en ligne."
+        );
+
+    }
+
+}
 
 function saveRound() {
 
