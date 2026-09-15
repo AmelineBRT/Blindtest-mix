@@ -8660,6 +8660,75 @@ async function saveRound() {
 
     round.name = newName;
 
+
+    /*
+     * Sauvegarde de la manche dans Cloudflare D1
+     */
+
+    try {
+
+        const roundResponse =
+            await fetch(
+                "https://blindtestmix.amelinebrt.workers.dev/rounds",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        id:
+                            round.id,
+
+                        partie_id:
+                            game.id,
+
+                        nom:
+                            round.name,
+
+                        ordre:
+                            game.rounds.indexOf(round) + 1
+
+                    })
+
+                }
+            );
+
+
+        if (!roundResponse.ok) {
+
+            throw new Error(
+                "Erreur lors de l'enregistrement de la manche en ligne."
+            );
+
+        }
+
+
+        const roundResult =
+            await roundResponse.json();
+
+        console.log(
+            "Manche mise à jour en ligne :",
+            roundResult
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Erreur sauvegarde manche D1 :",
+            error
+        );
+
+        alert(
+            "La manche a été enregistrée sur cet appareil, mais sa modification n'a pas pu être enregistrée en ligne."
+        );
+
+    }
+
+
     await saveTracksFromInputs(round);
 
     saveData();
@@ -8669,7 +8738,6 @@ async function saveRound() {
     showGame();
 
 }
-
 
 /* ========================================================
    DUPLIQUER MANCHE
