@@ -2698,11 +2698,40 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
     </button>
 
+</div>
+
+        </div>
+
+        <button
+            class="primary"
+            onclick="showCreatePerson()"
+        >
+            ＋ Créer une personne
+        </button>
+
+   <div class="people-search-container">
+
+    <input
+        id="peopleSearch"
+        class="search-input"
+        type="text"
+        placeholder="🔍 Rechercher..."
+        oninput="renderPeopleBank()"
+    >
+
     <select
         id="peopleSortSelect"
         class="filter-toggle sort-select"
         onchange="changePeopleSort(this.value)"
         title="Trier">
+
+        <option value="creation">
+            Ordre de création
+        </option>
+
+        <option value="occurrence">
+            Ordre d'occurrence
+        </option>
 
         <option value="alphabetical">
             Ordre alphabétique (A → Z)
@@ -2715,27 +2744,6 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
     </select>
 
 </div>
-
-        </div>
-
-        <button
-            class="primary"
-            onclick="showCreatePerson()"
-        >
-            ＋ Créer une personne
-        </button>
-
-        <div class="people-search-container">
-
-            <input
-                id="peopleSearch"
-                class="search-input"
-                type="text"
-                placeholder="🔍 Rechercher..."
-                oninput="renderPeopleBank()"
-            >
-
-        </div>
 
         <div id="peopleList"></div>
 
@@ -3186,7 +3194,7 @@ let groups = [];
 let people = []; 
 
 
-let peopleSortMode = "alphabetical";
+let peopleSortMode = "creation";
 
 let currentGameId = null;
 let currentRoundId = null;
