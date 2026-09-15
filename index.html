@@ -2687,18 +2687,34 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
                 👥 Mes personnes
             </h2>
 
-            <div class="games-header-actions">
+           <div class="games-header-actions">
 
-                <button
-                    id="peopleViewToggle"
-                    class="view-toggle"
-                    onclick="showGames()">
+    <button
+        id="peopleViewToggle"
+        class="view-toggle"
+        onclick="showGames()">
 
-                    🎶 Voir les parties
+        🎶 Voir les parties
 
-                </button>
+    </button>
 
-            </div>
+    <select
+        id="peopleSortSelect"
+        class="filter-toggle sort-select"
+        onchange="changePeopleSort(this.value)"
+        title="Trier">
+
+        <option value="alphabetical">
+            Ordre alphabétique (A → Z)
+        </option>
+
+        <option value="alphabetical-reverse">
+            Ordre alphabétique (Z → A)
+        </option>
+
+    </select>
+
+</div>
 
         </div>
 
@@ -3167,7 +3183,10 @@ onclick="history.back()"
 
 let games = [];
 let groups = [];
-let people = [];   
+let people = []; 
+
+
+let peopleSortMode = "alphabetical";
 
 let currentGameId = null;
 let currentRoundId = null;
@@ -3675,6 +3694,14 @@ async function loadGamesFromCloud() {
             }
 
 
+function changePeopleSort(mode) {
+
+    peopleSortMode = mode;
+
+    renderPeopleBank();
+
+}
+           
             /* =========================
                MANCHES
                ========================= */
@@ -4280,15 +4307,40 @@ function renderPeopleBank() {
             ? searchInput.value.trim().toLowerCase()
             : "";
 
-    const filteredPeople =
-        people.filter(function(person) {
+   let filteredPeople =
+    people.filter(function(person) {
 
-            return !search ||
-                person.nom
-                    .toLowerCase()
-                    .startsWith(search);
+        return !search ||
+            person.nom
+                .toLowerCase()
+                .startsWith(search);
 
-        });
+    });
+
+
+filteredPeople.sort(function(a, b) {
+
+    const nameA =
+        a.nom.toLowerCase();
+
+    const nameB =
+        b.nom.toLowerCase();
+
+    if (peopleSortMode === "alphabetical") {
+
+        return nameA.localeCompare(
+            nameB,
+            "fr"
+        );
+
+    }
+
+    return nameB.localeCompare(
+        nameA,
+        "fr"
+    );
+
+});
 
     let html = "";
 
