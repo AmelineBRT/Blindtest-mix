@@ -3244,19 +3244,38 @@ onclick="history.back()"
 
 function showCreatePerson() {
 
-    document.getElementById("personName").value = "";
+    document.getElementById(
+        "personName"
+    ).value = "";
 
-    document.getElementById("personEmojiButton").textContent = "👤";
+    document.getElementById(
+        "personEmojiInput"
+    ).value = "👤";
 
-    document.getElementById("personBackgroundEnabled").checked = false;
+    document.getElementById(
+        "personBackgroundEnabled"
+    ).checked = false;
 
-    document.getElementById("personBackgroundOptions").style.display = "none";
+    document.getElementById(
+        "personBackgroundOptions"
+    ).style.display = "none";
 
-    document.getElementById("personBackgroundColor").value = "#D9D9D9";
+    document.getElementById(
+        "personBackgroundColor"
+    ).value = "#B8DCD7";
 
-    document.getElementById("personBackgroundSize").value = "medium";
+    document.getElementById(
+        "personBackgroundSize"
+    ).value = "medium";
 
-    showScreen("createPersonScreen");
+    selectedPersonShape =
+        "circle";
+
+    updatePersonPreview();
+
+    showScreen(
+        "createPersonScreen"
+    );
 
 }
 
@@ -3452,6 +3471,8 @@ let duplicateSelectedCreators = [];
 let duplicateSelectedGroups = [];
 let duplicateSelectedParticipants = [];
    let duplicateSortMode = "creation";
+
+   let selectedPersonShape = "circle";
 
 /* ========================================================
    MODE SOMBRE
@@ -4709,7 +4730,186 @@ filteredPeople.sort(function(a, b) {
 
 }
 
-   
+
+   function togglePersonBackground() {
+
+    const checkbox =
+        document.getElementById(
+            "personBackgroundEnabled"
+        );
+
+    const options =
+        document.getElementById(
+            "personBackgroundOptions"
+        );
+
+    if (!checkbox || !options) {
+        return;
+    }
+
+    if (checkbox.checked) {
+
+        options.style.display = "block";
+
+    } else {
+
+        options.style.display = "none";
+
+    }
+
+    updatePersonPreview();
+
+}
+
+
+function selectPersonShape(shape) {
+
+    selectedPersonShape = shape;
+
+    updatePersonPreview();
+
+}
+
+
+function updatePersonPreview() {
+
+    const preview =
+        document.getElementById(
+            "personPreview"
+        );
+
+    const emojiInput =
+        document.getElementById(
+            "personEmojiInput"
+        );
+
+    const backgroundEnabled =
+        document.getElementById(
+            "personBackgroundEnabled"
+        );
+
+    const backgroundColor =
+        document.getElementById(
+            "personBackgroundColor"
+        );
+
+    const backgroundSize =
+        document.getElementById(
+            "personBackgroundSize"
+        );
+
+    if (
+        !preview ||
+        !emojiInput
+    ) {
+        return;
+    }
+
+    preview.textContent =
+        emojiInput.value || "👤";
+
+
+    /*
+     * Aucun fond
+     */
+
+    if (
+        !backgroundEnabled ||
+        !backgroundEnabled.checked
+    ) {
+
+        preview.style.background =
+            "transparent";
+
+        preview.style.borderRadius =
+            "50%";
+
+        preview.style.width =
+            "80px";
+
+        preview.style.height =
+            "80px";
+
+        return;
+
+    }
+
+
+    /*
+     * Couleur
+     */
+
+    preview.style.background =
+        backgroundColor
+            ? backgroundColor.value
+            : "#D9D9D9";
+
+
+    /*
+     * Forme
+     */
+
+    if (
+        selectedPersonShape === "circle"
+    ) {
+
+        preview.style.borderRadius =
+            "50%";
+
+    } else if (
+        selectedPersonShape === "rounded"
+    ) {
+
+        preview.style.borderRadius =
+            "18px";
+
+    } else {
+
+        preview.style.borderRadius =
+            "12px";
+
+    }
+
+
+    /*
+     * Taille
+     *
+     * Le fond reste toujours
+     * à l'intérieur de l'aperçu.
+     */
+
+    if (
+        !backgroundSize ||
+        backgroundSize.value === "small"
+    ) {
+
+        preview.style.width =
+            "48px";
+
+        preview.style.height =
+            "48px";
+
+    } else if (
+        backgroundSize.value === "large"
+    ) {
+
+        preview.style.width =
+            "76px";
+
+        preview.style.height =
+            "76px";
+
+    } else {
+
+        preview.style.width =
+            "62px";
+
+        preview.style.height =
+            "62px";
+
+    }
+
+}
    
    
 /* ========================================================
