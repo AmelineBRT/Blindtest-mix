@@ -5303,6 +5303,155 @@ function filterPersonEmoji(input) {
 }
 
 
+async function createPerson() {
+
+    const name =
+        document
+            .getElementById("personName")
+            .value
+            .trim();
+
+    const emoji =
+        document
+            .getElementById("personEmojiInput")
+            .value
+            .trim();
+
+    const backgroundEnabled =
+        document
+            .getElementById("personBackgroundEnabled")
+            .checked;
+
+    if (!name) {
+
+        alert(
+            "Indique le nom du participant."
+        );
+
+        return;
+    }
+
+    if (!emoji) {
+
+        alert(
+            "Choisis un emoji pour le participant."
+        );
+
+        return;
+    }
+
+
+    const personId =
+        Date.now().toString() +
+        Math.random()
+            .toString(36)
+            .substring(2, 7);
+
+
+    const person = {
+
+        id:
+            personId,
+
+        nom:
+            name,
+
+        emoji:
+            emoji,
+
+        fond_couleur:
+            backgroundEnabled
+                ? document
+                    .getElementById(
+                        "personBackgroundColor"
+                    )
+                    .value
+                : null,
+
+        fond_forme:
+            backgroundEnabled
+                ? selectedPersonShape
+                : null,
+
+        fond_taille:
+            backgroundEnabled
+                ? selectedPersonSize
+                : null
+
+    };
+
+
+    try {
+
+        const response =
+            await fetch(
+                "https://blindtestmix.amelinebrt.workers.dev/people",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(
+                            person
+                        )
+
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Erreur lors de la création du participant en ligne."
+            );
+
+        }
+
+
+        const result =
+            await response.json();
+
+
+        console.log(
+            "Participant enregistré en ligne :",
+            result
+        );
+
+
+        people.push(
+            person
+        );
+
+
+        renderPeopleBank();
+
+
+        alert(
+            "Participant créé !"
+        );
+
+
+        showPeopleBank();
+
+
+    } catch (error) {
+
+        console.error(
+            "Erreur création participant D1 :",
+            error
+        );
+
+        alert(
+            "Le participant n'a pas pu être enregistré en ligne."
+        );
+
+    }
+
+}
+
    
    
 /* ========================================================
