@@ -715,10 +715,36 @@ button:disabled {
 }
 
 .person-preview {
+    position: relative;
+
     width: 80px;
     height: 80px;
 
-    margin: 10px auto 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto;
+
+    background: transparent;
+}
+
+.person-preview-background {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    z-index: 1;
+}
+
+.person-preview-emoji {
+    position: relative;
+
+    z-index: 2;
 
     display: flex;
     align-items: center;
@@ -726,10 +752,40 @@ button:disabled {
 
     font-size: 40px;
 
-    background: transparent;
+    line-height: 1;
 
-    border-radius: 50%;
+    white-space: nowrap;
 }
+
+   .person-setting-row {
+    display: flex;
+    align-items: center;
+
+    min-height: 55px;
+
+    margin: 6px 0;
+}
+
+.person-setting-row > label {
+    width: 65px;
+
+    margin: 0;
+
+    flex: 0 0 65px;
+}
+
+.person-setting-row .person-shape-options,
+.person-setting-row .person-size-options {
+    margin: 0;
+    flex: 1;
+}
+
+.person-setting-row .color-picker-container {
+    margin: 0;
+}
+
+
+
    
 
 .game-card {
@@ -746,11 +802,21 @@ button:disabled {
 .person-background-option {
     display: flex;
     align-items: center;
-    gap: 7px;
+    justify-content: flex-start;
+
+    width: fit-content;
+
+    gap: 6px;
 
     margin: 10px 0 5px 0;
 
     cursor: pointer;
+}
+
+.person-background-option input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    flex: 0 0 auto;
 }
 
 .person-background-option input[type="checkbox"] {
@@ -822,21 +888,27 @@ button:disabled {
 }
 
 .shape-rectangle {
-    width: 32px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
 
-    border-radius: 6px;
+    border-radius: 8px;
 
     background: #999;
 }
 
 .shape-triangle {
-    width: 0;
-    height: 0;
+    width: 28px;
+    height: 28px;
 
-    border-left: 16px solid transparent;
-    border-right: 16px solid transparent;
-    border-bottom: 28px solid #999;
+    background: #999;
+
+    clip-path: polygon(
+        50% 0%,
+        100% 100%,
+        0% 100%
+    );
+
+    border-radius: 6px;
 }
 
 .person-size-options {
@@ -3309,31 +3381,31 @@ onclick="history.back()"
 
     <label>Emoji</label>
 
-    <div class="person-emoji-picker">
+<div class="person-emoji-picker">
 
-        <input
-            id="personEmojiInput"
-            class="person-emoji-input"
-            type="text"
-            inputmode="emoji"
-            maxlength="10"
-            value="👤"
-            placeholder="😀"
-            oninput="filterPersonEmoji(this); updatePersonPreview()"
-        >
+    <input
+        id="personEmojiInput"
+        class="person-emoji-input"
+        type="text"
+        inputmode="emoji"
+        maxlength="10"
+        value=""
+        placeholder="👤"
+        oninput="filterPersonEmoji(this); updatePersonPreview()"
+    >
 
-    </div>
+</div>
 
-    <label class="person-background-option">
+<label class="person-background-option">
 
-        <input
-            id="personBackgroundEnabled"
-            type="checkbox"
-            onchange="togglePersonBackground()">
+    <input
+        id="personBackgroundEnabled"
+        type="checkbox"
+        onchange="togglePersonBackground()">
 
-        <span>Ajouter un fond</span>
+    <span>Ajouter un fond</span>
 
-    </label>
+</label>
 
     <div
         id="personBackgroundArea"
@@ -3345,91 +3417,117 @@ onclick="history.back()"
             class="person-background-options"
         >
 
-            <label>Forme</label>
+<div class="person-setting-row">
 
-            <div class="person-shape-options">
+    <label>Forme</label>
 
-                <button
-                    type="button"
-                    class="person-shape-button selected"
-                    id="personShapeCircle"
-                    onclick="selectPersonShape('circle')"
-                    title="Rond">
-                    <span class="shape-circle"></span>
-                </button>
+    <div class="person-shape-options">
 
-                <button
-                    type="button"
-                    class="person-shape-button"
-                    id="personShapeRectangle"
-                    onclick="selectPersonShape('rectangle')"
-                    title="Rectangle">
-                    <span class="shape-rectangle"></span>
-                </button>
+        <button
+            type="button"
+            class="person-shape-button selected"
+            id="personShapeCircle"
+            onclick="selectPersonShape('circle')"
+            title="Rond">
+            <span class="shape-circle"></span>
+        </button>
 
-                <button
-                    type="button"
-                    class="person-shape-button"
-                    id="personShapeTriangle"
-                    onclick="selectPersonShape('triangle')"
-                    title="Triangle">
-                    <span class="shape-triangle"></span>
-                </button>
+        <button
+            type="button"
+            class="person-shape-button"
+            id="personShapeRectangle"
+            onclick="selectPersonShape('rectangle')"
+            title="Carré arrondi">
+            <span class="shape-rectangle"></span>
+        </button>
 
-            </div>
+        <button
+            type="button"
+            class="person-shape-button"
+            id="personShapeTriangle"
+            onclick="selectPersonShape('triangle')"
+            title="Triangle">
+            <span class="shape-triangle"></span>
+        </button>
 
-            <label>Couleur</label>
+    </div>
 
-            <div class="color-picker-container">
+</div>
 
-                <input
-                    id="personBackgroundColor"
-                    type="color"
-                    value="#B8DCD7"
-                    onchange="updatePersonPreview()">
 
-            </div>
+<div class="person-setting-row">
 
-            <label>Taille</label>
+    <label>Couleur</label>
 
-            <div class="person-size-options">
+    <div class="color-picker-container">
 
-                <button
-                    type="button"
-                    class="person-size-button"
-                    id="personSizeSmall"
-                    onclick="selectPersonSize('small')"
-                    title="Petite">
-                    <span class="size-small"></span>
-                </button>
+        <input
+            id="personBackgroundColor"
+            type="color"
+            value="#B8DCD7"
+            onchange="updatePersonPreview()">
 
-                <button
-                    type="button"
-                    class="person-size-button selected"
-                    id="personSizeMedium"
-                    onclick="selectPersonSize('medium')"
-                    title="Moyenne">
-                    <span class="size-medium"></span>
-                </button>
+    </div>
 
-                <button
-                    type="button"
-                    class="person-size-button"
-                    id="personSizeLarge"
-                    onclick="selectPersonSize('large')"
-                    title="Grande">
-                    <span class="size-large"></span>
-                </button>
+</div>
+
+
+<div class="person-setting-row">
+
+    <label>Taille</label>
+
+    <div class="person-size-options">
+
+        <button
+            type="button"
+            class="person-size-button"
+            id="personSizeSmall"
+            onclick="selectPersonSize('small')"
+            title="Petite">
+            <span class="size-small"></span>
+        </button>
+
+        <button
+            type="button"
+            class="person-size-button selected"
+            id="personSizeMedium"
+            onclick="selectPersonSize('medium')"
+            title="Moyenne">
+            <span class="size-medium"></span>
+        </button>
+
+        <button
+            type="button"
+            class="person-size-button"
+            id="personSizeLarge"
+            onclick="selectPersonSize('large')"
+            title="Grande">
+            <span class="size-large"></span>
+        </button>
+
+    </div>
+
 
             </div>
 
             <div class="person-preview-container">
 
-                <div
-                    id="personPreview"
-                    class="person-preview">
-                    👤
-                </div>
+<div
+    id="personPreview"
+    class="person-preview">
+
+    <div
+        id="personPreviewBackground"
+        class="person-preview-background">
+    </div>
+
+    <span
+        id="personPreviewEmoji"
+        class="person-preview-emoji">
+        👤
+    </span>
+
+</div>
 
             </div>
 
@@ -5039,6 +5137,16 @@ function updatePersonPreview() {
             "personPreview"
         );
 
+    const background =
+        document.getElementById(
+            "personPreviewBackground"
+        );
+
+    const emoji =
+        document.getElementById(
+            "personPreviewEmoji"
+        );
+
     const emojiInput =
         document.getElementById(
             "personEmojiInput"
@@ -5054,69 +5162,98 @@ function updatePersonPreview() {
             "personBackgroundColor"
         );
 
-    if (!preview || !emojiInput) {
+    if (
+        !preview ||
+        !background ||
+        !emoji ||
+        !emojiInput
+    ) {
         return;
     }
 
-    preview.textContent =
+    emoji.textContent =
         emojiInput.value || "👤";
 
+
+    /*
+     * Aucun fond
+     */
 
     if (
         !enabled ||
         !enabled.checked
     ) {
 
-        preview.style.background =
-            "transparent";
+        background.style.display =
+            "none";
 
-        preview.style.width =
-            "80px";
-
-        preview.style.height =
-            "80px";
-
-        preview.style.borderRadius =
+        background.style.width =
             "0";
 
-        preview.style.clipPath =
-            "none";
+        background.style.height =
+            "0";
 
         return;
 
     }
 
 
-    let size = 64;
+    background.style.display =
+        "block";
 
-    if (selectedPersonSize === "small") {
+
+    /*
+     * Taille du fond
+     */
+
+    let size = 58;
+
+    if (
+        selectedPersonSize === "small"
+    ) {
+
         size = 48;
-    }
 
-    if (selectedPersonSize === "medium") {
+    } else if (
+        selectedPersonSize === "medium"
+    ) {
+
         size = 58;
-    }
 
-    if (selectedPersonSize === "large") {
+    } else if (
+        selectedPersonSize === "large"
+    ) {
+
         size = 68;
+
     }
 
 
-    preview.style.width =
+    background.style.width =
         size + "px";
 
-    preview.style.height =
+    background.style.height =
         size + "px";
 
-    preview.style.background =
+
+    /*
+     * Couleur
+     */
+
+    background.style.background =
         color
             ? color.value
             : "#B8DCD7";
 
-    preview.style.borderRadius =
+
+    /*
+     * Forme
+     */
+
+    background.style.borderRadius =
         "0";
 
-    preview.style.clipPath =
+    background.style.clipPath =
         "none";
 
 
@@ -5124,21 +5261,21 @@ function updatePersonPreview() {
         selectedPersonShape === "circle"
     ) {
 
-        preview.style.borderRadius =
+        background.style.borderRadius =
             "50%";
 
     } else if (
         selectedPersonShape === "rectangle"
     ) {
 
-        preview.style.borderRadius =
+        background.style.borderRadius =
             "10px";
 
     } else if (
         selectedPersonShape === "triangle"
     ) {
 
-        preview.style.clipPath =
+        background.style.clipPath =
             "polygon(50% 0%, 100% 100%, 0% 100%)";
 
     }
@@ -9626,10 +9763,10 @@ function startSpecificRound(roundId) {
         "personName"
     ).value = "";
 
-    document.getElementById(
-        "personEmojiInput"
-    ).value = "👤";
-
+document.getElementById(
+    "personEmojiInput"
+).value = "";
+      
     document.getElementById(
         "personBackgroundEnabled"
     ).checked = false;
