@@ -3242,50 +3242,6 @@ onclick="history.back()"
 </section>
 
 
-function showCreatePerson() {
-
-    document.getElementById(
-        "personName"
-    ).value = "";
-
-    document.getElementById(
-        "personEmojiInput"
-    ).value = "👤";
-
-    document.getElementById(
-        "personBackgroundEnabled"
-    ).checked = false;
-
-    document.getElementById(
-        "personBackgroundOptions"
-    ).style.display = "none";
-
-    document.getElementById(
-        "personBackgroundColor"
-    ).value = "#B8DCD7";
-
-    document.getElementById(
-        "personBackgroundSize"
-    ).value = "medium";
-
-    selectedPersonShape =
-        "circle";
-
-    updatePersonPreview();
-
-    showScreen(
-        "createPersonScreen"
-    );
-
-}
-
-
-
-
-
-
-
-
 
 
    
@@ -9357,6 +9313,53 @@ function startSpecificRound(roundId) {
     loadRoundForPlaying();
 
 }
+
+
+
+   
+/* ========================================================
+   CRÉER UNE PERSONNE
+   ======================================================== */
+
+   
+   function showCreatePerson() {
+
+    document.getElementById(
+        "personName"
+    ).value = "";
+
+    document.getElementById(
+        "personEmojiInput"
+    ).value = "👤";
+
+    document.getElementById(
+        "personBackgroundEnabled"
+    ).checked = false;
+
+    document.getElementById(
+        "personBackgroundOptions"
+    ).style.display = "none";
+
+    document.getElementById(
+        "personBackgroundColor"
+    ).value = "#B8DCD7";
+
+    document.getElementById(
+        "personBackgroundSize"
+    ).value = "medium";
+
+    selectedPersonShape =
+        "circle";
+
+    updatePersonPreview();
+
+    showScreen(
+        "createPersonScreen"
+    );
+
+}
+
+
 
 
 /* ========================================================
