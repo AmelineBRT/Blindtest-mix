@@ -684,6 +684,52 @@ button:disabled {
 .person-edit-button.visible {
     display: block;
 }
+
+   .person-emoji-picker {
+    display: flex;
+    justify-content: center;
+    margin: 8px 0 15px 0;
+}
+
+.person-emoji-input {
+    width: 60px;
+    height: 60px;
+
+    padding: 0;
+
+    border: 1px solid #ccc;
+    border-radius: 8px;
+
+    background: #fff;
+
+    text-align: center;
+
+    font-size: 32px;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+.person-preview-container {
+    margin: 15px 0;
+}
+
+.person-preview {
+    width: 80px;
+    height: 80px;
+
+    margin: 10px auto 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 40px;
+
+    background: transparent;
+
+    border-radius: 50%;
+}
    
 
 .game-card {
@@ -3071,17 +3117,22 @@ onclick="history.back()"
         type="text"
         placeholder="Ex : Ameline">
 
-    <label>Icône</label>
+ <label>Icône</label>
 
-    <button
-        type="button"
-        id="personEmojiButton"
-        class="person-emoji-button"
-        onclick="openPersonEmojiPicker()">
+<div class="person-emoji-picker">
 
-        👤
+    <input
+        id="personEmojiInput"
+        class="person-emoji-input"
+        type="text"
+        inputmode="emoji"
+        maxlength="2"
+        value="👤"
+        onclick="this.select()"
+        oninput="updatePersonPreview()"
+    >
 
-    </button>
+</div>
 
     <label class="person-background-option">
 
@@ -3154,6 +3205,20 @@ onclick="history.back()"
 
     </div>
 
+<div class="person-preview-container">
+
+    <label>Aperçu</label>
+
+    <div
+        id="personPreview"
+        class="person-preview"
+    >
+        👤
+    </div>
+
+</div>
+
+   
     <button
         class="primary"
         onclick="createPerson()">
