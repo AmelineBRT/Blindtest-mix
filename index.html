@@ -3053,6 +3053,158 @@ onclick="history.back()"
 </section>
 
 
+
+<!-- ==================================================
+     CRÉER UNE PERSONNE
+     ================================================== -->
+
+<section id="createPersonScreen" class="screen">
+
+<div class="card">
+
+    <h2>👥 Nouvelle personne</h2>
+
+    <label>Nom de la personne</label>
+
+    <input
+        id="personName"
+        type="text"
+        placeholder="Ex : Ameline">
+
+    <label>Icône</label>
+
+    <button
+        type="button"
+        id="personEmojiButton"
+        class="person-emoji-button"
+        onclick="openPersonEmojiPicker()">
+
+        👤
+
+    </button>
+
+    <label class="person-background-option">
+
+        <input
+            id="personBackgroundEnabled"
+            type="checkbox"
+            onchange="togglePersonBackground()">
+
+        Ajouter un fond
+
+    </label>
+
+    <div
+        id="personBackgroundOptions"
+        class="person-background-options"
+        style="display:none;"
+    >
+
+        <label>Forme</label>
+
+        <div class="person-shape-options">
+
+            <button
+                type="button"
+                onclick="selectPersonShape('circle')">
+                Rond
+            </button>
+
+            <button
+                type="button"
+                onclick="selectPersonShape('rounded')">
+                Carré arrondi
+            </button>
+
+            <button
+                type="button"
+                onclick="selectPersonShape('rectangle')">
+                Rectangle
+            </button>
+
+        </div>
+
+        <label>Couleur</label>
+
+        <input
+            id="personBackgroundColor"
+            type="color"
+            value="#D9D9D9"
+            onchange="updatePersonPreview()">
+
+        <label>Taille</label>
+
+        <select
+            id="personBackgroundSize"
+            onchange="updatePersonPreview()">
+
+            <option value="small">
+                Petite
+            </option>
+
+            <option value="medium" selected>
+                Moyenne
+            </option>
+
+            <option value="large">
+                Grande
+            </option>
+
+        </select>
+
+    </div>
+
+    <button
+        class="primary"
+        onclick="createPerson()">
+
+        💾 Créer la personne
+
+    </button>
+
+<button
+    class="back-arrow-button"
+    onclick="showPeopleBank()"
+    title="Retour"
+>
+    <svg class="back-arrow-icon">
+        <use href="#back-arrow-icon"></use>
+    </svg>
+</button>
+
+</div>
+
+</section>
+
+
+function showCreatePerson() {
+
+    document.getElementById("personName").value = "";
+
+    document.getElementById("personEmojiButton").textContent = "👤";
+
+    document.getElementById("personBackgroundEnabled").checked = false;
+
+    document.getElementById("personBackgroundOptions").style.display = "none";
+
+    document.getElementById("personBackgroundColor").value = "#D9D9D9";
+
+    document.getElementById("personBackgroundSize").value = "medium";
+
+    showScreen("createPersonScreen");
+
+}
+
+
+
+
+
+
+
+
+
+
+   
 <!-- ==================================================
      MOT DE PASSE OUBLIÉ
      ================================================== -->
