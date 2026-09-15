@@ -7524,7 +7524,7 @@ item.participants.forEach(function(name, index) {
 
 }
 
-   function addParticipant(type) {
+ async function addParticipant(type) {
 
     const item =
         type === "game"
@@ -7549,81 +7549,280 @@ item.participants.forEach(function(name, index) {
         return;
     }
 
-   if (!Array.isArray(item.participants)) {
-    item.participants = [];
-}
+    if (!Array.isArray(item.participants)) {
+        item.participants = [];
+    }
 
-const alreadyExists =
-    item.participants.some(function(participant) {
+    const alreadyExists =
+        item.participants.some(function(participant) {
 
-        return participant.toLowerCase() ===
-               name.toLowerCase();
+            return participant.toLowerCase() ===
+                   name.toLowerCase();
 
-    });
+        });
 
-if (alreadyExists) {
+    if (alreadyExists) {
 
-    alert(
-        '"' + name + '" existe déjà parmi les participants.'
-    );
+        alert(
+            '"' + name + '" existe déjà parmi les participants.'
+        );
 
-    input.focus();
+        input.focus();
 
-    return;
+        return;
 
-}
+    }
 
-item.participants.push(name);
+    item.participants.push(name);
 
 
-/*
- * Si on ajoute une personne à un groupe,
- * on l'ajoute automatiquement à toutes
- * les parties de ce groupe.
- */
-if (type === "group") {
+    /*
+     * Si on ajoute une personne à un groupe,
+     * on l'ajoute automatiquement à toutes
+     * les parties de ce groupe.
+     */
 
-    games.forEach(function(game) {
+    if (type === "group") {
 
-        if (game.groupId !== item.id) {
-            return;
-        }
+        games.forEach(function(game) {
 
-        if (!Array.isArray(game.participants)) {
-            game.participants = [];
-        }
+            if (game.groupId !== item.id) {
+                return;
+            }
 
-        const alreadyInGame =
-            game.participants.some(
-                function(participant) {
+            if (!Array.isArray(game.participants)) {
+                game.participants = [];
+            }
 
-                    return participant.toLowerCase() ===
-                           name.toLowerCase();
+            const alreadyInGame =
+                game.participants.some(
+                    function(participant) {
 
-                }
+                        return participant.toLowerCase() ===
+                               name.toLowerCase();
+
+                    }
+                );
+
+            if (!alreadyInGame) {
+
+                game.participants.push(name);
+
+            }
+
+        });
+
+    }
+
+
+    /*
+     * Sauvegarde locale
+     */
+
+    saveData();
+
+
+    /*
+     * Sauvegarde dans Cloudflare D1
+     */
+
+    try {
+
+        if (type === "game") {
+
+            const personneId =
+                Date.now().toString() +
+                Math.random()
+                    .toString(36)
+                    .substring(2, 7);
+
+            const response =
+                await fetch(
+                    "https://blindtestmix.amelinebrt.workers.dev/partie-personnes",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            partie_id:
+                                item.id,
+
+                            personne_id:
+                                personneId,
+
+                            nom:
+                                name
+
+                        })
+
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Erreur lors de l'enregistrement du participant."
+                );
+
+            }
+
+
+            const result =
+                await response.json();
+
+            console.log(
+                "Participant enregistré en ligne :",
+                result
             );
 
-        if (!alreadyInGame) {
+        }
 
-            game.participants.push(name);
+
+        if (type === "group") {
+
+            const personneId =
+                Date.now().toString() +
+                Math.random()
+                    .toString(36)
+                    .substring(2, 7);
+
+
+            const groupResponse =
+                await fetch(
+                    "https://blindtestmix.amelinebrt.workers.dev/group-personnes",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            groupe_id:
+                                item.id,
+
+                            personne_id:
+                                personneId,
+
+                            nom:
+                                name
+
+                        })
+
+                    }
+                );
+
+
+            if (!groupResponse.ok) {
+
+                throw new Error(
+                    "Erreur lors de l'enregistrement du participant du groupe."
+                );
+
+            }
+
+
+            const groupResult =
+                await groupResponse.json();
+
+            console.log(
+                "Participant du groupe enregistré en ligne :",
+                groupResult
+            );
+
+
+            /*
+             * Le participant doit également être
+             * enregistré dans chaque partie du groupe.
+             */
+
+            for (
+                let i = 0;
+                i < games.length;
+                i++
+            ) {
+
+                const game =
+                    games[i];
+
+                if (game.groupId !== item.id) {
+                    continue;
+                }
+
+                const alreadyInCloud =
+                    false;
+
+                const gamePersonId =
+                    personneId;
+
+
+                const gameResponse =
+                    await fetch(
+                        "https://blindtestmix.amelinebrt.workers.dev/partie-personnes",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+
+                            body: JSON.stringify({
+
+                                partie_id:
+                                    game.id,
+
+                                personne_id:
+                                    gamePersonId,
+
+                                nom:
+                                    name
+
+                            })
+
+                        }
+                    );
+
+
+                if (!gameResponse.ok) {
+
+                    throw new Error(
+                        "Erreur lors de l'enregistrement du participant dans une partie."
+                    );
+
+                }
+
+            }
 
         }
 
-    });
+
+    } catch (error) {
+
+        console.error(
+            "Erreur sauvegarde participant D1 :",
+            error
+        );
+
+        alert(
+            "Le participant a été ajouté sur cet appareil, mais il n'a pas pu être enregistré en ligne."
+        );
+
+    }
+
+
+    renderParticipants(type);
+
+    document.getElementById(
+        type + "ParticipantInput"
+    ).focus();
 
 }
-
-
-saveData();
-
-renderParticipants(type);
-
-document.getElementById(
-    type + "ParticipantInput"
-).focus();
-
-}
-
 function toggleParticipantDelete(type, index) {
 
     const button =
