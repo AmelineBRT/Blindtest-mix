@@ -646,11 +646,39 @@ button:disabled {
 
     flex: 0 0 36px;
 
+    position: relative;
+
     display: flex;
     align-items: center;
     justify-content: center;
 
     font-size: 22px;
+}
+
+.person-bank-background {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    z-index: 1;
+}
+
+.people-bank-emoji-character {
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    line-height: 1;
+
+    white-space: nowrap;
 }
    
 .people-bank-name {
@@ -4881,44 +4909,132 @@ function renderPeopleBank() {
             ? searchInput.value.trim().toLowerCase()
             : "";
 
-   let filteredPeople =
-    people.filter(function(person) {
 
-        return !search ||
-            person.nom
-                .toLowerCase()
-                .startsWith(search);
+    let filteredPeople =
+        people.filter(function(person) {
+
+            return !search ||
+                person.nom
+                    .toLowerCase()
+                    .startsWith(search);
+
+        });
+
+
+    filteredPeople.sort(function(a, b) {
+
+        const nameA =
+            a.nom.toLowerCase();
+
+        const nameB =
+            b.nom.toLowerCase();
+
+
+        if (
+            peopleSortMode === "creation"
+        ) {
+
+            return people.indexOf(a) -
+                   people.indexOf(b);
+
+        }
+
+
+        if (
+            peopleSortMode === "alphabetical"
+        ) {
+
+            return nameA.localeCompare(
+                nameB,
+                "fr"
+            );
+
+        }
+
+
+        return nameB.localeCompare(
+            nameA,
+            "fr"
+        );
 
     });
 
 
-filteredPeople.sort(function(a, b) {
-
-    const nameA =
-        a.nom.toLowerCase();
-
-    const nameB =
-        b.nom.toLowerCase();
-
-    if (peopleSortMode === "alphabetical") {
-
-        return nameA.localeCompare(
-            nameB,
-            "fr"
-        );
-
-    }
-
-    return nameB.localeCompare(
-        nameA,
-        "fr"
-    );
-
-});
-
     let html = "";
 
+
     filteredPeople.forEach(function(person) {
+
+        let backgroundHTML = "";
+
+
+        /*
+         * Fond de l'emoji
+         */
+
+        if (
+            person.fond_couleur
+        ) {
+
+            let size = 26;
+
+
+            if (
+                person.fond_taille === "small"
+            ) {
+
+                size = 22;
+
+            } else if (
+                person.fond_taille === "medium"
+            ) {
+
+                size = 26;
+
+            } else if (
+                person.fond_taille === "large"
+            ) {
+
+                size = 32;
+
+            }
+
+
+            let shapeStyle =
+                "border-radius: 50%;";
+
+
+            if (
+                person.fond_forme === "rectangle"
+            ) {
+
+                shapeStyle =
+                    "border-radius: 8px;";
+
+            } else if (
+                person.fond_forme === "triangle"
+            ) {
+
+                shapeStyle =
+                    "clip-path: polygon(50% 0%, 100% 100%, 0% 100%);";
+
+            }
+
+
+            backgroundHTML = `
+                <span
+                    class="person-bank-background"
+                    style="
+                        width:${size}px;
+                        height:${size}px;
+                        background:${person.fond_couleur};
+                        ${shapeStyle}
+                    ">
+                </span>
+            `;
+
+        }
+
 
         html += `
             <div
@@ -4928,13 +5044,20 @@ filteredPeople.sort(function(a, b) {
 
                 <div class="people-bank-emoji">
 
-                    ${
-                        person.emoji
-                            ? escapeHTML(person.emoji)
-                            : "👤"
-                    }
+                    ${backgroundHTML}
+
+                    <span
+                        class="people-bank-emoji-character"
+                    >
+                        ${
+                            person.emoji
+                                ? escapeHTML(person.emoji)
+                                : "👤"
+                        }
+                    </span>
 
                 </div>
+
 
                 <span
                     class="people-bank-name"
@@ -4942,6 +5065,7 @@ filteredPeople.sort(function(a, b) {
                 >
                     ${escapeHTML(person.nom)}
                 </span>
+
 
                 <button
                     type="button"
@@ -4958,7 +5082,10 @@ filteredPeople.sort(function(a, b) {
 
     });
 
-    if (filteredPeople.length === 0) {
+
+    if (
+        filteredPeople.length === 0
+    ) {
 
         html += `
             <div class="password-help">
@@ -4968,7 +5095,9 @@ filteredPeople.sort(function(a, b) {
 
     }
 
-    container.innerHTML = html;
+
+    container.innerHTML =
+        html;
 
 }
 
