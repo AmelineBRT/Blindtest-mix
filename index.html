@@ -3490,42 +3490,46 @@ onclick="history.back()"
         id="personName"
         type="text"
         placeholder="">
-  
-<div class="person-setting-row">
-
-<label>
-    Emoji
-</label>
-
-<div
-    class="person-emoji-picker"
-    data-help="Windows : Windows + . ou Windows + ;&#10;Mac : Ctrl + Cmd + Espace"
->
-
-    <input
-        id="personEmojiInput"
-        class="person-emoji-input"
-        type="text"
-        inputmode="emoji"
-        maxlength="2"
-        value=""
-        placeholder="👤"
-        oninput="filterPersonEmoji(this); updatePersonPreview()"
-    >
 
 
-</div>
-   
-<label class="person-background-option">
+    <div class="person-setting-row">
 
-    <input
-        id="personBackgroundEnabled"
-        type="checkbox"
-        onchange="togglePersonBackground()">
+        <label>
+            Emoji
+        </label>
 
-    <span>Ajouter un fond</span>
+        <div
+            class="person-emoji-picker"
+            data-help="Windows : Windows + . ou Windows + ;&#10;Mac : Ctrl + Cmd + Espace"
+        >
 
-</label>
+            <input
+                id="personEmojiInput"
+                class="person-emoji-input"
+                type="text"
+                inputmode="emoji"
+                maxlength="2"
+                value=""
+                placeholder="👤"
+                oninput="filterPersonEmoji(this); updatePersonPreview()"
+            >
+
+        </div>
+
+    </div>
+
+
+    <label class="person-background-option">
+
+        <input
+            id="personBackgroundEnabled"
+            type="checkbox"
+            onchange="togglePersonBackground()">
+
+        <span>Ajouter un fond</span>
+
+    </label>
+
 
     <div
         id="personBackgroundArea"
@@ -3537,123 +3541,142 @@ onclick="history.back()"
             class="person-background-options"
         >
 
-<div class="person-setting-row">
+            <div class="person-setting-row">
 
-    <label>Forme</label>
+                <label>
+                    Forme
+                </label>
 
-    <div class="person-shape-options">
+                <div class="person-shape-options">
 
-        <button
-            type="button"
-            class="person-shape-button selected"
-            id="personShapeCircle"
-            onclick="selectPersonShape('circle')"
-            title="Rond">
-            <span class="shape-circle"></span>
-        </button>
+                    <button
+                        type="button"
+                        class="person-shape-button selected"
+                        id="personShapeCircle"
+                        onclick="selectPersonShape('circle')"
+                        title="Rond">
 
-        <button
-            type="button"
-            class="person-shape-button"
-            id="personShapeRectangle"
-            onclick="selectPersonShape('rectangle')"
-            title="Carré arrondi">
-            <span class="shape-rectangle"></span>
-        </button>
+                        <span class="shape-circle"></span>
 
-        <button
-            type="button"
-            class="person-shape-button"
-            id="personShapeTriangle"
-            onclick="selectPersonShape('triangle')"
-            title="Triangle">
-            <span class="shape-triangle"></span>
-        </button>
+                    </button>
 
-    </div>
+                    <button
+                        type="button"
+                        class="person-shape-button"
+                        id="personShapeRectangle"
+                        onclick="selectPersonShape('rectangle')"
+                        title="Carré arrondi">
 
-</div>
+                        <span class="shape-rectangle"></span>
 
+                    </button>
 
-<div class="person-setting-row">
+                    <button
+                        type="button"
+                        class="person-shape-button"
+                        id="personShapeTriangle"
+                        onclick="selectPersonShape('triangle')"
+                        title="Triangle">
 
-    <label>Couleur</label>
+                        <span class="shape-triangle"></span>
 
-    <div class="color-picker-container">
+                    </button>
 
-        <input
-            id="personBackgroundColor"
-            type="color"
-            value="#B8DCD7"
-            onchange="updatePersonPreview()">
-
-    </div>
-
-</div>
-
-
-<div class="person-setting-row">
-
-    <label>Taille</label>
-
-    <div class="person-size-options">
-
-        <button
-            type="button"
-            class="person-size-button"
-            id="personSizeSmall"
-            onclick="selectPersonSize('small')"
-            title="Petite">
-            <span class="size-small"></span>
-        </button>
-
-        <button
-            type="button"
-            class="person-size-button selected"
-            id="personSizeMedium"
-            onclick="selectPersonSize('medium')"
-            title="Moyenne">
-            <span class="size-medium"></span>
-        </button>
-
-        <button
-            type="button"
-            class="person-size-button"
-            id="personSizeLarge"
-            onclick="selectPersonSize('large')"
-            title="Grande">
-            <span class="size-large"></span>
-        </button>
-
-    </div>
-
+                </div>
 
             </div>
 
+
+            <div class="person-setting-row">
+
+                <label>
+                    Couleur
+                </label>
+
+                <div class="color-picker-container">
+
+                    <input
+                        id="personBackgroundColor"
+                        type="color"
+                        value="#B8DCD7"
+                        onchange="updatePersonPreview()">
+
+                </div>
+
+            </div>
+
+
+            <div class="person-setting-row">
+
+                <label>
+                    Taille
+                </label>
+
+                <div class="person-size-options">
+
+                    <button
+                        type="button"
+                        class="person-size-button"
+                        id="personSizeSmall"
+                        onclick="selectPersonSize('small')"
+                        title="Petite">
+
+                        <span class="size-small"></span>
+
+                    </button>
+
+                    <button
+                        type="button"
+                        class="person-size-button selected"
+                        id="personSizeMedium"
+                        onclick="selectPersonSize('medium')"
+                        title="Moyenne">
+
+                        <span class="size-medium"></span>
+
+                    </button>
+
+                    <button
+                        type="button"
+                        class="person-size-button"
+                        id="personSizeLarge"
+                        onclick="selectPersonSize('large')"
+                        title="Grande">
+
+                        <span class="size-large"></span>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
             <div class="person-preview-container">
 
-<div
-    id="personPreview"
-    class="person-preview">
+                <div
+                    id="personPreview"
+                    class="person-preview">
 
-    <div
-        id="personPreviewBackground"
-        class="person-preview-background">
-    </div>
+                    <div
+                        id="personPreviewBackground"
+                        class="person-preview-background">
+                    </div>
 
-    <span
-        id="personPreviewEmoji"
-        class="person-preview-emoji">
-        👤
-    </span>
+                    <span
+                        id="personPreviewEmoji"
+                        class="person-preview-emoji">
+                        👤
+                    </span>
 
-</div>
+                </div>
 
             </div>
 
         </div>
 
     </div>
+
 
     <button
         class="primary"
@@ -3662,6 +3685,7 @@ onclick="history.back()"
         💾 Créer le participant
 
     </button>
+
 
     <button
         class="back-arrow-button"
@@ -3677,8 +3701,6 @@ onclick="history.back()"
 </div>
 
 </section>
-
-
  
 <!-- ==================================================
      MOT DE PASSE OUBLIÉ
