@@ -3213,25 +3213,32 @@ async function loadGamesFromCloud() {
 
         onlineGroups.forEach(function(group) {
 
-            const alreadyExists =
-                groups.some(function(localGroup) {
+            const localGroup =
+                groups.find(function(localGroup) {
 
                     return localGroup.id === group.id;
 
                 });
 
 
-            if (!alreadyExists) {
+            /* Groupe absent en local :
+               on l'ajoute */
+
+            if (!localGroup) {
 
                 groups.push({
 
-                    id: group.id,
+                    id:
+                        group.id,
 
-                    name: group.nom,
+                    name:
+                        group.nom,
 
-                    comment: group.commentaire || "",
+                    comment:
+                        group.commentaire || "",
 
-                    color: group.couleur || "",
+                    color:
+                        group.couleur || "",
 
                     participants:
                         Array.isArray(group.participants)
@@ -3239,6 +3246,45 @@ async function loadGamesFromCloud() {
                                 return person.nom;
                             })
                             : []
+
+                });
+
+                return;
+
+            }
+
+
+            /* Groupe déjà présent :
+               on ajoute seulement les participants
+               qui manquent */
+
+            if (!Array.isArray(localGroup.participants)) {
+
+                localGroup.participants = [];
+
+            }
+
+
+            if (Array.isArray(group.participants)) {
+
+                group.participants.forEach(function(person) {
+
+                    const alreadyExists =
+                        localGroup.participants.some(function(name) {
+
+                            return name.toLowerCase() ===
+                                   person.nom.toLowerCase();
+
+                        });
+
+
+                    if (!alreadyExists) {
+
+                        localGroup.participants.push(
+                            person.nom
+                        );
+
+                    }
 
                 });
 
@@ -3257,22 +3303,135 @@ async function loadGamesFromCloud() {
             i++
         ) {
 
-            const game = onlineGames[i];
+            const game =
+                onlineGames[i];
 
 
-            const existingGame =
-                games.find(function(localGame) {
+            const localGame =
+                games.find(function(existingGame) {
 
-                    return localGame.id === game.id;
+                    return existingGame.id === game.id;
 
                 });
 
 
             /* =========================
-               PARTIE DÉJÀ EN LOCAL
+               PARTIE ABSENTE EN LOCAL
                ========================= */
 
-            if (existingGame) {
+            if (!localGame) {
+
+                const detailResponse =
+                    await fetch(
+                        "https://blindtestmix.amelinebrt.workers.dev/parties/" +
+                        game.id
+                    );
+
+
+                if (!detailResponse.ok) {
+
+                    console.warn(
+                        "Impossible de charger la partie :",
+                        game.id
+                    );
+
+                    continue;
+
+                }
+
+
+                const detail =
+                    await detailResponse.json();
+
+
+                const participants =
+                    Array.isArray(detail.participants)
+                        ? detail.participants.map(function(person) {
+                            return person.nom;
+                        })
+                        : [];
+
+
+                if (
+                    detail.createur &&
+                    !participants.some(function(participant) {
+
+                        return participant.toLowerCase() ===
+                               detail.createur.toLowerCase();
+
+                    })
+                ) {
+
+                    participants.unshift(
+                        detail.createur
+                    );
+
+                }
+
+
+                const rounds =
+                    Array.isArray(detail.manches)
+                        ? detail.manches.map(function(round) {
+
+                            return {
+
+                                id:
+                                    round.id,
+
+                                name:
+                                    round.nom,
+
+                                tracks:
+                                    Array.isArray(round.pistes)
+                                        ? round.pistes.map(function(track) {
+
+                                            return {
+
+                                                title:
+                                                    track.titre || "",
+
+                                                url:
+                                                    track.url || ""
+
+                                            };
+
+                                        })
+                                        : []
+
+                            };
+
+                        })
+                        : [];
+
+
+                games.push({
+
+                    id:
+                        detail.id,
+
+                    name:
+                        detail.nom,
+
+                    creator:
+                        detail.createur,
+
+                    groupId:
+                        detail.groupe_id || "",
+
+                    password:
+                        detail.mot_de_passe || "",
+
+                    email:
+                        detail.email_recuperation || "",
+
+                    participants:
+                        participants,
+
+                    rounds:
+                        rounds
+
+                });
+
 
                 continue;
 
@@ -3280,7 +3439,7 @@ async function loadGamesFromCloud() {
 
 
             /* =========================
-               RÉCUPÉRATION DU DÉTAIL
+               PARTIE DÉJÀ EN LOCAL
                ========================= */
 
             const detailResponse =
@@ -3293,7 +3452,7 @@ async function loadGamesFromCloud() {
             if (!detailResponse.ok) {
 
                 console.warn(
-                    "Impossible de charger la partie :",
+                    "Impossible de charger les détails de la partie :",
                     game.id
                 );
 
@@ -3307,22 +3466,98 @@ async function loadGamesFromCloud() {
 
 
             /* =========================
-               TRANSFORMATION DES MANCHES
+               PARTICIPANTS
                ========================= */
 
-            const rounds =
-                Array.isArray(detail.manches)
-                    ? detail.manches.map(function(round) {
+            if (!Array.isArray(localGame.participants)) {
 
-                        return {
+                localGame.participants = [];
 
-                            id: round.id,
+            }
 
-                            name: round.nom,
+
+            if (Array.isArray(detail.participants)) {
+
+                detail.participants.forEach(function(person) {
+
+                    const alreadyExists =
+                        localGame.participants.some(function(name) {
+
+                            return name.toLowerCase() ===
+                                   person.nom.toLowerCase();
+
+                        });
+
+
+                    if (!alreadyExists) {
+
+                        localGame.participants.push(
+                            person.nom
+                        );
+
+                    }
+
+                });
+
+            }
+
+
+            if (
+                localGame.creator &&
+                !localGame.participants.some(function(name) {
+
+                    return name.toLowerCase() ===
+                           localGame.creator.toLowerCase();
+
+                })
+            ) {
+
+                localGame.participants.unshift(
+                    localGame.creator
+                );
+
+            }
+
+
+            /* =========================
+               MANCHES
+               ========================= */
+
+            if (!Array.isArray(localGame.rounds)) {
+
+                localGame.rounds = [];
+
+            }
+
+
+            if (Array.isArray(detail.manches)) {
+
+                detail.manches.forEach(function(cloudRound) {
+
+                    const localRound =
+                        localGame.rounds.find(function(round) {
+
+                            return round.id === cloudRound.id;
+
+                        });
+
+
+                    /* Manche absente en local :
+                       on l'ajoute avec ses pistes */
+
+                    if (!localRound) {
+
+                        localGame.rounds.push({
+
+                            id:
+                                cloudRound.id,
+
+                            name:
+                                cloudRound.nom,
 
                             tracks:
-                                Array.isArray(round.pistes)
-                                    ? round.pistes.map(function(track) {
+                                Array.isArray(cloudRound.pistes)
+                                    ? cloudRound.pistes.map(function(track) {
 
                                         return {
 
@@ -3337,75 +3572,82 @@ async function loadGamesFromCloud() {
                                     })
                                     : []
 
-                        };
+                        });
 
-                    })
-                    : [];
+                        return;
 
-
-            /* =========================
-               PARTICIPANTS
-               ========================= */
-
-            const participants =
-                Array.isArray(detail.participants)
-                    ? detail.participants.map(function(person) {
-                        return person.nom;
-                    })
-                    : [];
+                    }
 
 
-            if (
-                detail.createur &&
-                !participants.some(function(participant) {
+                    /* =========================
+                       PISTES
+                       ========================= */
 
-                    return participant.toLowerCase() ===
-                           detail.createur.toLowerCase();
+                    if (!Array.isArray(localRound.tracks)) {
 
-                })
-            ) {
+                        localRound.tracks = [];
 
-                participants.unshift(
-                    detail.createur
-                );
+                    }
+
+
+                    if (Array.isArray(cloudRound.pistes)) {
+
+                        cloudRound.pistes.forEach(function(cloudTrack, index) {
+
+                            const localTrack =
+                                localRound.tracks[index];
+
+
+                            /* Si la piste n'existe pas
+                               localement, on l'ajoute */
+
+                            if (!localTrack) {
+
+                                localRound.tracks.push({
+
+                                    title:
+                                        cloudTrack.titre || "",
+
+                                    url:
+                                        cloudTrack.url || ""
+
+                                });
+
+                            }
+
+                        });
+
+                    }
+
+                });
 
             }
 
-
-            /* =========================
-               CRÉATION DE LA PARTIE LOCALE
-               ========================= */
-
-            games.push({
-
-                id:
-                    detail.id,
-
-                name:
-                    detail.nom,
-
-                creator:
-                    detail.createur,
-
-                groupId:
-                    detail.groupe_id || "",
-
-                password:
-                    detail.mot_de_passe || "",
-
-                email:
-                    detail.email_recuperation || "",
-
-                participants:
-                    participants,
-
-                rounds:
-                    rounds
-
-            });
-
         }
 
+
+        /* =========================
+           SAUVEGARDE
+           ========================= */
+
+        saveData();
+
+
+        console.log(
+            "Synchronisation Cloudflare terminée."
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Erreur chargement D1 :",
+            error
+        );
+
+    }
+
+}
 
         /* =========================
            SAUVEGARDE LOCALE
