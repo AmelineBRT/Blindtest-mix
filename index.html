@@ -5724,7 +5724,7 @@ if (verification !== "SUPPRIMER") {
 
 
 
-function createGroup() {
+async function createGroup() {
 
     const name =
         document
@@ -5754,7 +5754,8 @@ function createGroup() {
             "groupColor"
         ).value;
 
-    groups.push({
+
+    const group = {
 
         id:
             Date.now().toString() +
@@ -5766,11 +5767,81 @@ function createGroup() {
 
         comment: comment,
 
-        color: color
+        color: color,
 
-    });
+        participants: []
+
+    };
+
+
+    groups.push(group);
 
     saveData();
+
+
+    /*
+     * Sauvegarde du groupe dans Cloudflare D1
+     */
+
+    try {
+
+        const response =
+            await fetch(
+                "https://blindtestmix.amelinebrt.workers.dev/groups",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        id: group.id,
+
+                        nom: group.name,
+
+                        commentaire: group.comment || null,
+
+                        couleur: group.color || null
+
+                    })
+
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Erreur lors de l'enregistrement du groupe en ligne."
+            );
+
+        }
+
+
+        const result =
+            await response.json();
+
+        console.log(
+            "Groupe enregistré en ligne :",
+            result
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Erreur sauvegarde groupe D1 :",
+            error
+        );
+
+        alert(
+            "Le groupe a été créé sur cet appareil, mais il n'a pas pu être enregistré en ligne."
+        );
+
+    }
+
 
     alert(
         "Groupe créé !"
@@ -5779,8 +5850,6 @@ function createGroup() {
     showGames();
 
 }
-
-
 function updateGroupSelect(
     selectId,
     selectedId = ""
