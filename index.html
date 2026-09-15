@@ -3169,6 +3169,10 @@ async function loadGamesFromCloud() {
 
     try {
 
+        /* =========================
+           CHARGEMENT DES PARTIES
+           ========================= */
+
         const response =
             await fetch(
                 "https://blindtestmix.amelinebrt.workers.dev/parties"
@@ -3186,37 +3190,55 @@ async function loadGamesFromCloud() {
             await response.json();
 
 
-        onlineGames.forEach(function(game) {
+        /* =========================
+           CHARGEMENT DES GROUPES
+           ========================= */
+
+        const groupsResponse =
+            await fetch(
+                "https://blindtestmix.amelinebrt.workers.dev/groups"
+            );
+
+        if (!groupsResponse.ok) {
+
+            throw new Error(
+                "Erreur lors du chargement des groupes en ligne."
+            );
+
+        }
+
+        const onlineGroups =
+            await groupsResponse.json();
+
+
+        onlineGroups.forEach(function(group) {
 
             const alreadyExists =
-                games.some(function(localGame) {
+                groups.some(function(localGroup) {
 
-                    return localGame.id === game.id;
+                    return localGroup.id === group.id;
 
                 });
 
 
             if (!alreadyExists) {
 
-                games.push({
+                groups.push({
 
-                    id: game.id,
+                    id: group.id,
 
-                    name: game.nom,
+                    name: group.nom,
 
-                    creator: game.createur,
+                    comment: group.commentaire || "",
 
-                    groupId: game.groupe_id || "",
+                    color: group.couleur || "",
 
-                    password: game.mot_de_passe || "",
-
-                    email: game.email_recuperation || "",
-
-                    participants: [
-                        game.createur
-                    ],
-
-                    rounds: []
+                    participants:
+                        Array.isArray(group.participants)
+                            ? group.participants.map(function(person) {
+                                return person.nom;
+                            })
+                            : []
 
                 });
 
@@ -3225,11 +3247,175 @@ async function loadGamesFromCloud() {
         });
 
 
+        /* =========================
+           CHARGEMENT DES PARTIES
+           ========================= */
+
+        for (
+            let i = 0;
+            i < onlineGames.length;
+            i++
+        ) {
+
+            const game = onlineGames[i];
+
+
+            const existingGame =
+                games.find(function(localGame) {
+
+                    return localGame.id === game.id;
+
+                });
+
+
+            /* =========================
+               PARTIE DÉJÀ EN LOCAL
+               ========================= */
+
+            if (existingGame) {
+
+                continue;
+
+            }
+
+
+            /* =========================
+               RÉCUPÉRATION DU DÉTAIL
+               ========================= */
+
+            const detailResponse =
+                await fetch(
+                    "https://blindtestmix.amelinebrt.workers.dev/parties/" +
+                    game.id
+                );
+
+
+            if (!detailResponse.ok) {
+
+                console.warn(
+                    "Impossible de charger la partie :",
+                    game.id
+                );
+
+                continue;
+
+            }
+
+
+            const detail =
+                await detailResponse.json();
+
+
+            /* =========================
+               TRANSFORMATION DES MANCHES
+               ========================= */
+
+            const rounds =
+                Array.isArray(detail.manches)
+                    ? detail.manches.map(function(round) {
+
+                        return {
+
+                            id: round.id,
+
+                            name: round.nom,
+
+                            tracks:
+                                Array.isArray(round.pistes)
+                                    ? round.pistes.map(function(track) {
+
+                                        return {
+
+                                            title:
+                                                track.titre || "",
+
+                                            url:
+                                                track.url || ""
+
+                                        };
+
+                                    })
+                                    : []
+
+                        };
+
+                    })
+                    : [];
+
+
+            /* =========================
+               PARTICIPANTS
+               ========================= */
+
+            const participants =
+                Array.isArray(detail.participants)
+                    ? detail.participants.map(function(person) {
+                        return person.nom;
+                    })
+                    : [];
+
+
+            if (
+                detail.createur &&
+                !participants.some(function(participant) {
+
+                    return participant.toLowerCase() ===
+                           detail.createur.toLowerCase();
+
+                })
+            ) {
+
+                participants.unshift(
+                    detail.createur
+                );
+
+            }
+
+
+            /* =========================
+               CRÉATION DE LA PARTIE LOCALE
+               ========================= */
+
+            games.push({
+
+                id:
+                    detail.id,
+
+                name:
+                    detail.nom,
+
+                creator:
+                    detail.createur,
+
+                groupId:
+                    detail.groupe_id || "",
+
+                password:
+                    detail.mot_de_passe || "",
+
+                email:
+                    detail.email_recuperation || "",
+
+                participants:
+                    participants,
+
+                rounds:
+                    rounds
+
+            });
+
+        }
+
+
+        /* =========================
+           SAUVEGARDE LOCALE
+           ========================= */
+
         saveData();
 
 
         console.log(
-            "Parties en ligne ajoutées à Blindtest Mix :",
+            "Parties et groupes en ligne chargés dans Blindtest Mix :",
             onlineGames.length
         );
 
