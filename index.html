@@ -636,6 +636,10 @@ button:disabled {
     margin-bottom: 5px;
 }
 
+   .people-bank-item:hover {
+    background: rgba(255,255,255,0.85);
+}
+
 .people-bank-emoji {
     width: 36px;
     height: 36px;
@@ -649,7 +653,29 @@ button:disabled {
     font-size: 22px;
 }
    
+.people-bank-name {
+    flex: 1;
+    min-width: 0;
 
+    font-weight: bold;
+}
+
+.person-edit-button {
+    display: none;
+
+    width: auto;
+    margin: 0;
+    padding: 4px 7px;
+
+    background: transparent;
+    color: #555;
+
+    font-size: 12px;
+}
+
+.person-edit-button.visible {
+    display: block;
+}
    
 
 .game-card {
@@ -4258,10 +4284,13 @@ function renderPeopleBank() {
 
     let html = "";
 
-    filteredPeople.forEach(function(person) {
+    filteredPeople.forEach(function(person, index) {
 
         html += `
-            <div class="people-bank-item">
+            <div
+                class="people-bank-item"
+                onclick="togglePersonEdit(${index})"
+            >
 
                 <div class="people-bank-emoji">
 
@@ -4273,9 +4302,19 @@ function renderPeopleBank() {
 
                 </div>
 
-                <span>
+                <span class="people-bank-name">
                     ${escapeHTML(person.nom)}
                 </span>
+
+                <button
+                    type="button"
+                    class="person-edit-button"
+                    id="edit-person-${index}"
+                    onclick="event.stopPropagation(); editPerson(${index})"
+                    title="Modifier"
+                >
+                    ⚙️ Modifier
+                </button>
 
             </div>
         `;
@@ -4295,6 +4334,62 @@ function renderPeopleBank() {
     container.innerHTML = html;
 
 }
+
+   function togglePersonEdit(index) {
+
+    const button =
+        document.getElementById(
+            "edit-person-" + index
+        );
+
+    if (!button) {
+        return;
+    }
+
+    if (
+        button.classList.contains("visible")
+    ) {
+
+        button.classList.remove("visible");
+
+    } else {
+
+        document
+            .querySelectorAll(
+                ".person-edit-button.visible"
+            )
+            .forEach(function(otherButton) {
+
+                otherButton.classList.remove(
+                    "visible"
+                );
+
+            });
+
+        button.classList.add("visible");
+
+    }
+
+}
+
+
+   function editPerson(index) {
+
+    const person =
+        people[index];
+
+    if (!person) {
+        return;
+    }
+
+    console.log(
+        "Personne à modifier :",
+        person
+    );
+
+}
+
+   
    
    
 /* ========================================================
