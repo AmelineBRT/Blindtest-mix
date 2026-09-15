@@ -2614,6 +2614,52 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
 </section> 
 
+   <section id="peopleScreen" class="screen">
+
+    <div
+        id="peopleMainCard"
+        class="card game-main-card"
+    >
+
+        <h2 id="peopleScreenTitle">
+            👥 Personnes
+        </h2>
+
+        <div class="people-search-container">
+
+            <input
+                id="peopleSearch"
+                class="search-input"
+                type="text"
+                placeholder="🔍 Rechercher..."
+                oninput="renderPeopleBank()"
+            >
+
+        </div>
+
+        <div id="peopleList"></div>
+
+        <button
+            class="primary"
+            onclick="showCreatePerson()"
+        >
+            ＋ Créer une personne
+        </button>
+
+        <button
+            class="back-arrow-button"
+            onclick="goBackFromPeople()"
+            title="Retour"
+        >
+            <svg class="back-arrow-icon">
+                <use href="#back-arrow-icon"></use>
+            </svg>
+        </button>
+
+    </div>
+
+</section>
+
 <!-- ==================================================
      MODIFIER UNE PARTIE
      ================================================== -->
@@ -3054,6 +3100,7 @@ onclick="history.back()"
 
 let games = [];
 let groups = [];
+let people = [];   
 
 let currentGameId = null;
 let currentRoundId = null;
@@ -3780,17 +3827,17 @@ window.addEventListener("popstate", function(event) {
             event.state.screen === "gamesScreen"
         ) {
 
-        if (
-    event.state.view === "groups"
-) {
+            if (
+                event.state.view === "groups"
+            ) {
 
-    showGroups();
+                showGroups();
 
-} else {
+            } else {
 
-    showGames();
+                showGames();
 
-}
+            }
 
         } else if (
             event.state.screen === "gameScreen"
@@ -3812,6 +3859,12 @@ window.addEventListener("popstate", function(event) {
 
             }
 
+        } else if (
+            event.state.screen === "peopleScreen"
+        ) {
+
+            showPeopleBank();
+
         } else {
 
             showScreen(
@@ -3820,35 +3873,40 @@ window.addEventListener("popstate", function(event) {
 
         }
 
- } else {
+    } else {
 
-    /*
-     * L'utilisateur essaie de quitter
-     * Blindtest Mix.
-     */
+        /*
+         * L'utilisateur essaie de quitter
+         * Blindtest Mix.
+         */
 
-history.pushState(
-    {
-        screen: "gamesScreen",
-        gameId: null,
-        groupId: null,
-        roundId: null,
-        view: gamesView
-    },
-    "",
-    "#gamesScreen"
-);
+        history.pushState(
+            {
+                screen: "gamesScreen",
+                gameId: null,
+                groupId: null,
+                roundId: null,
+                view: gamesView
+            },
+            "",
+            "#gamesScreen"
+        );
 
-    document
-        .getElementById("leaveAppModal")
-        .classList.add("active");
+        document
+            .getElementById("leaveAppModal")
+            .classList.add("active");
 
-}
+    }
 
     isBrowserBack = false;
 
 });
 
+   function goBackFromPeople() {
+
+    history.back();
+
+}
    
 function stayOnApp() {
 
@@ -3950,9 +4008,23 @@ function showGames() {
     renderGames();
 
 }
+
+
+function showPeopleBank() {
+
+    isAppNavigation = true;
+
+    showScreen("peopleScreen");
+
+    isAppNavigation = false;
+
+    loadPeopleFromCloud();
+
+}
+   
    
 /* ========================================================
-   BASCULER PARTIES / GROUPES
+   BASCULER PARTIES / GROUPES / PERSONNES
    ======================================================== */
 
 function toggleGamesView() {
@@ -4071,6 +4143,111 @@ sortSelect.value = sortMode;
 }
 
 
+
+async function loadPeopleFromCloud() {
+
+    try {
+
+        const response =
+            await fetch(
+                "https://blindtestmix.amelinebrt.workers.dev/people"
+            );
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Erreur lors du chargement des personnes."
+            );
+
+        }
+
+        const onlinePeople =
+            await response.json();
+
+        people = onlinePeople;
+
+        renderPeopleBank();
+
+    } catch (error) {
+
+        console.error(
+            "Erreur chargement des personnes :",
+            error
+        );
+
+    }
+
+}
+
+
+function renderPeopleBank() {
+
+    const container =
+        document.getElementById("peopleList");
+
+    if (!container) {
+        return;
+    }
+
+    const searchInput =
+        document.getElementById("peopleSearch");
+
+    const search =
+        searchInput
+            ? searchInput.value.trim().toLowerCase()
+            : "";
+
+    const filteredPeople =
+        people.filter(function(person) {
+
+            return !search ||
+                person.nom
+                    .toLowerCase()
+                    .startsWith(search);
+
+        });
+
+    let html = "";
+
+    filteredPeople.forEach(function(person) {
+
+        html += `
+            <div class="people-bank-item">
+
+                <div class="people-bank-emoji">
+
+                    ${
+                        person.emoji
+                            ? escapeHTML(person.emoji)
+                            : "👤"
+                    }
+
+                </div>
+
+                <span>
+                    ${escapeHTML(person.nom)}
+                </span>
+
+            </div>
+        `;
+
+    });
+
+    if (filteredPeople.length === 0) {
+
+        html += `
+            <div class="password-help">
+                Aucune personne trouvée.
+            </div>
+        `;
+
+    }
+
+    container.innerHTML = html;
+
+}
+   
+   
 /* ========================================================
    FILTRES
    ======================================================== */
