@@ -692,6 +692,11 @@ button:disabled {
     font-weight: bold;
 }
 
+   .people-sort-select {
+    flex: 0 0 auto;
+    width: auto;
+}
+
 .person-edit-button {
     display: none;
 
@@ -3146,7 +3151,7 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
             ＋ Créer une personne
         </button>
 
-   <div class="people-search-container">
+<div class="search-filter-row">
 
     <input
         id="peopleSearch"
@@ -3158,14 +3163,13 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
     <select
         id="peopleSortSelect"
-        class="filter-toggle sort-select"
+        class="filter-toggle sort-select people-sort-select"
         onchange="changePeopleSort(this.value)"
         title="Trier">
 
         <option value="creation">
             Ordre de création
         </option>
-
 
         <option value="alphabetical">
             Ordre alphabétique (A → Z)
@@ -3689,7 +3693,7 @@ onclick="history.back()"
 
     <button
         class="back-arrow-button"
-        onclick="showPeopleBank()"
+onclick="history.back()"
         title="Retour">
 
         <svg class="back-arrow-icon">
@@ -4633,6 +4637,12 @@ window.addEventListener("popstate", function(event) {
 
             showPeopleBank();
 
+           } else if (
+    event.state.screen === "createPersonScreen"
+) {
+
+    showCreatePerson();
+
         } else {
 
             showScreen(
@@ -4731,11 +4741,12 @@ function showGroups() {
 
     gamesView = "groups";
 
-    document.getElementById(
-        "gamesViewTitle"
-    ).textContent =
-        "🎉 Mes groupes";
+ document.getElementById(
+    "gamesViewTitle"
+).textContent =
+    "🎉 Groupes";
 
+   
     document.getElementById(
         "gamesViewToggle"
     ).textContent =
@@ -4759,7 +4770,7 @@ function showGames() {
     document.getElementById(
         "gamesViewTitle"
     ).textContent =
-        "🎶 Mes parties";
+        "🎶 Parties";
 
     document.getElementById(
         "gamesViewToggle"
@@ -10144,39 +10155,7 @@ function startSpecificRound(roundId) {
    ======================================================== */
 
    
-   function showCreatePerson() {
-
-    document.getElementById(
-        "personName"
-    ).value = "";
-
-document.getElementById(
-    "personEmojiInput"
-).value = "";
-      
-    document.getElementById(
-        "personBackgroundEnabled"
-    ).checked = false;
-
-    document.getElementById(
-        "personBackgroundColor"
-    ).value = "#B8DCD7";
-
-    selectedPersonShape =
-        "circle";
-
-    selectedPersonSize =
-        "medium";
-
-    updatePersonShapeButtons();
-    updatePersonSizeButtons();
-    updatePersonPreview();
-
-    showScreen(
-        "createPersonScreen"
-    );
-
-}
+ }
 
 /* ========================================================
    CRÉER UNE MANCHE
