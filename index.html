@@ -5549,236 +5549,265 @@ return (
     });
 
 }
-function createGameCard(game, group = null) {
 
-    const div =
-        document.createElement("div");
+   
+async function createGame() {
 
-    div.className =
-        "game-card clickable";
+    const name =
+        document.getElementById("gameName").value.trim();
 
+    const creator =
+        document.getElementById("gameCreator").value.trim();
 
-    const gameGroup =
-        group ||
-        groups.find(function(g) {
-            return g.id === game.groupId;
-        });
+    const groupId =
+        document.getElementById("gameGroup").value;
 
+    const password =
+        document.getElementById("gamePassword").value;
 
-    const groupTextColor =
-        gameGroup &&
-        isDarkColor(gameGroup.color)
-            ? "#ffffff"
-            : "#222222";
+    const email =
+        document.getElementById("gameEmail").value.trim();
 
+    if (!name) {
+        alert("Donne un nom à ta partie.");
+        return;
+    }
 
-    const showGroupHeader =
-        group === null;
+    if (!creator) {
+        alert("Indique qui a créé la partie.");
+        return;
+    }
 
-
-    if (gameGroup) {
-
-        div.classList.add(
-            "has-group"
+    if (password && !email) {
+        alert(
+            "Une adresse e-mail est obligatoire lorsque tu utilises un mot de passe."
         );
+        return;
+    }
 
 
-        /*
-         * Dégradé uniquement dans
-         * "Voir les parties"
-         */
-        if (showGroupHeader) {
+    /* =========================
+       PARTICIPANTS
+       ========================= */
 
-            const lightGroupColor =
-                lightenColor(
-                    gameGroup.color,
-                    0.88
-                );
+    let participants = [creator];
 
+    if (groupId) {
 
-            div.style.setProperty(
-                "--card-base-color",
-                gameGroup.color
-            );
+        const group =
+            groups.find(function(group) {
 
-            div.style.setProperty(
-                "--card-light-color",
-                lightGroupColor
-            );
+                return group.id === groupId;
+
+            });
 
 
-            div.style.background =
-                gameGroup.color;
+        if (
+            group &&
+            Array.isArray(group.participants)
+        ) {
+
+            group.participants.forEach(function(name) {
+
+                const alreadyExists =
+                    participants.some(function(participant) {
+
+                        return participant.toLowerCase() ===
+                               name.toLowerCase();
+
+                    });
 
 
-        } else {
+                if (!alreadyExists) {
 
-            /*
-             * Dans "Voir les groupes",
-             * on garde la couleur claire
-             * du groupe.
-             */
-            div.style.background =
-                lightenColor(
-                    gameGroup.color,
-                    0.88
-                );
+                    participants.push(name);
 
-        }
+                }
 
-
-        div.style.color =
-            "#222222";
-
-
-        if (showGroupHeader) {
-
-            div.classList.add(
-                "has-group-header"
-            );
-
-            div.style.setProperty(
-                "--group-color",
-                gameGroup.color
-            );
+            });
 
         }
 
     }
 
 
-    /*
-     * Partie indépendante
-     */
-    if (!gameGroup) {
+    /* =========================
+       CRÉATION DE LA PARTIE
+       ========================= */
 
-        div.classList.add(
-            "independent-card"
+    const game = {
+
+        id:
+            Date.now().toString(),
+
+        name:
+            name,
+
+        creator:
+            creator,
+
+        groupId:
+            groupId,
+
+        password:
+            password,
+
+        email:
+            email,
+
+        participants:
+            participants,
+
+        rounds:
+            []
+
+    };
+
+
+    games.push(game);
+
+    saveData();
+
+
+    /* =========================
+       ENREGISTREMENT DE LA PARTIE
+       ========================= */
+
+    try {
+
+        const response =
+            await fetch(
+                "https://blindtestmix.amelinebrt.workers.dev/parties",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        id:
+                            game.id,
+
+                        nom:
+                            game.name,
+
+                        createur:
+                            game.creator,
+
+                        groupe_id:
+                            game.groupId || null,
+
+                        mot_de_passe:
+                            game.password || null,
+
+                        email_recuperation:
+                            game.email || null
+
+                    })
+
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Erreur lors de l'enregistrement de la partie en ligne."
+            );
+
+        }
+
+
+        console.log(
+            "Partie enregistrée en ligne."
         );
 
-div.style.setProperty(
-    "--card-base-color",
-    "#e8e8e8"
-);
 
-div.style.setProperty(
-    "--card-light-color",
-    "#fcfcfc"
-);
+        /* =========================
+           ENREGISTREMENT DES PARTICIPANTS
+           ========================= */
 
-div.style.background =
-    "#e8e8e8";
-    }
+        for (
+            let index = 0;
+            index < participants.length;
+            index++
+        ) {
+
+            const participant =
+                participants[index];
 
 
-    div.onclick =
-        function() {
+            const personneId =
+                game.id +
+                "-person-" +
+                index;
 
-            if (group !== null) {
 
-                gameReturnContext =
-                    "group";
+            const participantResponse =
+                await fetch(
+                    "https://blindtestmix.amelinebrt.workers.dev/partie-personnes",
+                    {
+                        method: "POST",
 
-                currentGroupId =
-                    group.id;
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
 
-            } else {
+                        body: JSON.stringify({
 
-                gameReturnContext =
-                    "games";
+                            partie_id:
+                                game.id,
+
+                            personne_id:
+                                personneId,
+
+                            nom:
+                                participant
+
+                        })
+
+                    }
+                );
+
+
+            if (!participantResponse.ok) {
+
+                throw new Error(
+                    "Erreur lors de l'enregistrement d'un participant."
+                );
 
             }
 
-            openGame(game.id);
-
-        };
+        }
 
 
-    const passwordIcon =
-        game.password
-        ? " 🔒"
-        : "";
+        console.log(
+            "Participants enregistrés en ligne :",
+            participants.length
+        );
 
 
-    const groupHeader =
-        !showGroupHeader
-        ? ""
-        : gameGroup
-        ? `
+    } catch (error) {
 
-   <div
-       class="game-group-header"
-       style="
-           color:${groupTextColor} !important;
-       "
-   >
-
-                <span>
-                    ${escapeHTML(gameGroup.name)}
-                </span>
-
-                <span>
-                    🎉
-                </span>
-
-            </div>
-
-        `
-        : `
-
-            <div
-                class="game-group-header independent-header"
-            >
-
-                <span>
-                    Indépendant
-                </span>
-
-                <span>
-                    🎭
-                </span>
-
-            </div>
-
-        `;
+        console.error(
+            "Erreur sauvegarde D1 :",
+            error
+        );
 
 
-    div.innerHTML = `
+        alert(
+            "La partie a été créée sur cet appareil, mais elle n'a pas pu être enregistrée complètement en ligne."
+        );
 
-        ${groupHeader}
-
-        <div class="game-card-content">
-
-            <h3>
-                🎶 ${escapeHTML(game.name)}
-                ${passwordIcon}
-            </h3>
-
-            <div class="game-info">
-
-                <span class="creator-label">
-                    Créé par :
-                </span>
-
-                <span
-                    class="creator-name"
-                    style="color:#555 !important;"
-                >
-                    ${escapeHTML(game.creator)}
-                </span>
-
-            </div>
-
-            <div class="game-info">
-                ${game.rounds.length} manche(s)
-            </div>
-
-        </div>
-
-    `;
+    }
 
 
-    return div;
+    currentGameId =
+        game.id;
+
+    showGame();
 
 }
 
