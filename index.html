@@ -768,6 +768,23 @@ margin-bottom: -23px;
     background: transparent;
 }
 
+
+.people-search-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.people-search-container .search-input {
+    flex: 1;
+    min-width: 0;
+}
+
+.people-search-container .sort-select {
+    flex: 0 0 auto;
+    width: auto;
+}
+
    
    
 /* =========================================================
@@ -2729,9 +2746,6 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
             Ordre de création
         </option>
 
-        <option value="occurrence">
-            Ordre d'occurrence
-        </option>
 
         <option value="alphabetical">
             Ordre alphabétique (A → Z)
