@@ -710,6 +710,31 @@ button:disabled {
     cursor: pointer;
 }
 
+   .person-emoji-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.person-emoji-help {
+    width: 15px;
+    height: 15px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #c8c8c8;
+    border-radius: 50%;
+
+    color: #aaa;
+
+    font-size: 10px;
+    font-weight: bold;
+
+    cursor: help;
+}
+
 .person-preview-container {
     margin: 15px 0;
 }
@@ -782,7 +807,14 @@ button:disabled {
 
 
 
-   .person-setting-row .person-emoji-picker.color-picker-container {
+.person-setting-row .person-emoji-picker {
+    margin: 0;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.person-setting-row .color-picker-container {
     margin: 0;
     flex: 1;
     display: flex;
@@ -828,15 +860,11 @@ button:disabled {
 }
 
 .person-background-area {
-    height: 365px;
-
-    overflow: hidden;
-
-    visibility: hidden;
+    display: none;
 }
 
 .person-background-area.visible {
-    visibility: visible;
+    display: block;
 }
 
 .person-background-options {
@@ -3006,8 +3034,8 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
         <div class="games-header">
 
-            <h2 id="peopleScreenTitle">
-                👥 Mes personnes
+           <h2 id="peopleScreenTitle">
+                👥 Participants
             </h2>
 
            <div class="games-header-actions">
@@ -3376,10 +3404,22 @@ onclick="history.back()"
         id="personName"
         type="text"
         placeholder="">
+  
+<div class="person-setting-row">
 
-   <div class="person-setting-row">
+    <label class="person-emoji-label">
 
-    <label>Emoji</label>
+        Emoji
+
+        <span
+            class="person-emoji-help"
+            title="Sur téléphone : ouvre le clavier emoji. Sur ordinateur : Windows + . ou Windows + ;. Sur Mac : Ctrl + Cmd + Espace.">
+
+            ?
+
+        </span>
+
+    </label>
 
     <div class="person-emoji-picker">
 
@@ -3397,6 +3437,7 @@ onclick="history.back()"
     </div>
 
 </div>
+   
 <label class="person-background-option">
 
     <input
@@ -5004,7 +5045,7 @@ filteredPeople.sort(function(a, b) {
 }
 
 
-  function togglePersonBackground() {
+function togglePersonBackground() {
 
     const checkbox =
         document.getElementById(
@@ -5034,6 +5075,7 @@ filteredPeople.sort(function(a, b) {
 
 }
 
+   
 
 function selectPersonShape(shape) {
 
@@ -5311,11 +5353,14 @@ async function createPerson() {
             .value
             .trim();
 
-    const emoji =
-        document
-            .getElementById("personEmojiInput")
-            .value
-            .trim();
+   const emojiInput =
+    document
+        .getElementById("personEmojiInput")
+        .value
+        .trim();
+
+const emoji =
+    emojiInput || "👤";
 
     const backgroundEnabled =
         document
@@ -5330,16 +5375,6 @@ async function createPerson() {
 
         return;
     }
-
-    if (!emoji) {
-
-        alert(
-            "Choisis un emoji pour le participant."
-        );
-
-        return;
-    }
-
 
     const personId =
         Date.now().toString() +
