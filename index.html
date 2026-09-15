@@ -780,10 +780,14 @@ button:disabled {
     flex: 1;
 }
 
-.person-setting-row .color-picker-container {
-    margin: 0;
-}
 
+
+   .person-setting-row .person-emoji-picker.color-picker-container {
+    margin: 0;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
 
 
    
@@ -897,18 +901,12 @@ button:disabled {
 }
 
 .shape-triangle {
-    width: 28px;
-    height: 28px;
+    width: 0;
+    height: 0;
 
-    background: #999;
-
-    clip-path: polygon(
-        50% 0%,
-        100% 100%,
-        0% 100%
-    );
-
-    border-radius: 6px;
+    border-left: 16px solid transparent;
+    border-right: 16px solid transparent;
+    border-bottom: 28px solid #999;
 }
 
 .person-size-options {
@@ -3379,23 +3377,26 @@ onclick="history.back()"
         type="text"
         placeholder="">
 
+   <div class="person-setting-row">
+
     <label>Emoji</label>
 
-<div class="person-emoji-picker">
+    <div class="person-emoji-picker">
 
-    <input
-        id="personEmojiInput"
-        class="person-emoji-input"
-        type="text"
-        inputmode="emoji"
-        maxlength="10"
-        value=""
-        placeholder="👤"
-        oninput="filterPersonEmoji(this); updatePersonPreview()"
-    >
+        <input
+            id="personEmojiInput"
+            class="person-emoji-input"
+            type="text"
+            inputmode="emoji"
+            maxlength="2"
+            value=""
+            placeholder="👤"
+            oninput="filterPersonEmoji(this); updatePersonPreview()"
+        >
+
+    </div>
 
 </div>
-
 <label class="person-background-option">
 
     <input
@@ -5292,11 +5293,12 @@ function filterPersonEmoji(input) {
                 return /\p{Extended_Pictographic}/u
                     .test(character);
 
-            })
-            .join("");
+            });
 
     input.value =
-        emojiCharacters;
+        emojiCharacters.length > 0
+            ? emojiCharacters[0]
+            : "";
 
 }
 
