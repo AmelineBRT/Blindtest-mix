@@ -742,6 +742,196 @@ button:disabled {
     padding-top: 38px;
 }
 
+
+.person-background-option {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    margin: 10px 0 5px 0;
+
+    cursor: pointer;
+}
+
+.person-background-option input[type="checkbox"] {
+    margin: 0;
+}
+
+.person-background-area {
+    height: 365px;
+
+    overflow: hidden;
+
+    visibility: hidden;
+}
+
+.person-background-area.visible {
+    visibility: visible;
+}
+
+.person-background-options {
+    height: 365px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.person-shape-options {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+
+    height: 55px;
+
+    margin: 8px 0 15px 0;
+}
+
+.person-shape-button,
+.person-size-button {
+    width: 55px;
+    height: 50px;
+
+    padding: 0;
+    margin: 0;
+
+    background: #ffffff;
+
+    border: 1px solid #ccc;
+    border-radius: 8px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+}
+
+.person-shape-button.selected,
+.person-size-button.selected {
+    border: 2px solid #09463E;
+}
+
+.shape-circle {
+    width: 28px;
+    height: 28px;
+
+    border-radius: 50%;
+
+    background: #999;
+}
+
+.shape-rectangle {
+    width: 32px;
+    height: 24px;
+
+    border-radius: 6px;
+
+    background: #999;
+}
+
+.shape-triangle {
+    width: 0;
+    height: 0;
+
+    border-left: 16px solid transparent;
+    border-right: 16px solid transparent;
+    border-bottom: 28px solid #999;
+}
+
+.person-size-options {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+
+    height: 55px;
+
+    margin: 8px 0 15px 0;
+}
+
+.size-small {
+    width: 18px;
+    height: 18px;
+
+    border-radius: 50%;
+
+    background: #999;
+}
+
+.size-medium {
+    width: 28px;
+    height: 28px;
+
+    border-radius: 50%;
+
+    background: #999;
+}
+
+.size-large {
+    width: 38px;
+    height: 38px;
+
+    border-radius: 50%;
+
+    background: #999;
+}
+
+.person-emoji-picker {
+    display: flex;
+    justify-content: center;
+
+    margin: 8px 0 15px 0;
+}
+
+.person-emoji-input {
+    width: 60px;
+    height: 60px;
+
+    padding: 0;
+
+    border: 1px solid #ccc;
+    border-radius: 8px;
+
+    background: #fff;
+
+    text-align: center;
+
+    font-size: 32px;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+.person-preview-container {
+    height: 105px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-top: 5px;
+}
+
+.person-preview {
+    width: 58px;
+    height: 58px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 40px;
+
+    background: transparent;
+
+    border-radius: 50%;
+
+    transition:
+        width 0.15s,
+        height 0.15s,
+        background 0.15s;
+}
    
    
 
@@ -3108,31 +3298,31 @@ onclick="history.back()"
 
 <div class="card">
 
-    <h2>👥 Nouvelle personne</h2>
+    <h2>👥 Nouveau participant</h2>
 
-    <label>Nom de la personne</label>
+    <label>Nom du participant</label>
 
     <input
         id="personName"
         type="text"
-        placeholder="Ex : Ameline">
+        placeholder="">
 
- <label>Icône</label>
+    <label>Emoji</label>
 
-<div class="person-emoji-picker">
+    <div class="person-emoji-picker">
 
-    <input
-        id="personEmojiInput"
-        class="person-emoji-input"
-        type="text"
-        inputmode="emoji"
-        maxlength="2"
-        value="👤"
-        onclick="this.select()"
-        oninput="updatePersonPreview()"
-    >
+        <input
+            id="personEmojiInput"
+            class="person-emoji-input"
+            type="text"
+            inputmode="emoji"
+            maxlength="10"
+            value="👤"
+            placeholder="😀"
+            oninput="filterPersonEmoji(this); updatePersonPreview()"
+        >
 
-</div>
+    </div>
 
     <label class="person-background-option">
 
@@ -3141,110 +3331,137 @@ onclick="history.back()"
             type="checkbox"
             onchange="togglePersonBackground()">
 
-        Ajouter un fond
+        <span>Ajouter un fond</span>
 
     </label>
 
     <div
-        id="personBackgroundOptions"
-        class="person-background-options"
-        style="display:none;"
+        id="personBackgroundArea"
+        class="person-background-area"
     >
 
-        <label>Forme</label>
+        <div
+            id="personBackgroundOptions"
+            class="person-background-options"
+        >
 
-        <div class="person-shape-options">
+            <label>Forme</label>
 
-            <button
-                type="button"
-                onclick="selectPersonShape('circle')">
-                Rond
-            </button>
+            <div class="person-shape-options">
 
-            <button
-                type="button"
-                onclick="selectPersonShape('rounded')">
-                Carré arrondi
-            </button>
+                <button
+                    type="button"
+                    class="person-shape-button selected"
+                    id="personShapeCircle"
+                    onclick="selectPersonShape('circle')"
+                    title="Rond">
+                    <span class="shape-circle"></span>
+                </button>
 
-            <button
-                type="button"
-                onclick="selectPersonShape('rectangle')">
-                Rectangle
-            </button>
+                <button
+                    type="button"
+                    class="person-shape-button"
+                    id="personShapeRectangle"
+                    onclick="selectPersonShape('rectangle')"
+                    title="Rectangle">
+                    <span class="shape-rectangle"></span>
+                </button>
+
+                <button
+                    type="button"
+                    class="person-shape-button"
+                    id="personShapeTriangle"
+                    onclick="selectPersonShape('triangle')"
+                    title="Triangle">
+                    <span class="shape-triangle"></span>
+                </button>
+
+            </div>
+
+            <label>Couleur</label>
+
+            <div class="color-picker-container">
+
+                <input
+                    id="personBackgroundColor"
+                    type="color"
+                    value="#B8DCD7"
+                    onchange="updatePersonPreview()">
+
+            </div>
+
+            <label>Taille</label>
+
+            <div class="person-size-options">
+
+                <button
+                    type="button"
+                    class="person-size-button"
+                    id="personSizeSmall"
+                    onclick="selectPersonSize('small')"
+                    title="Petite">
+                    <span class="size-small"></span>
+                </button>
+
+                <button
+                    type="button"
+                    class="person-size-button selected"
+                    id="personSizeMedium"
+                    onclick="selectPersonSize('medium')"
+                    title="Moyenne">
+                    <span class="size-medium"></span>
+                </button>
+
+                <button
+                    type="button"
+                    class="person-size-button"
+                    id="personSizeLarge"
+                    onclick="selectPersonSize('large')"
+                    title="Grande">
+                    <span class="size-large"></span>
+                </button>
+
+            </div>
+
+            <div class="person-preview-container">
+
+                <div
+                    id="personPreview"
+                    class="person-preview">
+                    👤
+                </div>
+
+            </div>
 
         </div>
 
-        <label>Couleur</label>
-
-        <input
-            id="personBackgroundColor"
-            type="color"
-            value="#D9D9D9"
-            onchange="updatePersonPreview()">
-
-        <label>Taille</label>
-
-        <select
-            id="personBackgroundSize"
-            onchange="updatePersonPreview()">
-
-            <option value="small">
-                Petite
-            </option>
-
-            <option value="medium" selected>
-                Moyenne
-            </option>
-
-            <option value="large">
-                Grande
-            </option>
-
-        </select>
-
     </div>
 
-<div class="person-preview-container">
-
-    <label>Aperçu</label>
-
-    <div
-        id="personPreview"
-        class="person-preview"
-    >
-        👤
-    </div>
-
-</div>
-
-   
     <button
         class="primary"
         onclick="createPerson()">
 
-        💾 Créer la personne
+        💾 Créer le participant
 
     </button>
 
-<button
-    class="back-arrow-button"
-    onclick="showPeopleBank()"
-    title="Retour"
->
-    <svg class="back-arrow-icon">
-        <use href="#back-arrow-icon"></use>
-    </svg>
-</button>
+    <button
+        class="back-arrow-button"
+        onclick="showPeopleBank()"
+        title="Retour">
+
+        <svg class="back-arrow-icon">
+            <use href="#back-arrow-icon"></use>
+        </svg>
+
+    </button>
 
 </div>
 
 </section>
 
 
-
-
-   
+ 
 <!-- ==================================================
      MOT DE PASSE OUBLIÉ
      ================================================== -->
@@ -3429,6 +3646,7 @@ let duplicateSelectedParticipants = [];
    let duplicateSortMode = "creation";
 
    let selectedPersonShape = "circle";
+   let selectedPersonSize = "medium";
 
 /* ========================================================
    MODE SOMBRE
@@ -4687,29 +4905,29 @@ filteredPeople.sort(function(a, b) {
 }
 
 
-   function togglePersonBackground() {
+  function togglePersonBackground() {
 
     const checkbox =
         document.getElementById(
             "personBackgroundEnabled"
         );
 
-    const options =
+    const area =
         document.getElementById(
-            "personBackgroundOptions"
+            "personBackgroundArea"
         );
 
-    if (!checkbox || !options) {
+    if (!checkbox || !area) {
         return;
     }
 
     if (checkbox.checked) {
 
-        options.style.display = "block";
+        area.classList.add("visible");
 
     } else {
 
-        options.style.display = "none";
+        area.classList.remove("visible");
 
     }
 
@@ -4717,6 +4935,233 @@ filteredPeople.sort(function(a, b) {
 
 }
 
+
+function selectPersonShape(shape) {
+
+    selectedPersonShape =
+        shape;
+
+    updatePersonShapeButtons();
+    updatePersonPreview();
+
+}
+
+
+function selectPersonSize(size) {
+
+    selectedPersonSize =
+        size;
+
+    updatePersonSizeButtons();
+    updatePersonPreview();
+
+}
+
+
+function updatePersonShapeButtons() {
+
+    document
+        .querySelectorAll(
+            ".person-shape-button"
+        )
+        .forEach(function(button) {
+
+            button.classList.remove(
+                "selected"
+            );
+
+        });
+
+    const selectedButton =
+        document.getElementById(
+            "personShape" +
+            (
+                selectedPersonShape === "circle"
+                    ? "Circle"
+                    : selectedPersonShape === "rectangle"
+                        ? "Rectangle"
+                        : "Triangle"
+            )
+        );
+
+    if (selectedButton) {
+
+        selectedButton.classList.add(
+            "selected"
+        );
+
+    }
+
+}
+
+
+function updatePersonSizeButtons() {
+
+    document
+        .querySelectorAll(
+            ".person-size-button"
+        )
+        .forEach(function(button) {
+
+            button.classList.remove(
+                "selected"
+            );
+
+        });
+
+    const selectedButton =
+        document.getElementById(
+            "personSize" +
+            (
+                selectedPersonSize === "small"
+                    ? "Small"
+                    : selectedPersonSize === "medium"
+                        ? "Medium"
+                        : "Large"
+            )
+        );
+
+    if (selectedButton) {
+
+        selectedButton.classList.add(
+            "selected"
+        );
+
+    }
+
+}
+
+
+function updatePersonPreview() {
+
+    const preview =
+        document.getElementById(
+            "personPreview"
+        );
+
+    const emojiInput =
+        document.getElementById(
+            "personEmojiInput"
+        );
+
+    const enabled =
+        document.getElementById(
+            "personBackgroundEnabled"
+        );
+
+    const color =
+        document.getElementById(
+            "personBackgroundColor"
+        );
+
+    if (!preview || !emojiInput) {
+        return;
+    }
+
+    preview.textContent =
+        emojiInput.value || "👤";
+
+
+    if (
+        !enabled ||
+        !enabled.checked
+    ) {
+
+        preview.style.background =
+            "transparent";
+
+        preview.style.width =
+            "80px";
+
+        preview.style.height =
+            "80px";
+
+        preview.style.borderRadius =
+            "0";
+
+        preview.style.clipPath =
+            "none";
+
+        return;
+
+    }
+
+
+    let size = 64;
+
+    if (selectedPersonSize === "small") {
+        size = 48;
+    }
+
+    if (selectedPersonSize === "medium") {
+        size = 58;
+    }
+
+    if (selectedPersonSize === "large") {
+        size = 68;
+    }
+
+
+    preview.style.width =
+        size + "px";
+
+    preview.style.height =
+        size + "px";
+
+    preview.style.background =
+        color
+            ? color.value
+            : "#B8DCD7";
+
+    preview.style.borderRadius =
+        "0";
+
+    preview.style.clipPath =
+        "none";
+
+
+    if (
+        selectedPersonShape === "circle"
+    ) {
+
+        preview.style.borderRadius =
+            "50%";
+
+    } else if (
+        selectedPersonShape === "rectangle"
+    ) {
+
+        preview.style.borderRadius =
+            "10px";
+
+    } else if (
+        selectedPersonShape === "triangle"
+    ) {
+
+        preview.style.clipPath =
+            "polygon(50% 0%, 100% 100%, 0% 100%)";
+
+    }
+
+}
+
+
+function filterPersonEmoji(input) {
+
+    const emojiCharacters =
+        Array.from(input.value)
+            .filter(function(character) {
+
+                return /\p{Extended_Pictographic}/u
+                    .test(character);
+
+            })
+            .join("");
+
+    input.value =
+        emojiCharacters;
+
+}
 
 function selectPersonShape(shape) {
 
@@ -9337,20 +9782,17 @@ function startSpecificRound(roundId) {
     ).checked = false;
 
     document.getElementById(
-        "personBackgroundOptions"
-    ).style.display = "none";
-
-    document.getElementById(
         "personBackgroundColor"
     ).value = "#B8DCD7";
-
-    document.getElementById(
-        "personBackgroundSize"
-    ).value = "medium";
 
     selectedPersonShape =
         "circle";
 
+    selectedPersonSize =
+        "medium";
+
+    updatePersonShapeButtons();
+    updatePersonSizeButtons();
     updatePersonPreview();
 
     showScreen(
@@ -9358,9 +9800,6 @@ function startSpecificRound(roundId) {
     );
 
 }
-
-
-
 
 /* ========================================================
    CRÉER UNE MANCHE
