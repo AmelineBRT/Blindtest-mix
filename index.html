@@ -657,6 +657,10 @@ button:disabled {
     flex: 1;
     min-width: 0;
 
+    font-weight: normal;
+}
+
+.people-bank-name.selected {
     font-weight: bold;
 }
 
@@ -665,14 +669,18 @@ button:disabled {
 
     width: auto;
     margin: 0;
-    padding: 4px 7px;
+    padding: 2px 4px;
 
     background: transparent;
     color: #555;
 
-    font-size: 12px;
+    font-size: 18px;
+    line-height: 1;
 }
 
+.person-edit-button.visible {
+    display: block;
+}
 .person-edit-button.visible {
     display: block;
 }
@@ -4284,12 +4292,12 @@ function renderPeopleBank() {
 
     let html = "";
 
-    filteredPeople.forEach(function(person, index) {
+    filteredPeople.forEach(function(person) {
 
         html += `
             <div
                 class="people-bank-item"
-                onclick="togglePersonEdit(${index})"
+                onclick="togglePersonEdit('${person.id}')"
             >
 
                 <div class="people-bank-emoji">
@@ -4302,18 +4310,21 @@ function renderPeopleBank() {
 
                 </div>
 
-                <span class="people-bank-name">
+                <span
+                    class="people-bank-name"
+                    id="person-name-${person.id}"
+                >
                     ${escapeHTML(person.nom)}
                 </span>
 
                 <button
                     type="button"
                     class="person-edit-button"
-                    id="edit-person-${index}"
-                    onclick="event.stopPropagation(); editPerson(${index})"
+                    id="edit-person-${person.id}"
+                    onclick="event.stopPropagation(); editPerson('${person.id}')"
                     title="Modifier"
                 >
-                    ⚙️ Modifier
+                    ✏️
                 </button>
 
             </div>
@@ -4335,43 +4346,61 @@ function renderPeopleBank() {
 
 }
 
-   function togglePersonEdit(index) {
+   
+ function togglePersonEdit(personId) {
 
     const button =
         document.getElementById(
-            "edit-person-" + index
+            "edit-person-" + personId
         );
 
-    if (!button) {
+    const name =
+        document.getElementById(
+            "person-name-" + personId
+        );
+
+    if (!button || !name) {
         return;
     }
 
-    if (
-        button.classList.contains("visible")
-    ) {
+    const wasVisible =
+        button.classList.contains("visible");
 
-        button.classList.remove("visible");
 
-    } else {
+    document
+        .querySelectorAll(
+            ".person-edit-button.visible"
+        )
+        .forEach(function(otherButton) {
 
-        document
-            .querySelectorAll(
-                ".person-edit-button.visible"
-            )
-            .forEach(function(otherButton) {
+            otherButton.classList.remove(
+                "visible"
+            );
 
-                otherButton.classList.remove(
-                    "visible"
-                );
+        });
 
-            });
+    document
+        .querySelectorAll(
+            ".people-bank-name.selected"
+        )
+        .forEach(function(otherName) {
+
+            otherName.classList.remove(
+                "selected"
+            );
+
+        });
+
+
+    if (!wasVisible) {
 
         button.classList.add("visible");
+
+        name.classList.add("selected");
 
     }
 
 }
-
 
    function editPerson(index) {
 
