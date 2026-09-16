@@ -868,12 +868,50 @@ button:disabled {
     position: relative;
 }
 
-.person-emoji-help
-.keyboard-key
-.keyboard-space
+.person-emoji-picker::after {
+    content: attr(data-help);
+
+    position: absolute;
+
+    left: 50%;
+    bottom: calc(100% + 8px);
+
+    transform: translateX(-50%);
+
+    width: max-content;
+    max-width: 240px;
+
+    padding: 7px 9px;
+
+    background: rgba(40,40,40,0.94);
+    color: white;
+
+    border-radius: 6px;
+
+    font-size: 11px;
+    line-height: 1.4;
+
+    white-space: pre-line;
+    text-align: left;
+
+    opacity: 0;
+    visibility: hidden;
+
+    pointer-events: none;
+
+    transition:
+        opacity 0.1s ease,
+        visibility 0.1s ease;
+
+    z-index: 50;
+}
+
+.person-emoji-picker:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
    
-
-
 
    
 
@@ -3465,48 +3503,22 @@ onclick="history.back()"
         </label>
 
         <div
-         <div class="person-emoji-picker">
+            class="person-emoji-picker"
+            data-help="Windows : Windows + . ou Windows + ;&#10;Mac : Ctrl + Cmd + Espace"
+        >
 
-    <input
-        id="personEmojiInput"
-        class="person-emoji-input"
-        type="text"
-        inputmode="emoji"
-        maxlength="2"
-        value=""
-        placeholder="👤"
-        oninput="filterPersonEmoji(this); updatePersonPreview()"
-    >
+            <input
+                id="personEmojiInput"
+                class="person-emoji-input"
+                type="text"
+                inputmode="emoji"
+                maxlength="2"
+                value=""
+                placeholder="👤"
+                oninput="filterPersonEmoji(this); updatePersonPreview()"
+            >
 
-    <div class="person-emoji-help">
-
-        <strong>
-            Pour faire un emoji sur ordinateur :
-        </strong>
-
-        <div>
-            Sur Windows :
-            <span class="keyboard-key">Windows</span>
-            +
-            <span class="keyboard-key">.</span>
-            ou
-            <span class="keyboard-key">Windows</span>
-            +
-            <span class="keyboard-key">;</span>
         </div>
-
-        <div>
-            Sur Mac :
-            <span class="keyboard-key">Ctrl</span>
-            +
-            <span class="keyboard-key">Cmd</span>
-            +
-            <span class="keyboard-key keyboard-space">Espace</span>
-        </div>
-
-    </div>
-
-</div>
 
     </div>
 
