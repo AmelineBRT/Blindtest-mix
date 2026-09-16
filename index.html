@@ -3490,7 +3490,8 @@ onclick="history.back()"
 
 <div class="card">
 
-    <h2>👥 Nouveau participant</h2>
+   <h2 id="personScreenTitle">👥 Nouveau participant</h2>
+   <section id="createPersonScreen" class="screen">
 
     <label>Nom du participant</label>
 
@@ -3686,13 +3687,13 @@ onclick="history.back()"
     </div>
 
 
-    <button
-        class="primary"
-        onclick="createPerson()">
+<button
+    id="personSaveButton"
+    class="primary"
+    onclick="createPerson()">
 
-        💾 Créer le participant
-
-    </button>
+    💾 Créer le participant
+</button>
 
 
     <button
@@ -3895,6 +3896,7 @@ let duplicateSelectedParticipants = [];
 
    let selectedPersonShape = "circle";
    let selectedPersonSize = "medium";
+   let editingPersonId = null;
 
 /* ========================================================
    MODE SOMBRE
@@ -5237,22 +5239,54 @@ function renderPeopleBank() {
 
 }
 
-   function editPerson(index) {
+  function editPerson(personId) {
 
     const person =
-        people[index];
+        people.find(function(person) {
+            return person.id === personId;
+        });
 
     if (!person) {
         return;
     }
 
-    console.log(
-        "Personne à modifier :",
-        person
-    );
+    editingPersonId = person.id;
 
+    document.getElementById("personScreenTitle").textContent =
+        "👥 Modifier le participant";
+
+    document.getElementById("personName").value =
+        person.nom || "";
+
+    document.getElementById("personEmojiInput").value =
+        person.emoji || "";
+
+    const backgroundEnabled =
+        !!person.fond_couleur;
+
+    document.getElementById("personBackgroundEnabled").checked =
+        backgroundEnabled;
+
+    document.getElementById("personBackgroundColor").value =
+        person.fond_couleur || "#B8DCD7";
+
+    selectedPersonShape =
+        person.fond_forme || "circle";
+
+    selectedPersonSize =
+        person.fond_taille || "medium";
+
+    updatePersonShapeButtons();
+    updatePersonSizeButtons();
+    updatePersonPreview();
+
+    togglePersonBackground();
+
+    document.getElementById("personSaveButton").textContent =
+        "💾 Enregistrer les modifications";
+
+    showScreen("createPersonScreen");
 }
-
 
 function togglePersonBackground() {
 
@@ -10152,38 +10186,35 @@ function startSpecificRound(roundId) {
    ======================================================== */
 
    
-   function showCreatePerson() {
+ function showCreatePerson() {
 
-    document.getElementById(
-        "personName"
-    ).value = "";
+    editingPersonId = null;
 
-document.getElementById(
-    "personEmojiInput"
-).value = "";
-      
-    document.getElementById(
-        "personBackgroundEnabled"
-    ).checked = false;
+    document.getElementById("personScreenTitle").textContent =
+        "👥 Nouveau participant";
 
-    document.getElementById(
-        "personBackgroundColor"
-    ).value = "#B8DCD7";
+    document.getElementById("personName").value = "";
 
-    selectedPersonShape =
-        "circle";
+    document.getElementById("personEmojiInput").value = "";
 
-    selectedPersonSize =
-        "medium";
+    document.getElementById("personBackgroundEnabled").checked = false;
+
+    document.getElementById("personBackgroundColor").value = "#B8DCD7";
+
+    selectedPersonShape = "circle";
+
+    selectedPersonSize = "medium";
 
     updatePersonShapeButtons();
     updatePersonSizeButtons();
     updatePersonPreview();
 
-    showScreen(
-        "createPersonScreen"
-    );
+    togglePersonBackground();
 
+    document.getElementById("personSaveButton").textContent =
+        "💾 Créer le participant";
+
+    showScreen("createPersonScreen");
 }
 
 /* ========================================================
