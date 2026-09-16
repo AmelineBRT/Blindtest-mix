@@ -615,6 +615,10 @@ button:disabled {
     background: rgba(0,0,0,0.06);
 }
 
+   .people-bank-name.dimmed {
+    color: #999;
+}
+
    .games-header-actions {
     display: flex;
     align-items: center;
@@ -5227,7 +5231,29 @@ function renderPeopleBank() {
 
         });
 
+    document
+    .querySelectorAll(
+        ".people-bank-name"
+    )
+    .forEach(function(otherName) {
+        otherName.classList.add(
+            "dimmed"
+        );
+    });
 
+
+    if (wasVisible) {
+    document
+        .querySelectorAll(
+            ".people-bank-name"
+        )
+        .forEach(function(otherName) {
+            otherName.classList.remove(
+                "dimmed"
+            );
+        });
+}
+    
     if (!wasVisible) {
 
         button.classList.add("visible");
