@@ -5596,14 +5596,14 @@ async function createPerson() {
             .value
             .trim();
 
-   const emojiInput =
-    document
-        .getElementById("personEmojiInput")
-        .value
-        .trim();
+    const emojiInput =
+        document
+            .getElementById("personEmojiInput")
+            .value
+            .trim();
 
-const emoji =
-    emojiInput || "👤";
+    const emoji =
+        emojiInput || "👤";
 
     const backgroundEnabled =
         document
@@ -5611,13 +5611,106 @@ const emoji =
             .checked;
 
     if (!name) {
+        alert("Indique le nom du participant.");
+        return;
+    }
 
-        alert(
-            "Indique le nom du participant."
-        );
+    /*
+     * MODE MODIFICATION
+     */
+    if (editingPersonId) {
+
+        const person =
+            people.find(function(person) {
+                return person.id === editingPersonId;
+            });
+
+        if (!person) {
+            return;
+        }
+
+        person.nom = name;
+
+        person.emoji = emoji;
+
+        person.fond_couleur =
+            backgroundEnabled
+                ? document.getElementById("personBackgroundColor").value
+                : null;
+
+        person.fond_forme =
+            backgroundEnabled
+                ? selectedPersonShape
+                : null;
+
+        person.fond_taille =
+            backgroundEnabled
+                ? selectedPersonSize
+                : null;
+
+        /*
+         * Sauvegarde locale
+         */
+        saveData();
+
+        /*
+         * Sauvegarde Cloudflare D1
+         */
+        try {
+
+            const response =
+                await fetch(
+                    "https://blindtestmix.amelinebrt.workers.dev/people",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            id: person.id,
+                            nom: person.nom,
+                            emoji: person.emoji,
+                            fond_couleur: person.fond_couleur,
+                            fond_forme: person.fond_forme,
+                            fond_taille: person.fond_taille
+                        })
+                    }
+                );
+
+            if (!response.ok) {
+                throw new Error(
+                    "Erreur lors de la modification du participant."
+                );
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Erreur modification participant D1 :",
+                error
+            );
+
+            alert(
+                "Le participant a été modifié sur cet appareil, mais la modification n'a pas pu être enregistrée en ligne."
+            );
+
+            return;
+        }
+
+        editingPersonId = null;
+
+        renderPeopleBank();
+
+        showPeopleBank();
 
         return;
     }
+
+    /*
+     * MODE CRÉATION
+     */
 
     const personId =
         Date.now().toString() +
@@ -5625,25 +5718,17 @@ const emoji =
             .toString(36)
             .substring(2, 7);
 
-
     const person = {
 
-        id:
-            personId,
+        id: personId,
 
-        nom:
-            name,
+        nom: name,
 
-        emoji:
-            emoji,
+        emoji: emoji,
 
         fond_couleur:
             backgroundEnabled
-                ? document
-                    .getElementById(
-                        "personBackgroundColor"
-                    )
-                    .value
+                ? document.getElementById("personBackgroundColor").value
                 : null,
 
         fond_forme:
@@ -5655,10 +5740,11 @@ const emoji =
             backgroundEnabled
                 ? selectedPersonSize
                 : null
-
     };
 
-
+    /*
+     * Sauvegarde Cloudflare D1
+     */
     try {
 
         const response =
@@ -5671,65 +5757,38 @@ const emoji =
                         "Content-Type": "application/json"
                     },
 
-                    body:
-                        JSON.stringify(
-                            person
-                        )
-
+                    body: JSON.stringify(person)
                 }
             );
 
-
         if (!response.ok) {
-
             throw new Error(
-                "Erreur lors de la création du participant en ligne."
+                "Erreur lors de la création du participant."
             );
-
         }
-
-
-        const result =
-            await response.json();
-
-
-        console.log(
-            "Participant enregistré en ligne :",
-            result
-        );
-
-
-        people.push(
-            person
-        );
-
-
-        renderPeopleBank();
-
-
-        alert(
-            "Participant créé !"
-        );
-
-
-        showPeopleBank();
-
 
     } catch (error) {
 
         console.error(
-            "Erreur création participant D1 :",
+            "Erreur sauvegarde participant D1 :",
             error
         );
 
         alert(
-            "Le participant n'a pas pu être enregistré en ligne."
+            "Le participant a été créé sur cet appareil, mais il n'a pas pu être enregistré en ligne."
         );
 
+        return;
     }
 
-}
+    people.push(person);
 
+    saveData();
+
+    alert("Participant créé !");
+
+    showPeopleBank();
+}
    
    
 /* ========================================================
