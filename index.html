@@ -5254,13 +5254,11 @@ function renderPeopleBank() {
         });
 }
     
-    if (!wasVisible) {
-
-        button.classList.add("visible");
-
-        name.classList.add("selected");
-
-    }
+if (!wasVisible) {
+    name.classList.remove("dimmed");
+    button.classList.add("visible");
+    name.classList.add("selected");
+}
 
 }
 
