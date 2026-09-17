@@ -506,27 +506,263 @@ button:disabled {
     top: 58px;
     right: 10px;
 
-    width: min(300px, calc(100% - 20px));
+    width: min(340px, calc(100% - 20px));
 
-    padding: 10px;
+    background: rgba(255,255,255,0.97);
 
-    background: rgba(255,255,255,0.96);
+    border-radius: 10px;
 
-    border-radius: 8px;
-
-    box-shadow: 0 3px 10px rgba(0,0,0,0.18);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.20);
 
     font-size: 13px;
 
-    z-index: 20;
+    z-index: 50;
+
+    overflow: hidden;
 }
 
 .participants-panel.visible {
     display: block;
 }
 
-.participants-panel.visible {
-    display: block;
+
+   .participants-panel-content {
+    display: flex;
+    flex-direction: column;
+
+    padding: 10px;
+}
+
+
+/* ========================================================
+   LISTE DES PARTICIPANTS DÉJÀ AJOUTÉS
+   ======================================================== */
+
+.participant-current-list {
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+
+    max-height: 150px;
+
+    overflow-y: auto;
+
+    margin-bottom: 10px;
+
+    padding-right: 3px;
+}
+
+
+/* ========================================================
+   RECHERCHE
+   ======================================================== */
+
+.participant-search {
+    position: sticky;
+    top: 0;
+
+    background: white;
+
+    padding-bottom: 7px;
+
+    z-index: 3;
+}
+
+.participant-search input {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    margin: 0;
+
+    padding: 8px 10px;
+
+    font-size: 13px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 7px;
+}
+
+
+/* ========================================================
+   BOUTON NOUVELLE PERSONNE
+   ======================================================== */
+
+.participant-new-person-button {
+
+    width: 100%;
+
+    margin: 0 0 10px 0;
+
+    padding: 8px 10px;
+
+    background: #09463E;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 7px;
+
+    font-size: 13px;
+
+    cursor: pointer;
+}
+
+
+/* ========================================================
+   TITRE BANQUE
+   ======================================================== */
+
+.participant-bank-title {
+
+    font-weight: bold;
+
+    margin-bottom: 6px;
+}
+
+
+/* ========================================================
+   BANQUE DES PARTICIPANTS
+   ======================================================== */
+
+.participant-bank {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+
+    max-height: 230px;
+
+    overflow-y: auto;
+
+    padding-right: 3px;
+}
+
+
+.participant-bank-item {
+
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 8px;
+
+    padding: 6px 7px;
+
+    margin: 0;
+
+    background: rgba(255,255,255,0.65);
+
+    color: #222;
+
+    border: none;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    text-align: left;
+}
+
+
+.participant-bank-item:hover {
+
+    background: rgba(0,0,0,0.05);
+
+}
+
+
+.participant-bank-add {
+
+    font-size: 18px;
+
+    color: #777;
+
+    flex: 0 0 auto;
+}
+
+
+.participant-bank-empty {
+
+    padding: 8px;
+
+    color: #888;
+
+    text-align: center;
+}
+
+
+/* ========================================================
+   ICÔNES DES PERSONNES
+   ======================================================== */
+
+.participant-name {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    min-width: 0;
+}
+
+
+.participant-person-icon {
+
+    position: relative;
+
+    width: 32px;
+    height: 32px;
+
+    flex: 0 0 32px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 18px;
+}
+
+
+.participant-person-background {
+
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    z-index: 1;
+}
+
+
+.participant-person-emoji {
+
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    line-height: 1;
 }
 
 .participants-title {
@@ -9422,9 +9658,94 @@ function getParticipantIconHTML(name) {
         </span>
     `;
 }
+
+
+function getPersonIconHTML(person) {
+
+    if (!person) {
+        return "";
+    }
+
+    let backgroundHTML = "";
+
+    if (person.fond_couleur) {
+
+        let size = 26;
+
+        if (person.fond_taille === "small") {
+            size = 22;
+        } else if (person.fond_taille === "large") {
+            size = 32;
+        }
+
+        let shapeStyle =
+            "border-radius: 50%;";
+
+        if (person.fond_forme === "rectangle") {
+
+            shapeStyle =
+                "border-radius: 8px;";
+
+        } else if (person.fond_forme === "triangle") {
+
+            shapeStyle =
+                "clip-path: polygon(50% 0%, 100% 100%, 0% 100%);";
+
+        }
+
+        backgroundHTML = `
+            <span
+                class="participant-person-background"
+                style="
+                    width:${size}px;
+                    height:${size}px;
+                    background:${person.fond_couleur};
+                    ${shapeStyle}
+                "
+            ></span>
+        `;
+
+    }
+
+
+    return `
+        <span class="participant-person-icon">
+
+            ${backgroundHTML}
+
+            <span class="participant-person-emoji">
+                ${
+                    person.emoji
+                        ? escapeHTML(person.emoji)
+                        : "👤"
+                }
+            </span>
+
+        </span>
+    `;
+}
+
+
+function getParticipantIconHTML(name) {
+
+    const person =
+        people.find(function(person) {
+
+            return person.nom.toLowerCase() ===
+                   name.toLowerCase();
+
+        });
+
+    if (!person) {
+        return "";
+    }
+
+    return getPersonIconHTML(person);
+}
+
    
    
-   function renderParticipants(type) {
+  function renderParticipants(type) {
 
     const panel =
         document.getElementById(
@@ -9453,12 +9774,19 @@ function getParticipantIconHTML(name) {
     }
 
     let html = `
-<div class="participants-title">
-    👥 Personnes ayant déjà participé
-</div>
+        <div class="participants-panel-content">
 
-        <div class="participant-list">
+            <div class="participants-title">
+                👥 Participants
+            </div>
+
+            <div class="participant-current-list">
     `;
+
+
+    /* ========================================================
+       PARTICIPANTS DÉJÀ AJOUTÉS
+       ======================================================== */
 
     if (item.participants.length === 0) {
 
@@ -9470,80 +9798,333 @@ function getParticipantIconHTML(name) {
 
     } else {
 
-item.participants.forEach(function(name, index) {
+        item.participants.forEach(function(name, index) {
 
-    const isCreator =
-        type === "game" &&
-        item.creator &&
-        name.toLowerCase() ===
-        item.creator.toLowerCase();
+            const isCreator =
+                type === "game" &&
+                item.creator &&
+                name.toLowerCase() ===
+                item.creator.toLowerCase();
 
-    html += `
-        <div
-            class="participant-item"
-            ${
-                isCreator
-                    ? ""
-                    : `onclick="toggleParticipantDelete('${type}', ${index})"`
-            }
-        >
+            html += `
+                <div
+                    class="participant-item"
+                    ${
+                        isCreator
+                            ? ""
+                            : `onclick="toggleParticipantDelete('${type}', ${index})"`
+                    }
+                >
 
-         <span
-    class="participant-name ${
-        isCreator
-            ? "participant-creator"
-            : ""
-    }"
->
-    ${getParticipantIconHTML(name)}
-    ${escapeHTML(name)}
-</span>
+                    <span
+                        class="participant-name ${
+                            isCreator
+                                ? "participant-creator"
+                                : ""
+                        }"
+                    >
+                        ${getParticipantIconHTML(name)}
+                        ${escapeHTML(name)}
+                    </span>
 
-            ${
-                isCreator
-                    ? ""
-                    : `
-                        <button
-                            type="button"
-                            class="participant-remove"
-                            id="remove-${type}-${index}"
-                            onclick="event.stopPropagation(); removeParticipant('${type}', ${index})"
-                            title="Supprimer">
-                            ×
-                        </button>
-                    `
-            }
+                    ${
+                        isCreator
+                            ? ""
+                            : `
+                                <button
+                                    type="button"
+                                    class="participant-remove"
+                                    id="remove-${type}-${index}"
+                                    onclick="event.stopPropagation(); removeParticipant('${type}', ${index})"
+                                    title="Supprimer">
+                                    ×
+                                </button>
+                            `
+                    }
 
-        </div>
-    `;
+                </div>
+            `;
 
-});
+        });
 
     }
 
+
     html += `
-        </div>
+            </div>
 
-        <div class="participant-add">
 
-<input
-    id="${type}ParticipantInput"
-    type="text"
-    placeholder="Nom du participant"
-    onclick="event.stopPropagation()">
+            <!-- RECHERCHE -->
 
-<button
-    type="button"
-    onclick="event.stopPropagation(); addParticipant('${type}')">
+            <div class="participant-search">
+                <input
+                    id="${type}ParticipantSearch"
+                    type="text"
+                    placeholder="🔎 Rechercher un participant..."
+                    oninput="filterParticipantBank('${type}', this.value)"
+                    onclick="event.stopPropagation()"
+                >
+            </div>
 
-    ＋ Ajouter
 
-</button>
+            <!-- NOUVELLE PERSONNE -->
+
+            <button
+                type="button"
+                class="participant-new-person-button"
+                onclick="event.stopPropagation(); showCreatePerson()"
+            >
+                ＋ Ajouter une nouvelle personne
+            </button>
+
+
+            <!-- BANQUE DES PARTICIPANTS -->
+
+            <div class="participant-bank-title">
+                Participants disponibles
+            </div>
+
+            <div
+                id="${type}ParticipantBank"
+                class="participant-bank"
+            >
+    `;
+
+
+    html += getParticipantBankHTML(type);
+
+
+    html += `
+            </div>
 
         </div>
     `;
 
+
     panel.innerHTML = html;
+}
+
+
+/* ========================================================
+   BANQUE DES PARTICIPANTS DISPONIBLES
+   ======================================================== */
+
+function getParticipantBankHTML(type, searchText = "") {
+
+    const item =
+        type === "game"
+            ? getCurrentGame()
+            : groups.find(function(group) {
+                return group.id === currentGroupId;
+            });
+
+    if (!item) {
+        return "";
+    }
+
+    if (!Array.isArray(item.participants)) {
+        item.participants = [];
+    }
+
+    const search =
+        searchText.trim().toLowerCase();
+
+
+    const availablePeople =
+        people.filter(function(person) {
+
+            const alreadyAdded =
+                item.participants.some(function(name) {
+
+                    return name.toLowerCase() ===
+                           person.nom.toLowerCase();
+
+                });
+
+            if (alreadyAdded) {
+                return false;
+            }
+
+            if (!search) {
+                return true;
+            }
+
+            return person.nom
+                .toLowerCase()
+                .includes(search);
+
+        });
+
+
+    if (availablePeople.length === 0) {
+
+        return `
+            <div class="participant-bank-empty">
+                ${
+                    search
+                        ? "Aucun participant trouvé."
+                        : "Tous les participants sont déjà ajoutés."
+                }
+            </div>
+        `;
+
+    }
+
+
+    let html = "";
+
+
+    availablePeople.forEach(function(person) {
+
+        html += `
+            <button
+                type="button"
+                class="participant-bank-item"
+                onclick="event.stopPropagation(); addExistingPersonToParticipants('${type}', '${person.id}')"
+            >
+
+                <span class="participant-name">
+                    ${getPersonIconHTML(person)}
+                    ${escapeHTML(person.nom)}
+                </span>
+
+                <span class="participant-bank-add">
+                    ＋
+                </span>
+
+            </button>
+        `;
+
+    });
+
+
+    return html;
+}
+
+
+/* ========================================================
+   FILTRER LA BANQUE
+   ======================================================== */
+
+function filterParticipantBank(type, searchText) {
+
+    const bank =
+        document.getElementById(
+            type + "ParticipantBank"
+        );
+
+    if (!bank) {
+        return;
+    }
+
+    bank.innerHTML =
+        getParticipantBankHTML(
+            type,
+            searchText
+        );
+}
+
+
+/* ========================================================
+   AJOUTER UNE PERSONNE EXISTANTE
+   ======================================================== */
+
+async function addExistingPersonToParticipants(type, personId) {
+
+    const person =
+        people.find(function(person) {
+            return person.id === personId;
+        });
+
+    if (!person) {
+        return;
+    }
+
+    const item =
+        type === "game"
+            ? getCurrentGame()
+            : groups.find(function(group) {
+                return group.id === currentGroupId;
+            });
+
+    if (!item) {
+        return;
+    }
+
+    if (!Array.isArray(item.participants)) {
+        item.participants = [];
+    }
+
+
+    const alreadyExists =
+        item.participants.some(function(name) {
+
+            return name.toLowerCase() ===
+                   person.nom.toLowerCase();
+
+        });
+
+
+    if (alreadyExists) {
+        return;
+    }
+
+
+    item.participants.push(
+        person.nom
+    );
+
+
+    /*
+     * Si on ajoute une personne à un groupe,
+     * on l'ajoute également aux parties du groupe.
+     */
+
+    if (type === "group") {
+
+        games.forEach(function(game) {
+
+            if (game.groupId !== item.id) {
+                return;
+            }
+
+            if (!Array.isArray(game.participants)) {
+                game.participants = [];
+            }
+
+            const alreadyInGame =
+                game.participants.some(
+                    function(name) {
+
+                        return name.toLowerCase() ===
+                               person.nom.toLowerCase();
+
+                    }
+                );
+
+
+            if (!alreadyInGame) {
+
+                game.participants.push(
+                    person.nom
+                );
+
+            }
+
+        });
+
+    }
+
+
+    saveData();
+
+
+    /*
+     * On conserve le panneau ouvert
+     * et on le reconstruit.
+     */
+
+    renderParticipants(type);
 
 }
 
