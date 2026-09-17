@@ -603,19 +603,20 @@ button:disabled {
 }
 
 .participant-new-person-button {
-    flex: 0 0 36px;
-    width: 36px;
-    height: 36px;
+    width: 100%;
     margin: 0;
-    padding: 0;
+    padding: 8px 10px;
     background: transparent;
-    color: #09463E;
-    border: 1px solid #09463E;
+    color: #720038;
+    border: 1px solid transparent;
     border-radius: 7px;
-    font-size: 20px;
-    line-height: 1;
+    font-size: 18px;
     cursor: pointer;
-       white-space: nowrap;
+}
+
+.participant-new-person-button.has-search-text {
+    background: #720038;
+    color: white;
 }
 
 
@@ -5072,7 +5073,7 @@ function saveData() {
    CHANGER D'ÉCRAN
    ======================================================== */
 
-function showScreen(screenId) {
+function showScreen(screenId, replaceHistory = false) {
 
     document
         .querySelectorAll(".screen")
@@ -5092,9 +5093,14 @@ function showScreen(screenId) {
      * uniquement lorsqu'on navigue normalement
      * dans l'application.
      */
-    if (!isBrowserBack && !isAppNavigation) {
+if (!isBrowserBack && !isAppNavigation) {
 
-    history.pushState(
+    const historyMethod =
+        replaceHistory
+            ? "replaceState"
+            : "pushState";
+
+    history[historyMethod](
         {
             screen: screenId,
             gameId: currentGameId,
@@ -9641,7 +9647,7 @@ function shareCurrentGame() {
    AFFICHER UNE PARTIE
    ======================================================== */
 
-function showGame() {
+function showGame(replaceHistory = false) {
 
     const game = getCurrentGame();
 
@@ -9789,7 +9795,10 @@ gameTitleElement.style.color =
 
     renderRounds();
 
-    showScreen("gameScreen");
+showScreen(
+    "gameScreen",
+    replaceHistory
+);
 
 }
 
@@ -10190,7 +10199,7 @@ if (alreadyAdded) {
             <div class="participant-bank-empty">
                 ${
                     search
-                        ? "Aucun participant trouvé."
+                        ? "Aucune personne trouvée, merci de cliquer sur +👤 ci-dessus."
                         : "Tous les participants sont déjà ajoutés."
                 }
             </div>
@@ -13258,8 +13267,10 @@ function loadRoundForPlaying() {
 
     updateNavigationButton();
 
-    showScreen("playScreen");
-
+   showScreen(
+    "playScreen",
+    document.getElementById("playScreen").classList.contains("active")
+);
 }
 
 
@@ -14320,7 +14331,7 @@ function nextRound() {
 
         pauseAll();
 
-        showGame();
+showGame(true);
 
         return;
 
@@ -14369,7 +14380,7 @@ function quitGame() {
 
     pauseAll();
 
-    showGame();
+    showGame(true);
 
 }
 
