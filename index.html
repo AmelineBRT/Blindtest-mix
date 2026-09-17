@@ -510,19 +510,28 @@ button:disabled {
    ======================================================== */
 
 .participant-current-list {
-
-    display: flex;
-    flex-direction: column;
-
-    gap: 5px;
-
-    max-height: 150px;
-
-    overflow-y: auto;
-
+    background: rgba(9, 70, 62, 0.07);
+    border: 1px solid rgba(9, 70, 62, 0.18);
+    border-radius: 8px;
+    padding: 7px;
     margin-bottom: 10px;
+}
 
-    padding-right: 3px;
+.participant-current-list .participant-item {
+    background: rgba(255, 255, 255, 0.85);
+}
+
+.participant-bank-title {
+    padding-top: 3px;
+    border-top: 1px solid #e5e5e5;
+    margin-top: 2px;
+    padding-top: 10px;
+}
+
+.participant-bank {
+    background: rgba(0, 0, 0, 0.025);
+    border-radius: 8px;
+    padding: 7px;
 }
 
 
@@ -563,28 +572,48 @@ button:disabled {
    BOUTON NOUVELLE PERSONNE
    ======================================================== */
 
-.participant-new-person-button {
-
+.participant-search-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     width: 100%;
-
     margin: 0 0 10px 0;
+    box-sizing: border-box;
+}
 
-    padding: 8px 10px;
+.participant-search-row .participant-search {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+}
 
-    background: #09463E;
+.participant-search-row .participant-search input {
+    width: 100%;
+    box-sizing: border-box;
+}
 
-    color: white;
-
-    border: none;
-
+.participant-new-person-button {
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    color: #09463E;
+    border: 1px solid #09463E;
     border-radius: 7px;
-
-    font-size: 13px;
-
+    font-size: 20px;
+    line-height: 1;
     cursor: pointer;
 }
 
 
+   .participant-new-person-button.has-search-text {
+    background: #A86BC1;
+    color: white;
+    border-color: #A86BC1;
+}
+   
 
 .participants-panel {
     display: none;
@@ -596,7 +625,7 @@ button:disabled {
 
     width: min(380px, calc(100% - 20px));
 
-    max-height: min(75vh, 620px);
+max-height: calc(100vh - 90px);
 
     background: rgba(255,255,255,0.98);
 
@@ -629,7 +658,7 @@ button:disabled {
 
     box-sizing: border-box;
 
-    max-height: min(75vh, 620px);
+max-height: calc(100vh - 90px);
 }
 
 
@@ -772,7 +801,7 @@ button:disabled {
 
     gap: 4px;
 
-    max-height: 230px;
+   max-height: min(230px, 32vh);
 
     overflow-y: auto;
 
@@ -9928,7 +9957,7 @@ function getParticipantIconHTML(name) {
         <div class="participants-panel-content">
 
             <div class="participants-title">
-                👥 Participants
+                👥 Personnes ayant déjà participé 
             </div>
 
             <div class="participant-current-list">
@@ -10007,32 +10036,35 @@ function getParticipantIconHTML(name) {
 
             <!-- RECHERCHE -->
 
-            <div class="participant-search">
-                <input
-                    id="${type}ParticipantSearch"
-                    type="text"
-                    placeholder="🔎 Rechercher un participant..."
-                    oninput="filterParticipantBank('${type}', this.value)"
-                    onclick="event.stopPropagation()"
-                >
-            </div>
+            <div class="participant-search-row">
 
+    <div class="participant-search">
+        <input
+            id="${type}ParticipantSearch"
+            type="text"
+            placeholder="🔎 Rechercher..."
+            oninput="filterParticipantBank('${type}', this.value)"
+            onclick="event.stopPropagation()"
+        >
+    </div>
 
-            <!-- NOUVELLE PERSONNE -->
+ <button
+    type="button"
+    id="${type}CreatePersonButton"
+    class="participant-new-person-button"
+    onclick="event.stopPropagation(); createPersonFromParticipantSearch('${type}')"
+    title="Créer une nouvelle personne"
+>
+    ＋👤
+</button>
 
-            <button
-                type="button"
-                class="participant-new-person-button"
-                onclick="event.stopPropagation(); showCreatePerson()"
-            >
-                ＋ Ajouter une nouvelle personne
-            </button>
+</div>
 
 
             <!-- BANQUE DES PARTICIPANTS -->
 
             <div class="participant-bank-title">
-                Participants disponibles
+                Autres personnes
             </div>
 
             <div
@@ -10175,8 +10207,81 @@ function filterParticipantBank(type, searchText) {
             type,
             searchText
         );
+
+    const createButton =
+        document.getElementById(
+            type + "CreatePersonButton"
+        );
+
+    if (!createButton) {
+        return;
+    }
+
+    if (searchText.trim()) {
+
+        createButton.classList.add(
+            "has-search-text"
+        );
+
+    } else {
+
+        createButton.classList.remove(
+            "has-search-text"
+        );
+
+    }
 }
 
+
+   function createPersonFromParticipantSearch(type) {
+
+    const searchInput =
+        document.getElementById(
+            type + "ParticipantSearch"
+        );
+
+    const searchText =
+        searchInput
+            ? searchInput.value.trim()
+            : "";
+
+    showCreatePerson();
+
+    if (searchText) {
+
+        document.getElementById(
+            "personName"
+        ).value = searchText;
+
+    }
+
+}
+
+
+   function createPersonFromParticipantSearch(type) {
+
+    const searchInput =
+        document.getElementById(
+            type + "ParticipantSearch"
+        );
+
+    const searchText =
+        searchInput
+            ? searchInput.value.trim()
+            : "";
+
+    showCreatePerson();
+
+    if (searchText) {
+
+        document.getElementById(
+            "personName"
+        ).value = searchText;
+
+    }
+
+}
+   
 
 /* ========================================================
    AJOUTER UNE PERSONNE EXISTANTE
