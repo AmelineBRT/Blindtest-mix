@@ -4230,7 +4230,7 @@ onclick="history.back()"
 
     <button
         class="back-arrow-button"
-        onclick="showPeopleBank()"
+onclick="history.back()"
         title="Retour">
 
         <svg class="back-arrow-icon">
@@ -5812,6 +5812,8 @@ function togglePersonEdit(personId) {
         button.classList.add("visible");
     }
 }
+
+   
   function editPerson(personId) {
 
     const person =
@@ -5862,6 +5864,8 @@ function togglePersonEdit(personId) {
 
     showScreen("createPersonScreen");
 }
+
+   
 
 function togglePersonBackground() {
 
@@ -6247,7 +6251,7 @@ async function deletePerson() {
         "Le participant a été supprimé."
     );
 
-    showPeopleBank();
+history.back();
 }
 
    
@@ -6366,7 +6370,7 @@ async function createPerson() {
 
         renderPeopleBank();
 
-showPeopleBank(true);
+history.back();
 
         return;
     }
@@ -6450,7 +6454,7 @@ showPeopleBank(true);
 
 alert("Participant créé !");
 
-showPeopleBank(true);
+history.back();
 }
    
    
