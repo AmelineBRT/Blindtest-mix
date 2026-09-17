@@ -549,7 +549,19 @@ button:disabled {
    RECHERCHE
    ======================================================== */
 
+.participant-search-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    margin: 0 0 12px 0;
+    box-sizing: border-box;
+}
+
 .participant-search {
+    flex: 1;
+    min-width: 0;
+
     position: sticky;
     top: 0;
 
@@ -577,6 +589,31 @@ button:disabled {
     border-radius: 7px;
 }
 
+.participant-new-person-button {
+    flex: 0 0 auto;
+    width: auto;
+
+    margin: 0;
+    padding: 8px 9px;
+
+    background: transparent;
+
+    color: #720038;
+
+    border: 1px solid transparent;
+
+    border-radius: 7px;
+
+    font-size: 18px;
+
+    cursor: pointer;
+}
+
+.participant-new-person-button.has-search-text {
+    background: #b47ab8;
+    color: white;
+}
+
 
 /* ========================================================
    BOUTON NOUVELLE PERSONNE
@@ -602,17 +639,6 @@ button:disabled {
     box-sizing: border-box;
 }
 
-.participant-new-person-button {
-    width: 100%;
-    margin: 0;
-    padding: 8px 10px;
-    background: transparent;
-    color: #720038;
-    border: 1px solid transparent;
-    border-radius: 7px;
-    font-size: 18px;
-    cursor: pointer;
-}
 
 .participant-new-person-button.has-search-text {
     background: #720038;
@@ -10114,7 +10140,7 @@ function getParticipantIconHTML(name) {
     onclick="event.stopPropagation(); createPersonFromParticipantSearch('${type}')"
     title="Créer une nouvelle personne"
 >
-    ＋&nbsp;👤
+    ＋👤
 </button>
 
 </div>
