@@ -10129,7 +10129,7 @@ function getParticipantIconHTML(name) {
     }
 
 
-  html += `
+html += `
                 </div>
 
             </div>
@@ -10140,8 +10140,42 @@ function getParticipantIconHTML(name) {
                 <!-- RECHERCHE -->
 
                 <div class="participant-search-row">
+
+                    <div class="participant-search">
+                        <input
+                            id="${type}ParticipantSearch"
+                            type="text"
+                            placeholder="🔎 Rechercher..."
+                            oninput="filterParticipantBank('${type}', this.value)"
+                            onclick="event.stopPropagation()"
+                        >
+                    </div>
+
+                    <button
+                        type="button"
+                        id="${type}CreatePersonButton"
+                        class="participant-new-person-button"
+                        onclick="event.stopPropagation(); createPersonFromParticipantSearch('${type}')"
+                        title="Créer une nouvelle personne"
+                    >
+                        ＋👤
+                    </button>
+
+                </div>
+
+
+                <!-- BANQUE DES PARTICIPANTS -->
+
+                <div class="participant-bank-title">
+                    Autres personnes
+                </div>
+
+                <div
+                    id="${type}ParticipantBank"
+                    class="participant-bank"
+                >
 `;
-    <div class="participant-search">
+     
         <input
             id="${type}ParticipantSearch"
             type="text"
