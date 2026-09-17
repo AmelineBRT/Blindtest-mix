@@ -10009,16 +10009,20 @@ function getParticipantIconHTML(name) {
         item.participants = [];
     }
 
-    let html = `
-        <div class="participants-panel-content">
+   let html = `
+    <div class="participants-panel-content">
 
-            <div class="participants-title">
-                👥 Personnes ayant déjà participé 
-            </div>
+        <div class="participants-columns">
 
-            <div class="participant-current-list">
-    `;
+            <div class="participants-column-current">
 
+                <div class="participants-title">
+                    👥 Personnes ayant déjà participé 
+                </div>
+
+                <div class="participant-current-list">
+`;
+     
 
     /* ========================================================
        PARTICIPANTS DÉJÀ AJOUTÉS
@@ -10086,14 +10090,18 @@ function getParticipantIconHTML(name) {
     }
 
 
-    html += `
+  html += `
+                </div>
+
             </div>
 
 
-            <!-- RECHERCHE -->
+            <div class="participants-column-other">
 
-            <div class="participant-search-row">
+                <!-- RECHERCHE -->
 
+                <div class="participant-search-row">
+`;
     <div class="participant-search">
         <input
             id="${type}ParticipantSearch"
@@ -10133,12 +10141,14 @@ function getParticipantIconHTML(name) {
     html += getParticipantBankHTML(type);
 
 
-    html += `
+html += `
+                </div>
+
             </div>
 
         </div>
-    `;
-
+    </div>
+`;
 
     panel.innerHTML = html;
 }
