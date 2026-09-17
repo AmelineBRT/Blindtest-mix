@@ -4809,11 +4809,7 @@ function showGames() {
     ).textContent =
         "🎉 Voir les groupes";
 
-    isAppNavigation = true;
-
     showScreen("gamesScreen");
-
-    isAppNavigation = false;
 
     renderFilters();
     renderGames();
@@ -4824,33 +4820,12 @@ function showGames() {
 function showPeopleBank() {
 
     editingPersonId = null;
-   
-    if (!isBrowserBack) {
-
-        history.pushState(
-            {
-                screen: "peopleScreen",
-                gameId: null,
-                groupId: null,
-                roundId: null,
-                view: gamesView
-            },
-            "",
-            "#peopleScreen"
-        );
-
-    }
-
-    isAppNavigation = true;
 
     showScreen("peopleScreen");
-
-    isAppNavigation = false;
 
     loadPeopleFromCloud();
 
 }
-
    
 /* ========================================================
    BASCULER PARTIES / GROUPES / PERSONNES
@@ -5093,29 +5068,28 @@ function renderPeopleBank() {
             person.fond_couleur
         ) {
 
-            let size = 26;
+       let size = 26;
 
 
-            if (
-                person.fond_taille === "small"
-            ) {
+if (
+    person.fond_taille === "small"
+) {
 
-                size = 22;
+    size = 22;
 
-            } else if (
-                person.fond_taille === "medium"
-            ) {
+} else if (
+    person.fond_taille === "medium"
+) {
 
-                size = 26;
+    size = 26;
 
-            } else if (
-                person.fond_taille === "large"
-            ) {
+} else if (
+    person.fond_taille === "large"
+) {
 
-                size = 32;
+    size = 31;
 
-            }
-
+}
 
             let shapeStyle =
                 "border-radius: 50%;";
