@@ -616,6 +616,47 @@ button:disabled {
     cursor: pointer;
 }
 
+   .participant-name {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.participant-person-icon {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+   
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 18px;
+}
+
+.participant-person-background {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    z-index: 1;
+}
+
+.participant-person-emoji {
+    position: relative;
+    z-index: 2;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    line-height: 1;
+}
+
 .people-bank-button:hover {
     background: rgba(0,0,0,0.06);
 }
@@ -9320,6 +9361,69 @@ function toggleParticipants(type) {
     }
 );
 
+
+function getParticipantIconHTML(name) {
+
+    const person =
+        people.find(function(person) {
+            return person.nom.toLowerCase() ===
+                   name.toLowerCase();
+        });
+
+    if (!person) {
+        return "";
+    }
+
+    let backgroundHTML = "";
+
+    if (person.fond_couleur) {
+
+        let size = 26;
+
+        if (person.fond_taille === "small") {
+            size = 22;
+        } else if (person.fond_taille === "large") {
+            size = 32;
+        }
+
+        let shapeStyle =
+            "border-radius: 50%;";
+
+        if (person.fond_forme === "rectangle") {
+
+            shapeStyle =
+                "border-radius: 8px;";
+
+        } else if (person.fond_forme === "triangle") {
+
+            shapeStyle =
+                "clip-path: polygon(50% 0%, 100% 100%, 0% 100%);";
+        }
+
+        backgroundHTML = `
+            <span
+                class="participant-person-background"
+                style="
+                    width:${size}px;
+                    height:${size}px;
+                    background:${person.fond_couleur};
+                    ${shapeStyle}
+                ">
+            </span>
+        `;
+    }
+
+    return `
+        <span class="participant-person-icon">
+            ${backgroundHTML}
+            <span class="participant-person-emoji">
+                ${person.emoji ? escapeHTML(person.emoji) : "👤"}
+            </span>
+        </span>
+    `;
+}
+   
+   
    function renderParticipants(type) {
 
     const panel =
@@ -9384,15 +9488,16 @@ item.participants.forEach(function(name, index) {
             }
         >
 
-            <span
-                class="participant-name ${
-                    isCreator
-                        ? "participant-creator"
-                        : ""
-                }"
-            >
-                ${escapeHTML(name)}
-            </span>
+         <span
+    class="participant-name ${
+        isCreator
+            ? "participant-creator"
+            : ""
+    }"
+>
+    ${getParticipantIconHTML(name)}
+    ${escapeHTML(name)}
+</span>
 
             ${
                 isCreator
