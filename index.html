@@ -10113,6 +10113,9 @@ function getParticipantBankHTML(type, searchText = "") {
     const availablePeople =
         people.filter(function(person) {
 
+console.log("PARTICIPANTS ACTUELS :", item.participants);
+console.log("PERSONNES DISPONIBLES :", people);
+           
             const alreadyAdded =
     item.participants.some(function(name) {
 
