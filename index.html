@@ -10020,7 +10020,7 @@ function getParticipantIconHTML(name) {
 
    
    
-  function renderParticipants(type) {
+function renderParticipants(type) {
 
     const panel =
         document.getElementById(
@@ -10048,20 +10048,20 @@ function getParticipantIconHTML(name) {
         item.participants = [];
     }
 
-   let html = `
-    <div class="participants-panel-content">
+    let html = `
+        <div class="participants-panel-content">
 
-        <div class="participants-columns">
+            <div class="participants-columns">
 
-            <div class="participants-column-current">
+                <div class="participants-column-current">
 
-                <div class="participants-title">
-                    👥 Personnes ayant déjà participé 
-                </div>
+                    <div class="participants-title">
+                        👥 Personnes ayant déjà participé 
+                    </div>
 
-                <div class="participant-current-list">
-`;
-     
+                    <div class="participant-current-list">
+    `;
+
 
     /* ========================================================
        PARTICIPANTS DÉJÀ AJOUTÉS
@@ -10101,7 +10101,7 @@ function getParticipantIconHTML(name) {
                                 ? "participant-creator"
                                 : ""
                         }"
-                    
+                    >
                         ${getParticipantIconHTML(name)}
                         ${escapeHTML(name)}
                     </span>
@@ -10129,103 +10129,68 @@ function getParticipantIconHTML(name) {
     }
 
 
-html += `
-                </div>
-
-            </div>
-
-
-            <div class="participants-column-other">
-
-                <!-- RECHERCHE -->
-
-                <div class="participant-search-row">
-
-                    <div class="participant-search">
-                        <input
-                            id="${type}ParticipantSearch"
-                            type="text"
-                            placeholder="🔎 Rechercher..."
-                            oninput="filterParticipantBank('${type}', this.value)"
-                            onclick="event.stopPropagation()"
-                        >
+    html += `
                     </div>
 
-                    <button
-                        type="button"
-                        id="${type}CreatePersonButton"
-                        class="participant-new-person-button"
-                        onclick="event.stopPropagation(); createPersonFromParticipantSearch('${type}')"
-                        title="Créer une nouvelle personne"
+                </div>
+
+
+                <div class="participants-column-other">
+
+                    <!-- RECHERCHE -->
+
+                    <div class="participant-search-row">
+
+                        <div class="participant-search">
+                            <input
+                                id="${type}ParticipantSearch"
+                                type="text"
+                                placeholder="🔎 Rechercher..."
+                                oninput="filterParticipantBank('${type}', this.value)"
+                                onclick="event.stopPropagation()"
+                            >
+                        </div>
+
+                        <button
+                            type="button"
+                            id="${type}CreatePersonButton"
+                            class="participant-new-person-button"
+                            onclick="event.stopPropagation(); createPersonFromParticipantSearch('${type}')"
+                            title="Créer une nouvelle personne"
+                        >
+                            ＋👤
+                        </button>
+
+                    </div>
+
+
+                    <!-- BANQUE DES PARTICIPANTS -->
+
+                    <div class="participant-bank-title">
+                        Autres personnes
+                    </div>
+
+                    <div
+                        id="${type}ParticipantBank"
+                        class="participant-bank"
                     >
-                        ＋👤
-                    </button>
-
-                </div>
-
-
-                <!-- BANQUE DES PARTICIPANTS -->
-
-                <div class="participant-bank-title">
-                    Autres personnes
-                </div>
-
-                <div
-                    id="${type}ParticipantBank"
-                    class="participant-bank"
-                >
-`;
-     
-        <input
-            id="${type}ParticipantSearch"
-            type="text"
-            placeholder="🔎 Rechercher..."
-            oninput="filterParticipantBank('${type}', this.value)"
-            onclick="event.stopPropagation()"
-        >
-    </div>
-
- <button
-    type="button"
-    id="${type}CreatePersonButton"
-    class="participant-new-person-button"
-    onclick="event.stopPropagation(); createPersonFromParticipantSearch('${type}')"
-    title="Créer une nouvelle personne"
->
-    ＋👤
-</button>
-
-</div>
-
-
-            <!-- BANQUE DES PARTICIPANTS -->
-
-            <div class="participant-bank-title">
-                Autres personnes
-            </div>
-
-            <div
-                id="${type}ParticipantBank"
-                class="participant-bank"
-            >
     `;
 
 
     html += getParticipantBankHTML(type);
 
 
-html += `
+    html += `
+                    </div>
+
                 </div>
 
             </div>
-
         </div>
-    </div>
-`;
+    `;
 
     panel.innerHTML = html;
 }
-
 
 /* ========================================================
    BANQUE DES PARTICIPANTS DISPONIBLES
