@@ -4823,6 +4823,8 @@ function showGames() {
 
 function showPeopleBank() {
 
+    editingPersonId = null;
+   
     if (!isBrowserBack) {
 
         history.pushState(
@@ -5767,73 +5769,6 @@ async function deletePerson() {
     showPeopleBank();
 }
 
-async function deletePerson() {
-
-    if (!editingPersonId) {
-        return;
-    }
-
-    const person =
-        people.find(function(person) {
-            return person.id === editingPersonId;
-        });
-
-    if (!person) {
-        return;
-    }
-
-    if (
-        !confirm(
-            "⚠️ Voulez-vous vraiment supprimer ce participant ?\n\nCette action est définitive."
-        )
-    ) {
-        return;
-    }
-
-    try {
-
-        const response =
-            await fetch(
-                "https://blindtestmix.amelinebrt.workers.dev/people/" +
-                encodeURIComponent(editingPersonId),
-                {
-                    method: "DELETE"
-                }
-            );
-
-        if (!response.ok) {
-            throw new Error(
-                "Erreur lors de la suppression du participant."
-            );
-        }
-
-    } catch (error) {
-
-        console.error(
-            "Erreur suppression participant D1 :",
-            error
-        );
-
-        alert(
-            "Le participant n'a pas pu être supprimé en ligne."
-        );
-
-        return;
-    }
-
-    people =
-        people.filter(function(person) {
-            return person.id !== editingPersonId;
-        });
-
-    editingPersonId = null;
-
-    saveData();
-
-    renderPeopleBank();
-
-    showPeopleBank();
-}
    
 async function createPerson() {
 
