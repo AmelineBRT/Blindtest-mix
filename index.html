@@ -5217,7 +5217,7 @@ function renderPeopleBank() {
 }
 
    
- function togglePersonEdit(personId) {
+function togglePersonEdit(personId) {
 
     const button =
         document.getElementById(
@@ -5229,12 +5229,12 @@ function renderPeopleBank() {
             "person-name-" + personId
         );
 
-const emoji =
-    document.querySelector(
-        ".people-bank-item:has(#edit-person-" + personId + ") .people-bank-emoji"
-    );
-   
-    if (!button || !name) {
+    const emoji =
+        document.querySelector(
+            ".people-bank-item:has(#edit-person-" + personId + ") .people-bank-emoji"
+        );
+
+    if (!button || !name || !emoji) {
         return;
     }
 
@@ -5254,6 +5254,7 @@ const emoji =
 
         });
 
+
     document
         .querySelectorAll(
             ".people-bank-name.selected"
@@ -5266,60 +5267,68 @@ const emoji =
 
         });
 
-document
-    .querySelectorAll(
-        ".people-bank-emoji"
-    )
-    .forEach(function(otherEmoji) {
-        otherEmoji.classList.remove(
-            "dimmed"
-        );
-    });
-    
-
-    document
-    .querySelectorAll(
-        ".people-bank-name"
-    )
-    .forEach(function(otherName) {
-        otherName.classList.add(
-            "dimmed"
-        );
-    });
-
 
     if (wasVisible) {
-    document
-        .querySelectorAll(
-            ".people-bank-name"
-        )
-        .forEach(function(otherName) {
-            otherName.classList.remove(
-                "dimmed"
-            );
-        });
-}
 
-document
-    .querySelectorAll(
-        ".people-bank-emoji"
-    )
-    .forEach(function(otherEmoji) {
-        otherEmoji.classList.remove(
-            "dimmed"
-        );
-    });
-    
-if (!wasVisible) {
-    name.classList.remove("dimmed");
-    emoji.classList.remove("dimmed");
-    button.classList.add("visible");
-    name.classList.add("selected");
-  
-}
+        document
+            .querySelectorAll(
+                ".people-bank-name"
+            )
+            .forEach(function(otherName) {
 
-}
+                otherName.classList.remove(
+                    "dimmed"
+                );
 
+            });
+
+        document
+            .querySelectorAll(
+                ".people-bank-emoji"
+            )
+            .forEach(function(otherEmoji) {
+
+                otherEmoji.classList.remove(
+                    "dimmed"
+                );
+
+            });
+
+    } else {
+
+        document
+            .querySelectorAll(
+                ".people-bank-name"
+            )
+            .forEach(function(otherName) {
+
+                otherName.classList.add(
+                    "dimmed"
+                );
+
+            });
+
+        document
+            .querySelectorAll(
+                ".people-bank-emoji"
+            )
+            .forEach(function(otherEmoji) {
+
+                otherEmoji.classList.add(
+                    "dimmed"
+                );
+
+            });
+
+        name.classList.remove("dimmed");
+
+        name.classList.add("selected");
+
+        emoji.classList.remove("dimmed");
+
+        button.classList.add("visible");
+    }
+}
   function editPerson(personId) {
 
     const person =
@@ -5686,11 +5695,26 @@ async function deletePerson() {
         return;
     }
 
-    if (
-        !confirm(
-            "⚠️ Voulez-vous vraiment supprimer ce participant ?\n\nCette action est définitive."
-        )
-    ) {
+    const confirmation =
+        confirm(
+            '⚠️ Voulez-vous vraiment supprimer le participant "' +
+            person.nom +
+            '" ?\n\n' +
+            'Il sera retiré de toutes les parties et de tous les groupes.\n\n' +
+            'Une seconde confirmation sera demandée.'
+        );
+
+    if (!confirmation) {
+        return;
+    }
+
+    const verification =
+        prompt(
+            'Pour confirmer la suppression du participant, écris exactement : SUPPRIMER'
+        );
+
+    if (verification !== "SUPPRIMER") {
+        alert("Suppression annulée.");
         return;
     }
 
@@ -5736,9 +5760,12 @@ async function deletePerson() {
 
     renderPeopleBank();
 
+    alert(
+        "Le participant a été supprimé."
+    );
+
     showPeopleBank();
 }
-
 
 async function deletePerson() {
 
