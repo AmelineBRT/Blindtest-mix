@@ -356,8 +356,9 @@ button:disabled {
     padding-top: 20px;
 }
 
-   .game-main-card:has(.participants-panel.visible) {
+.game-main-card:has(.participants-panel.visible) {
     overflow: visible;
+    z-index: 1000;
 }
 
 .game-main-card::before {
