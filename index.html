@@ -1112,6 +1112,45 @@ max-height: calc(100vh - 90px);
     line-height: 1;
 }
 
+   /* ========================================================
+   DEUX COLONNES PARTICIPANTS
+   ======================================================== */
+
+.participants-columns {
+    display: flex;
+    gap: 14px;
+    width: 100%;
+    min-height: 0;
+}
+
+.participants-column-current,
+.participants-column-other {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.participants-column-current .participant-current-list {
+    flex: 1;
+    max-height: none;
+    min-height: 0;
+    margin-bottom: 0;
+}
+
+.participants-column-other .participant-search-row {
+    flex-shrink: 0;
+}
+
+.participants-column-other .participant-bank-title {
+    flex-shrink: 0;
+}
+
+.participants-column-other .participant-bank {
+    flex: 1;
+    min-height: 0;
+}
+
 .people-bank-button:hover {
     background: rgba(0,0,0,0.06);
 }
