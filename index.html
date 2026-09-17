@@ -656,7 +656,7 @@ button:disabled {
     top: 58px;
     right: 10px;
 
-width: min(620px, calc(100vw - 20px));
+    width: min(620px, calc(100% - 20px));
 
 max-height: calc(100vh - 90px);
 
@@ -673,15 +673,10 @@ max-height: calc(100vh - 90px);
     overflow: hidden;
 }
 
-.participants-panel {
-    box-sizing: border-box;
-}
-   
 .participants-panel.visible {
     display: block;
     z-index: 1000;
 }
-
    
 /* ========================================================
    CONTENU DE LA FENÊTRE
@@ -898,28 +893,13 @@ max-height: calc(100vh - 90px);
    ======================================================== */
 
 .participant-bank-add {
-    width: 22px;
-    height: 22px;
+    font-size: 18px;
 
-    flex: 0 0 22px;
+    color: #777;
 
-    margin: 0;
-    padding: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: transparent;
-    color: #222;
-
-    border: none;
-
-    font-size: 17px;
-    line-height: 1;
-
-    cursor: pointer;
+    flex: 0 0 auto;
 }
+
 
 /* ========================================================
    AUCUN RÉSULTAT
@@ -2839,7 +2819,6 @@ label {
     padding: 12px;
 }
 
-   
 
 /* =========================================================
    MOBILE
@@ -3201,43 +3180,6 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 <main>
 
 
-   /* ========================================================
-   BOUTON +👤
-   ======================================================== */
-
-.participant-new-person-button {
-    flex: 0 0 auto;
-
-    width: 42px;
-    height: 35px;
-
-    margin: 0;
-    padding: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background: transparent;
-    color: #222;
-
-    border: none;
-    border-radius: 7px;
-
-    font-size: 16px;
-    line-height: 1;
-
-    cursor: pointer;
-    white-space: nowrap;
-}
-
-.participant-new-person-button.has-search-text {
-    background: #720038;
-    color: white;
-    border-color: #720038;
-}
-
-   
 <!-- ==================================================
      ÉCRAN : LISTE DES PARTIES
      ================================================== -->
