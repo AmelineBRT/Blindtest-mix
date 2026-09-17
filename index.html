@@ -5321,11 +5321,14 @@ function showGames() {
 }
 
 
-function showPeopleBank() {
+function showPeopleBank(replaceHistory = false) {
 
     editingPersonId = null;
 
-    showScreen("peopleScreen");
+    showScreen(
+        "peopleScreen",
+        replaceHistory
+    );
 
     loadPeopleFromCloud();
 
@@ -6363,7 +6366,7 @@ async function createPerson() {
 
         renderPeopleBank();
 
-        showPeopleBank();
+showPeopleBank(true);
 
         return;
     }
@@ -6445,9 +6448,9 @@ async function createPerson() {
 
     saveData();
 
-    alert("Participant créé !");
+alert("Participant créé !");
 
-    showPeopleBank();
+showPeopleBank(true);
 }
    
    
