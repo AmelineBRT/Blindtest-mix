@@ -656,7 +656,7 @@ button:disabled {
     top: 58px;
     right: 10px;
 
-    width: min(380px, calc(100% - 20px));
+    width: min(620px, calc(100% - 20px));
 
 max-height: calc(100vh - 90px);
 
@@ -845,17 +845,9 @@ max-height: calc(100vh - 90px);
 
     border-radius: 6px;
 
-    cursor: pointer;
-
-    text-align: left;
-
     box-sizing: border-box;
 }
-
-.participant-bank-item:hover {
-    background: rgba(0,0,0,0.05);
-}
-
+   
 
 /* ========================================================
    ICÔNE DES PARTICIPANTS
@@ -1118,7 +1110,7 @@ max-height: calc(100vh - 90px);
 
 .participants-columns {
     display: flex;
-    gap: 14px;
+    gap: 10px;
     width: 100%;
     min-height: 0;
 }
@@ -10265,24 +10257,25 @@ if (alreadyAdded) {
 
     availablePeople.forEach(function(person) {
 
-        html += `
-            <button
-                type="button"
-                class="participant-bank-item"
-                onclick="event.stopPropagation(); addExistingPersonToParticipants('${type}', '${person.id}')"
-            >
+       html += `
+    <div class="participant-bank-item">
 
-                <span class="participant-name">
-                    ${getPersonIconHTML(person)}
-                    ${escapeHTML(person.nom)}
-                </span>
+        <span class="participant-name">
+            ${getPersonIconHTML(person)}
+            ${escapeHTML(person.nom)}
+        </span>
 
-                <span class="participant-bank-add">
-                    ＋
-                </span>
+        <button
+            type="button"
+            class="participant-bank-add"
+            onclick="event.stopPropagation(); addExistingPersonToParticipants('${type}', '${person.id}')"
+            title="Ajouter"
+        >
+            ＋
+        </button>
 
-            </button>
-        `;
+    </div>
+`;
 
     });
 
