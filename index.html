@@ -517,12 +517,22 @@ button:disabled {
     margin-bottom: 10px;
 }
 
+   .participant-current-list {
+    background: rgba(9, 70, 62, 0.07);
+    border: 1px solid rgba(9, 70, 62, 0.18);
+    border-radius: 8px;
+    padding: 7px;
+}
+
+.participant-current-list .participant-item {
+    background: rgba(255, 255, 255, 0.85);
+}
+
 .participant-current-list .participant-item {
     background: rgba(255, 255, 255, 0.85);
 }
 
 .participant-bank-title {
-    padding-top: 3px;
     border-top: 1px solid #e5e5e5;
     margin-top: 2px;
     padding-top: 10px;
@@ -605,13 +615,14 @@ button:disabled {
     font-size: 20px;
     line-height: 1;
     cursor: pointer;
+       white-space: nowrap;
 }
 
 
    .participant-new-person-button.has-search-text {
-    background: #A86BC1;
+    background: #720038;
     color: white;
-    border-color: #A86BC1;
+    border-color: #720038;
 }
    
 
@@ -7175,6 +7186,7 @@ function renderActiveFilters() {
     let hasFilters = false;
 
 
+   
     /* =========================
        CRÉATEURS
        ========================= */
@@ -7372,6 +7384,37 @@ resetButton.onclick = resetFilters;
 
 }
 
+
+document.addEventListener(
+    "click",
+    function(event) {
+
+        const panels =
+            document.querySelectorAll(
+                ".participants-panel.visible"
+            );
+
+        panels.forEach(function(panel) {
+
+            if (
+                !panel.contains(event.target) &&
+                !event.target.closest(
+                    ".game-icon-button"
+                )
+            ) {
+
+                panel.classList.remove(
+                    "visible"
+                );
+
+            }
+
+        });
+
+    }
+);
+
+   
 /* ========================================================
    FILTRER PARTIES
    ======================================================== */
@@ -10055,7 +10098,7 @@ function getParticipantIconHTML(name) {
     onclick="event.stopPropagation(); createPersonFromParticipantSearch('${type}')"
     title="Créer une nouvelle personne"
 >
-    ＋👤
+    ＋&nbsp;👤
 </button>
 
 </div>
@@ -10217,7 +10260,18 @@ function filterParticipantBank(type, searchText) {
         return;
     }
 
-    if (searchText.trim()) {
+    const hasSearchText =
+        searchText.trim() !== "";
+
+    const hasAvailablePeople =
+        bank.querySelector(
+            ".participant-bank-item"
+        ) !== null;
+
+    if (
+        hasSearchText &&
+        !hasAvailablePeople
+    ) {
 
         createButton.classList.add(
             "has-search-text"
@@ -10230,8 +10284,8 @@ function filterParticipantBank(type, searchText) {
         );
 
     }
-}
 
+}
 
    function createPersonFromParticipantSearch(type) {
 
