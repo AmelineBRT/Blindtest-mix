@@ -611,7 +611,9 @@ button:disabled {
 }
 
 
-/* Contenu général de la fenêtre */
+/* ========================================================
+   CONTENU DE LA FENÊTRE
+   ======================================================== */
 
 .participants-panel-content {
     display: flex;
@@ -620,19 +622,26 @@ button:disabled {
 
     padding: 12px;
 
-    max-height: min(75vh, 620px);
-
     box-sizing: border-box;
+
+    max-height: min(75vh, 620px);
 }
 
 
-/* Personnes déjà présentes */
+/* ========================================================
+   TITRE
+   ======================================================== */
 
-.participant-current-title {
+.participants-title {
     font-weight: bold;
 
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
+
+
+/* ========================================================
+   PARTICIPANTS DÉJÀ AJOUTÉS
+   ======================================================== */
 
 .participant-current-list {
     display: flex;
@@ -653,10 +662,12 @@ button:disabled {
 
 /* Une personne déjà présente */
 
-.participant-current-item {
+.participant-item {
     display: flex;
 
     align-items: center;
+
+    justify-content: space-between;
 
     gap: 8px;
 
@@ -668,14 +679,39 @@ button:disabled {
 }
 
 
-/* Recherche */
+/* Nom + icône */
+
+.participant-name {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    min-width: 0;
+
+    flex: 1;
+}
+
+
+/* ========================================================
+   RECHERCHE
+   ======================================================== */
 
 .participant-search {
     width: 100%;
 
+    margin: 0 0 8px 0;
+
+    box-sizing: border-box;
+}
+
+.participant-search input {
+    width: 100%;
+
     box-sizing: border-box;
 
-    margin: 0 0 8px 0;
+    margin: 0;
 
     padding: 8px 10px;
 
@@ -689,7 +725,9 @@ button:disabled {
 }
 
 
-/* Bouton nouvelle personne */
+/* ========================================================
+   BOUTON NOUVELLE PERSONNE
+   ======================================================== */
 
 .participant-new-person-button {
     width: 100%;
@@ -712,16 +750,15 @@ button:disabled {
 }
 
 
-/* Titre des personnes disponibles */
+/* ========================================================
+   PERSONNES DISPONIBLES
+   ======================================================== */
 
 .participant-bank-title {
     font-weight: bold;
 
     margin-bottom: 6px;
 }
-
-
-/* Banque des personnes */
 
 .participant-bank {
     display: flex;
@@ -730,19 +767,17 @@ button:disabled {
 
     gap: 4px;
 
-    flex: 1;
-
-    min-height: 0;
-
     max-height: 230px;
 
     overflow-y: auto;
 
     padding-right: 3px;
+
+    min-height: 0;
 }
 
 
-/* Personne disponible */
+/* Une personne disponible */
 
 .participant-bank-item {
     width: 100%;
@@ -779,7 +814,9 @@ button:disabled {
 }
 
 
-/* Icône + emoji */
+/* ========================================================
+   ICÔNE DES PARTICIPANTS
+   ======================================================== */
 
 .participant-person-icon {
     position: relative;
@@ -816,7 +853,9 @@ button:disabled {
 }
 
 
-/* Petit + à droite */
+/* ========================================================
+   BOUTON +
+   ======================================================== */
 
 .participant-bank-add {
     font-size: 18px;
@@ -827,7 +866,9 @@ button:disabled {
 }
 
 
-/* Aucun résultat */
+/* ========================================================
+   AUCUN RÉSULTAT
+   ======================================================== */
 
 .participant-bank-empty {
     padding: 8px;
@@ -836,7 +877,6 @@ button:disabled {
 
     text-align: center;
 }
-
 
 
 /* ========================================================
