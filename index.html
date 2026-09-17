@@ -9721,7 +9721,7 @@ gameTitleElement.style.color =
 
 }
 
-function toggleParticipants(type) {
+async function toggleParticipants(type) {
 
     const panel =
         document.getElementById(
@@ -9738,45 +9738,15 @@ function toggleParticipants(type) {
 
         panel.classList.remove("visible");
 
-    } else {
-
-        renderParticipants(type);
-
-        panel.classList.add("visible");
-
+        return;
     }
 
+    await loadPeopleFromCloud();
+
+    renderParticipants(type);
+
+    panel.classList.add("visible");
 }
-
-   document.addEventListener(
-    "click",
-    function(event) {
-
-        if (
-            !event.target.closest(
-                ".participants-panel"
-            ) &&
-            !event.target.closest(
-                ".game-icon-button"
-            )
-        ) {
-
-            document
-                .querySelectorAll(
-                    ".participants-panel.visible"
-                )
-                .forEach(function(panel) {
-
-                    panel.classList.remove(
-                        "visible"
-                    );
-
-                });
-
-        }
-
-    }
-);
 
 
 function getParticipantIconHTML(name) {
