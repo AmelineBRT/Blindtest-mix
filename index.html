@@ -498,40 +498,6 @@ button:disabled {
     cursor: default;
 }
 
-.participants-panel {
-    display: none;
-
-    position: absolute;
-
-    top: 58px;
-    right: 10px;
-
-    width: min(340px, calc(100% - 20px));
-
-    background: rgba(255,255,255,0.97);
-
-    border-radius: 10px;
-
-    box-shadow: 0 3px 12px rgba(0,0,0,0.20);
-
-    font-size: 13px;
-
-    z-index: 50;
-
-    overflow: hidden;
-}
-
-.participants-panel.visible {
-    display: block;
-}
-
-
-   .participants-panel-content {
-    display: flex;
-    flex-direction: column;
-
-    padding: 10px;
-}
 
 
 /* ========================================================
@@ -614,29 +580,159 @@ button:disabled {
 }
 
 
-/* ========================================================
-   TITRE BANQUE
-   ======================================================== */
+
+.participants-panel {
+    display: none;
+
+    position: absolute;
+
+    top: 58px;
+    right: 10px;
+
+    width: min(380px, calc(100% - 20px));
+
+    max-height: min(75vh, 620px);
+
+    background: rgba(255,255,255,0.98);
+
+    border-radius: 10px;
+
+    box-shadow: 0 4px 16px rgba(0,0,0,0.20);
+
+    font-size: 13px;
+
+    z-index: 50;
+
+    overflow: hidden;
+}
+
+.participants-panel.visible {
+    display: block;
+}
+
+
+/* Contenu général de la fenêtre */
+
+.participants-panel-content {
+    display: flex;
+
+    flex-direction: column;
+
+    padding: 12px;
+
+    max-height: min(75vh, 620px);
+
+    box-sizing: border-box;
+}
+
+
+/* Personnes déjà présentes */
+
+.participant-current-title {
+    font-weight: bold;
+
+    margin-bottom: 6px;
+}
+
+.participant-current-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+
+    max-height: 150px;
+
+    overflow-y: auto;
+
+    padding-right: 3px;
+
+    margin-bottom: 10px;
+}
+
+
+/* Une personne déjà présente */
+
+.participant-current-item {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 6px 7px;
+
+    background: rgba(0,0,0,0.035);
+
+    border-radius: 6px;
+}
+
+
+/* Recherche */
+
+.participant-search {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    margin: 0 0 8px 0;
+
+    padding: 8px 10px;
+
+    font-size: 13px;
+
+    border: 1px solid #ddd;
+
+    border-radius: 7px;
+
+    background: white;
+}
+
+
+/* Bouton nouvelle personne */
+
+.participant-new-person-button {
+    width: 100%;
+
+    margin: 0 0 12px 0;
+
+    padding: 8px 10px;
+
+    background: #09463E;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 7px;
+
+    font-size: 13px;
+
+    cursor: pointer;
+}
+
+
+/* Titre des personnes disponibles */
 
 .participant-bank-title {
-
     font-weight: bold;
 
     margin-bottom: 6px;
 }
 
 
-/* ========================================================
-   BANQUE DES PARTICIPANTS
-   ======================================================== */
+/* Banque des personnes */
 
 .participant-bank {
-
     display: flex;
 
     flex-direction: column;
 
     gap: 4px;
+
+    flex: 1;
+
+    min-height: 0;
 
     max-height: 230px;
 
@@ -646,8 +742,9 @@ button:disabled {
 }
 
 
-.participant-bank-item {
+/* Personne disponible */
 
+.participant-bank-item {
     width: 100%;
 
     display: flex;
@@ -673,18 +770,55 @@ button:disabled {
     cursor: pointer;
 
     text-align: left;
-}
 
+    box-sizing: border-box;
+}
 
 .participant-bank-item:hover {
-
     background: rgba(0,0,0,0.05);
-
 }
 
 
-.participant-bank-add {
+/* Icône + emoji */
 
+.participant-person-icon {
+    position: relative;
+
+    width: 32px;
+    height: 32px;
+
+    flex: 0 0 32px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+.participant-person-background {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+
+    pointer-events: none;
+}
+
+.participant-person-emoji {
+    position: relative;
+
+    z-index: 1;
+
+    line-height: 1;
+}
+
+
+/* Petit + à droite */
+
+.participant-bank-add {
     font-size: 18px;
 
     color: #777;
@@ -693,14 +827,16 @@ button:disabled {
 }
 
 
-.participant-bank-empty {
+/* Aucun résultat */
 
+.participant-bank-empty {
     padding: 8px;
 
     color: #888;
 
     text-align: center;
 }
+
 
 
 /* ========================================================
@@ -9934,17 +10070,16 @@ function getParticipantBankHTML(type, searchText = "") {
         people.filter(function(person) {
 
             const alreadyAdded =
-                item.participants.some(function(name) {
+    item.participants.some(function(name) {
 
-                    return name.toLowerCase() ===
-                           person.nom.toLowerCase();
+        return String(name).trim().toLowerCase() ===
+               String(person.nom).trim().toLowerCase();
 
-                });
+    });
 
-            if (alreadyAdded) {
-                return false;
-            }
-
+if (alreadyAdded) {
+    return false;
+}
             if (!search) {
                 return true;
             }
