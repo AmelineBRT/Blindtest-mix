@@ -2219,7 +2219,10 @@ label {
 }
 
 #gameCreatorDisplay {
-    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
 }
 
 .game-card.has-group-header.has-group::before,
@@ -2287,7 +2290,54 @@ label {
     color: #555;
 }
 
-   
+
+   .creator-search-row {
+    margin-bottom: 6px;
+}
+
+.creator-person-bank {
+    margin-bottom: 10px;
+}
+
+.creator-person-option {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px;
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    font-size: 13px;
+    box-sizing: border-box;
+}
+
+.creator-person-option:hover {
+    background: rgba(0,0,0,0.04);
+}
+
+.creator-selected-person {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 26px;
+    margin: 4px 0 8px 0;
+}
+
+   .creator-info {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.creator-info .creator-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
 
 /* =========================================================
    GROUPES
@@ -3681,24 +3731,37 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
         type="text"
         placeholder="Ex : Blind Test Noël">
 
-  <label>Créé par</label>
+<label>Créé par</label>
 
 <input
     id="gameCreator"
     type="hidden">
 
-<div
-    id="gameCreatorSelector"
-    class="person-selector"
-    onclick="toggleCreatorSelector('game')">
+<div class="participant-search-row creator-search-row">
 
-    <span class="person-selector-placeholder">
-        Choisir une personne
-    </span>
+    <div class="participant-search">
+
+        <input
+            id="gameCreatorSearch"
+            type="text"
+            placeholder="🔎 Rechercher..."
+            oninput="filterCreatorBank('game', this.value)"
+            onfocus="renderCreatorBank('game', this.value)"
+        >
+
+    </div>
 
 </div>
 
 <div
+    id="gameCreatorSelected"
+    class="creator-selected-person">
+</div>
+
+<div
+    id="gameCreatorBank"
+    class="participant-bank creator-person-bank">
+</div>
     id="gameCreatorOptions"
     class="person-selector-options">
 </div>
@@ -4022,21 +4085,32 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
     id="editGameCreator"
     type="hidden">
 
-<div
-    id="editGameCreatorSelector"
-    class="person-selector"
-    onclick="toggleCreatorSelector('edit')">
+<div class="participant-search-row creator-search-row">
 
-    <span class="person-selector-placeholder">
-        Choisir une personne
-    </span>
+    <div class="participant-search">
+
+        <input
+            id="editGameCreatorSearch"
+            type="text"
+            placeholder="🔎 Rechercher..."
+            oninput="filterCreatorBank('edit', this.value)"
+            onfocus="renderCreatorBank('edit', this.value)"
+        >
+
+    </div>
 
 </div>
 
 <div
-    id="editGameCreatorOptions"
-    class="person-selector-options">
+    id="editGameCreatorSelected"
+    class="creator-selected-person">
 </div>
+
+<div
+    id="editGameCreatorBank"
+    class="participant-bank creator-person-bank">
+</div>
+   
     <label>Groupe</label>
 
     <select id="editGameGroup">
@@ -5601,9 +5675,12 @@ function showGroups() {
 
 }
 
-function showGames() {
+
+   async function showGames() {
 
     gamesView = "games";
+
+    await loadPeopleFromCloud();
 
     document.getElementById(
         "gamesViewTitle"
@@ -8314,64 +8391,37 @@ return (
 }
 
 
-function updateCreatorSelector(type, name) {
 
-    const selector =
-        document.getElementById(
-            type === "game"
-                ? "gameCreatorSelector"
-                : "editGameCreatorSelector"
-        );
-
-    const input =
-        document.getElementById(
-            type === "game"
-                ? "gameCreator"
-                : "editGameCreator"
-        );
-
-    if (!selector || !input) {
-        return;
-    }
-
-    input.value = name || "";
-
-    if (!name) {
-
-        selector.innerHTML = `
-            <span class="person-selector-placeholder">
-                Choisir une personne
-            </span>
-        `;
-
-        return;
-    }
-
-    selector.innerHTML = `
-        ${getParticipantIconHTML(name)}
-        <span>${escapeHTML(name)}</span>
-    `;
-}
-
-
-async function renderCreatorOptions(type) {
+async function renderCreatorBank(type, search) {
 
     await loadPeopleFromCloud();
 
-    const options =
+    const bank =
         document.getElementById(
             type === "game"
-                ? "gameCreatorOptions"
-                : "editGameCreatorOptions"
+                ? "gameCreatorBank"
+                : "editGameCreatorBank"
         );
 
-    if (!options) {
+    if (!bank) {
         return;
     }
 
-    options.innerHTML = "";
+    const searchText =
+        (search || "").trim().toLowerCase();
 
-    people.forEach(function(person) {
+    const filteredPeople =
+        people.filter(function(person) {
+
+            return person.nom
+                .toLowerCase()
+                .includes(searchText);
+
+        });
+
+    bank.innerHTML = "";
+
+    filteredPeople.forEach(function(person) {
 
         const option =
             document.createElement("button");
@@ -8379,7 +8429,7 @@ async function renderCreatorOptions(type) {
         option.type = "button";
 
         option.className =
-            "person-selector-option";
+            "creator-person-option";
 
         option.innerHTML = `
             ${getParticipantIconHTML(person.nom)}
@@ -8388,51 +8438,72 @@ async function renderCreatorOptions(type) {
 
         option.addEventListener(
             "click",
-            function(event) {
+            function() {
 
-                event.stopPropagation();
-
-                updateCreatorSelector(
+                selectCreator(
                     type,
                     person.nom
                 );
 
-                options.classList.remove("visible");
-
             }
         );
 
-        options.appendChild(option);
+        bank.appendChild(option);
 
     });
+
 }
 
 
-async function toggleCreatorSelector(type) {
+function filterCreatorBank(type, search) {
 
-    const options =
+    renderCreatorBank(
+        type,
+        search
+    );
+
+}
+
+
+function selectCreator(type, name) {
+
+    const input =
         document.getElementById(
             type === "game"
-                ? "gameCreatorOptions"
-                : "editGameCreatorOptions"
+                ? "gameCreator"
+                : "editGameCreator"
         );
 
-    if (!options) {
+    const searchInput =
+        document.getElementById(
+            type === "game"
+                ? "gameCreatorSearch"
+                : "editGameCreatorSearch"
+        );
+
+    const selected =
+        document.getElementById(
+            type === "game"
+                ? "gameCreatorSelected"
+                : "editGameCreatorSelected"
+        );
+
+    if (!input || !searchInput || !selected) {
         return;
     }
 
-    if (options.classList.contains("visible")) {
+    input.value = name;
 
-        options.classList.remove("visible");
+    searchInput.value = name;
 
-        return;
-    }
-
-    await renderCreatorOptions(type);
-
-    options.classList.add("visible");
+    selected.innerHTML = `
+        ${getParticipantIconHTML(name)}
+        <span>${escapeHTML(name)}</span>
+    `;
 }
-   
+
+
+
 
    
 async function createGame() {
@@ -9588,7 +9659,7 @@ div.style.background =
                 ${passwordIcon}
             </h3>
 
-            <div class="game-info">
+<div class="game-info creator-info">
 
                 <span class="creator-label">
                     Créé par :
@@ -11370,7 +11441,31 @@ async function showEditGame() {
     document.getElementById("editGameName").value =
         game.name;
 
-    updateCreatorSelector(
+    document.getElementById("editGameCreator").value =
+    game.creator;
+
+document.getElementById("editGameCreatorSearch").value =
+    game.creator;
+
+document.getElementById("editGameCreatorSelected").innerHTML = `
+    ${getParticipantIconHTML(game.creator)}
+    <span>${escapeHTML(game.creator)}</span>
+`;
+
+renderCreatorBank(
+    "edit",
+    game.creator
+);
+
+    document.getElementById("editGameCreatorSearch").value =
+        game.creator;
+
+    document.getElementById("editGameCreatorSelected").innerHTML = `
+        ${getParticipantIconHTML(game.creator)}
+        <span>${escapeHTML(game.creator)}</span>
+    `;
+
+    renderCreatorBank(
         "edit",
         game.creator
     );
