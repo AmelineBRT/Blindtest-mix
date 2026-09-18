@@ -652,10 +652,11 @@ button:disabled {
 
     position: absolute;
 
-    top: 58px;
-    right: 10px;
+top: 58px;
+left: 0;
 
-    width: min(620px, calc(100% - 20px));
+width: 100%;
+max-width: 100%;
 
 max-height: calc(100vh - 90px);
 
@@ -3097,22 +3098,6 @@ background: #ffffff;
 /* ========================================================
    PARTICIPANTS — AFFICHAGE MOBILE
    ======================================================== */
-
-@media (max-width: 600px) {
-
-    .participants-panel {
-        left: 0;
-        right: 0;
-
-        width: 100%;
-        max-width: none;
-
-        transform: none;
-
-        border-radius: 10px;
-    }
-
-}
 
     .participants-panel-content {
         width: 100%;
