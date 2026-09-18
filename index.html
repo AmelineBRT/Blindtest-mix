@@ -8537,9 +8537,11 @@ if (!searchText) {
 
     }
 
+   return filteredPeople.length;
 }
+   
 
-   function updateCreatorNewPersonButton(type, search) {
+function updateCreatorNewPersonButton(type, search, resultCount) {
 
     const button =
         document.getElementById(
@@ -8552,7 +8554,10 @@ if (!searchText) {
         return;
     }
 
-    if ((search || "").trim()) {
+    if (
+        (search || "").trim() &&
+        resultCount === 0
+    ) {
         button.classList.add("has-search-text");
     } else {
         button.classList.remove("has-search-text");
@@ -8560,16 +8565,18 @@ if (!searchText) {
 
 }
 
-function filterCreatorBank(type, search) {
+async function filterCreatorBank(type, search) {
+
+    const resultCount =
+        await renderCreatorBank(
+            type,
+            search
+        );
 
     updateCreatorNewPersonButton(
         type,
-        search
-    );
-
-    renderCreatorBank(
-        type,
-        search
+        search,
+        resultCount
     );
 
 }
