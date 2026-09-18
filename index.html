@@ -411,6 +411,7 @@ button:disabled {
 .game-main-card .game-card-content {
     position: relative;
     z-index: 2;
+    padding-top: 25px;
 }
 
   
@@ -3240,6 +3241,26 @@ background: #ffffff;
 
 }
 
+
+   @media (max-width: 600px) {
+
+    #groupScreen > .participants-panel {
+        position: absolute;
+
+        top: 135px;
+        left: 15px;
+        right: 15px;
+
+        width: auto;
+        max-width: none;
+
+        transform: none;
+
+        border-radius: 10px;
+    }
+
+}
+
    
    
 
@@ -3805,11 +3826,6 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
             class="group-screen-comment">
         </div>
 
-       <div
-    id="groupParticipantsPanel"
-    class="participants-panel">
-</div>
-
         <button
             class="primary"
             onclick="showCreateGameForCurrentGroup()">
@@ -3827,6 +3843,15 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 </button>
 
     </div>
+
+       </div>
+
+    <div
+        id="groupParticipantsPanel"
+        class="participants-panel">
+    </div>
+
+    <div id="groupGamesList"></div>
 
     <div id="groupGamesList"></div>
 
