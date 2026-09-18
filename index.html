@@ -3622,12 +3622,27 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
         type="text"
         placeholder="Ex : Blind Test Noël">
 
-    <label>Créé par</label>
+  <label>Créé par</label>
 
-    <input
-        id="gameCreator"
-        type="text"
-        placeholder="Ton prénom">
+<input
+    id="gameCreator"
+    type="hidden">
+
+<div
+    id="gameCreatorSelector"
+    class="person-selector"
+    onclick="toggleCreatorSelector('game')">
+
+    <span class="person-selector-placeholder">
+        Choisir une personne
+    </span>
+
+</div>
+
+<div
+    id="gameCreatorOptions"
+    class="person-selector-options">
+</div>
 
     <label>Groupe (facultatif)</label>
 
