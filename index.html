@@ -9365,7 +9365,7 @@ div.style.background =
     class="creator-name"
     style="color:#555 !important;"
 >
-    👤 ${escapeHTML(game.creator)}
+    ${getParticipantIconHTML(game.creator)} ${escapeHTML(game.creator)}
 </span>
 
             </div>
@@ -10005,7 +10005,7 @@ gameTitleElement.style.color =
         </span>
 
 <span class="creator-name">
-    👤 ${escapeHTML(game.creator)}
+    ${getParticipantIconHTML(game.creator)} ${escapeHTML(game.creator)}
 </span>
     `;
 
