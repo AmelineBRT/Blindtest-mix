@@ -598,7 +598,7 @@ button:disabled {
     padding: 0;
 
     background: transparent;
-    color: #720038;
+    color: #000;
 
     border: none;
     border-radius: 7px;
@@ -616,7 +616,7 @@ button:disabled {
 }
 
 .participant-new-person-button.has-search-text {
-    background: #b47ab8;
+    background: #720038;
     color: white;
 }
 
@@ -3129,7 +3129,71 @@ background: #ffffff;
     }
 }
 
-   
+
+    .participants-column-other {
+        border: none;
+        background: transparent;
+        padding: 0;
+    }
+
+    .participant-bank {
+        width: 100%;
+        box-sizing: border-box;
+        border: none;
+        background: transparent;
+        padding: 0;
+    }
+
+    .participant-bank-item {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+
+       .participant-bank-add {
+        width: 22px;
+        min-width: 22px;
+        height: 22px;
+        padding: 0;
+        margin: 0;
+        flex-shrink: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 16px;
+        line-height: 1;
+
+        border-radius: 50%;
+        background: transparent;
+        color: #000;
+        border: none;
+    }
+
+       .participant-item,
+    .participant-bank-item {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .participant-item .participant-name,
+    .participant-bank-item .participant-name {
+        flex: 1;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    .participant-remove {
+        width: 22px;
+        min-width: 22px;
+        height: 22px;
+        flex: 0 0 22px;
+        margin-left: 4px;
+    }
 
 
 /* ==================================================
