@@ -5082,9 +5082,9 @@ async function loadGamesFromCloud() {
 
     try {
 
-        /* =========================
+        /* ==================================================
            CHARGEMENT DES PARTIES
-           ========================= */
+           ================================================== */
 
         const response =
             await fetch(
@@ -5103,9 +5103,9 @@ async function loadGamesFromCloud() {
             await response.json();
 
 
-        /* =========================
+        /* ==================================================
            CHARGEMENT DES GROUPES
-           ========================= */
+           ================================================== */
 
         const groupsResponse =
             await fetch(
@@ -5124,41 +5124,55 @@ async function loadGamesFromCloud() {
             await groupsResponse.json();
 
 
-        onlineGroups.forEach(function(group) {
+        /* ==================================================
+           SYNCHRONISATION DES GROUPES
+           ================================================== */
+
+        onlineGroups.forEach(function(cloudGroup) {
 
             const localGroup =
-                groups.find(function(localGroup) {
+                groups.find(function(group) {
 
-                    return localGroup.id === group.id;
+                    return group.id ===
+                           cloudGroup.id;
 
                 });
 
 
-            /* Groupe absent en local :
-               on l'ajoute */
+            const participants =
+                Array.isArray(
+                    cloudGroup.participants
+                )
+                    ? cloudGroup.participants.map(
+                        function(person) {
+                            return person.nom;
+                        }
+                    )
+                    : [];
+
+
+            /* =========================
+               GROUPE ABSENT EN LOCAL
+               ========================= */
 
             if (!localGroup) {
 
                 groups.push({
 
                     id:
-                        group.id,
+                        cloudGroup.id,
 
                     name:
-                        group.nom,
+                        cloudGroup.nom,
 
                     comment:
-                        group.commentaire || "",
+                        cloudGroup.commentaire || "",
 
                     color:
-                        group.couleur || "",
+                        cloudGroup.couleur || "",
 
                     participants:
-                        Array.isArray(group.participants)
-                            ? group.participants.map(function(person) {
-                                return person.nom;
-                            })
-                            : []
+                        participants
 
                 });
 
@@ -5167,48 +5181,33 @@ async function loadGamesFromCloud() {
             }
 
 
-            /* Groupe déjà présent :
-               on ajoute seulement les participants
-               qui manquent */
+            /* =========================
+               GROUPE DÉJÀ EN LOCAL
+               ========================= */
 
-            if (!Array.isArray(localGroup.participants)) {
+            localGroup.name =
+                cloudGroup.nom;
 
-                localGroup.participants = [];
+            localGroup.comment =
+                cloudGroup.commentaire || "";
 
-            }
+            localGroup.color =
+                cloudGroup.couleur || "";
 
+            /*
+             * D1 devient la source de vérité
+             * pour les participants du groupe.
+             */
 
-            if (Array.isArray(group.participants)) {
-
-                group.participants.forEach(function(person) {
-
-                    const alreadyExists =
-                        localGroup.participants.some(function(name) {
-
-                            return name.toLowerCase() ===
-                                   person.nom.toLowerCase();
-
-                        });
-
-
-                    if (!alreadyExists) {
-
-                        localGroup.participants.push(
-                            person.nom
-                        );
-
-                    }
-
-                });
-
-            }
+            localGroup.participants =
+                participants;
 
         });
 
 
-        /* =========================
+        /* ==================================================
            CHARGEMENT DES PARTIES
-           ========================= */
+           ================================================== */
 
         for (
             let i = 0;
@@ -5216,75 +5215,87 @@ async function loadGamesFromCloud() {
             i++
         ) {
 
-            const game =
+            const cloudGame =
                 onlineGames[i];
 
 
-            const localGame =
-                games.find(function(existingGame) {
+            /* =========================
+               DÉTAILS DE LA PARTIE
+               ========================= */
 
-                    return existingGame.id === game.id;
+            const detailResponse =
+                await fetch(
+                    "https://blindtestmix.amelinebrt.workers.dev/parties/" +
+                    cloudGame.id
+                );
 
-                });
+
+            if (!detailResponse.ok) {
+
+                console.warn(
+                    "Impossible de charger la partie :",
+                    cloudGame.id
+                );
+
+                continue;
+
+            }
+
+
+            const detail =
+                await detailResponse.json();
 
 
             /* =========================
-               PARTIE ABSENTE EN LOCAL
+               PARTICIPANTS
                ========================= */
 
-            if (!localGame) {
-
-                const detailResponse =
-                    await fetch(
-                        "https://blindtestmix.amelinebrt.workers.dev/parties/" +
-                        game.id
-                    );
-
-
-                if (!detailResponse.ok) {
-
-                    console.warn(
-                        "Impossible de charger la partie :",
-                        game.id
-                    );
-
-                    continue;
-
-                }
-
-
-                const detail =
-                    await detailResponse.json();
-
-
-                const participants =
-                    Array.isArray(detail.participants)
-                        ? detail.participants.map(function(person) {
+            const participants =
+                Array.isArray(
+                    detail.participants
+                )
+                    ? detail.participants.map(
+                        function(person) {
                             return person.nom;
-                        })
-                        : [];
+                        }
+                    )
+                    : [];
 
 
-                if (
-                    detail.createur &&
-                    !participants.some(function(participant) {
+            /*
+             * Le créateur doit toujours rester
+             * présent parmi les participants.
+             */
+
+            if (
+                detail.createur &&
+                !participants.some(
+                    function(participant) {
 
                         return participant.toLowerCase() ===
                                detail.createur.toLowerCase();
 
-                    })
-                ) {
+                    }
+                )
+            ) {
 
-                    participants.unshift(
-                        detail.createur
-                    );
+                participants.unshift(
+                    detail.createur
+                );
 
-                }
+            }
 
 
-                const rounds =
-                    Array.isArray(detail.manches)
-                        ? detail.manches.map(function(round) {
+            /* =========================
+               MANCHES ET PISTES
+               ========================= */
+
+            const rounds =
+                Array.isArray(
+                    detail.manches
+                )
+                    ? detail.manches.map(
+                        function(round) {
 
                             return {
 
@@ -5295,27 +5306,51 @@ async function loadGamesFromCloud() {
                                     round.nom,
 
                                 tracks:
-                                    Array.isArray(round.pistes)
-                                        ? round.pistes.map(function(track) {
+                                    Array.isArray(
+                                        round.pistes
+                                    )
+                                        ? round.pistes.map(
+                                            function(track) {
 
-                                            return {
+                                                return {
 
-                                                title:
-                                                    track.titre || "",
+                                                    title:
+                                                        track.titre || "",
 
-                                                url:
-                                                    track.url || ""
+                                                    url:
+                                                        track.url || ""
 
-                                            };
+                                                };
 
-                                        })
+                                            }
+                                        )
                                         : []
 
                             };
 
-                        })
-                        : [];
+                        }
+                    )
+                    : [];
 
+
+            /* =========================
+               RECHERCHER LA PARTIE LOCALE
+               ========================= */
+
+            const localGame =
+                games.find(function(game) {
+
+                    return game.id ===
+                           detail.id;
+
+                });
+
+
+            /* =========================
+               PARTIE ABSENTE EN LOCAL
+               ========================= */
+
+            if (!localGame) {
 
                 games.push({
 
@@ -5345,7 +5380,6 @@ async function loadGamesFromCloud() {
 
                 });
 
-
                 continue;
 
             }
@@ -5355,201 +5389,37 @@ async function loadGamesFromCloud() {
                PARTIE DÉJÀ EN LOCAL
                ========================= */
 
-            const detailResponse =
-                await fetch(
-                    "https://blindtestmix.amelinebrt.workers.dev/parties/" +
-                    game.id
-                );
+            /*
+             * D1 devient la source de vérité.
+             */
 
+            localGame.name =
+                detail.nom;
 
-            if (!detailResponse.ok) {
+            localGame.creator =
+                detail.createur;
 
-                console.warn(
-                    "Impossible de charger les détails de la partie :",
-                    game.id
-                );
+            localGame.groupId =
+                detail.groupe_id || "";
 
-                continue;
+            localGame.password =
+                detail.mot_de_passe || "";
 
-            }
+            localGame.email =
+                detail.email_recuperation || "";
 
+            localGame.participants =
+                participants;
 
-            const detail =
-                await detailResponse.json();
-
-
-            /* =========================
-               PARTICIPANTS
-               ========================= */
-
-            if (!Array.isArray(localGame.participants)) {
-
-                localGame.participants = [];
-
-            }
-
-
-            if (Array.isArray(detail.participants)) {
-
-                detail.participants.forEach(function(person) {
-
-                    const alreadyExists =
-                        localGame.participants.some(function(name) {
-
-                            return name.toLowerCase() ===
-                                   person.nom.toLowerCase();
-
-                        });
-
-
-                    if (!alreadyExists) {
-
-                        localGame.participants.push(
-                            person.nom
-                        );
-
-                    }
-
-                });
-
-            }
-
-
-            if (
-                localGame.creator &&
-                !localGame.participants.some(function(name) {
-
-                    return name.toLowerCase() ===
-                           localGame.creator.toLowerCase();
-
-                })
-            ) {
-
-                localGame.participants.unshift(
-                    localGame.creator
-                );
-
-            }
-
-
-function changePeopleSort(mode) {
-
-    peopleSortMode = mode;
-
-    renderPeopleBank();
-
-}
-           
-            /* =========================
-               MANCHES
-               ========================= */
-
-            if (!Array.isArray(localGame.rounds)) {
-
-                localGame.rounds = [];
-
-            }
-
-
-            if (Array.isArray(detail.manches)) {
-
-                detail.manches.forEach(function(cloudRound) {
-
-                    const localRound =
-                        localGame.rounds.find(function(round) {
-
-                            return round.id === cloudRound.id;
-
-                        });
-
-
-                    /* Manche absente en local :
-                       on l'ajoute avec ses pistes */
-
-                    if (!localRound) {
-
-                        localGame.rounds.push({
-
-                            id:
-                                cloudRound.id,
-
-                            name:
-                                cloudRound.nom,
-
-                            tracks:
-                                Array.isArray(cloudRound.pistes)
-                                    ? cloudRound.pistes.map(function(track) {
-
-                                        return {
-
-                                            title:
-                                                track.titre || "",
-
-                                            url:
-                                                track.url || ""
-
-                                        };
-
-                                    })
-                                    : []
-
-                        });
-
-                        return;
-
-                    }
-
-
-                    /* =========================
-                       PISTES
-                       ========================= */
-
-                    if (!Array.isArray(localRound.tracks)) {
-
-                        localRound.tracks = [];
-
-                    }
-
-
-                    if (Array.isArray(cloudRound.pistes)) {
-
-                        cloudRound.pistes.forEach(function(cloudTrack, index) {
-
-                            const localTrack =
-                                localRound.tracks[index];
-
-
-                            /* Si la piste n'existe pas
-                               localement, on l'ajoute */
-
-                            if (!localTrack) {
-
-                                localRound.tracks.push({
-
-                                    title:
-                                        cloudTrack.titre || "",
-
-                                    url:
-                                        cloudTrack.url || ""
-
-                                });
-
-                            }
-
-                        });
-
-                    }
-
-                });
-
-            }
+            localGame.rounds =
+                rounds;
 
         }
 
 
-        /* =========================
-           SAUVEGARDE
-           ========================= */
+        /* ==================================================
+           SAUVEGARDE LOCALE
+           ================================================== */
 
         saveData();
 
@@ -5571,6 +5441,14 @@ function changePeopleSort(mode) {
 }
 
 
+function changePeopleSort(mode) {
+
+    peopleSortMode = mode;
+
+    renderPeopleBank();
+
+}
+   
    
 /* ========================================================
    SAUVEGARDE
