@@ -12170,6 +12170,9 @@ async function addExistingPersonToParticipants(type, personId) {
     ).focus();
 
 }
+
+
+   
 function toggleParticipantDelete(type, index) {
 
     const button =
@@ -12381,7 +12384,7 @@ function toggleEditEmailRequirement() {
    ENREGISTRER MODIFICATIONS PARTIE
    ======================================================== */
 
-function saveGameChanges() {
+async function saveGameChanges() {
 
     const game = getCurrentGame();
 
@@ -12516,6 +12519,71 @@ if (groupId) {
 }
 
     saveData();
+
+       try {
+
+        const response =
+            await fetch(
+                "https://blindtestmix.amelinebrt.workers.dev/parties",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        id:
+                            game.id,
+
+                        nom:
+                            game.name,
+
+                        createur:
+                            game.creator,
+
+                        groupe_id:
+                            game.groupId || null,
+
+                        mot_de_passe:
+                            game.password || null,
+
+                        email_recuperation:
+                            game.email || null
+
+                    })
+
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Erreur lors de l'enregistrement de la modification en ligne."
+            );
+
+        }
+
+
+        console.log(
+            "Modification de la partie enregistrée en ligne."
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Erreur sauvegarde modification D1 :",
+            error
+        );
+
+        alert(
+            "La partie a été modifiée sur cet appareil, mais la modification n'a pas pu être enregistrée en ligne."
+        );
+
+    }
 
     alert("Partie modifiée !");
 
