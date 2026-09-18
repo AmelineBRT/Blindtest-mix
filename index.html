@@ -358,7 +358,6 @@ button:disabled {
 
 .game-main-card:has(.participants-panel.visible) {
     z-index: 1000;
-    overflow: visible;
 }
 
 .game-main-card::before {
@@ -3225,15 +3224,17 @@ background: #ffffff;
 @media (max-width: 600px) {
 
     #gameMainCard .participants-panel {
-        left: 50%;
-        right: auto;
-        width: calc(100% + 50px);
+        left: -20px;
+        right: -20px;
+        width: auto;
         max-width: none;
-        transform: translateX(-50%);
+        transform: none;
         border-radius: 10px;
     }
 
 }
+
+   
    
 
    
