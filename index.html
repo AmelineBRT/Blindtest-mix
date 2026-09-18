@@ -357,7 +357,6 @@ button:disabled {
 }
 
 .game-main-card:has(.participants-panel.visible) {
-    overflow: visible;
     z-index: 1000;
 }
 
@@ -3196,6 +3195,31 @@ background: #ffffff;
     }
 
 
+   /* ========================================================
+   FENÊTRE PARTICIPANTS — MOBILE
+   ======================================================== */
+
+@media (max-width: 600px) {
+
+    .participants-panel {
+        left: 50%;
+        right: auto;
+
+        width: 100vw;
+        max-width: 100vw;
+
+        transform: translateX(-50%);
+
+        box-sizing: border-box;
+
+        border-radius: 10px;
+    }
+
+}
+
+
+
+   
 /* ==================================================
    FIN DES CSS et DEBUT DES HTML
    ================================================== */
