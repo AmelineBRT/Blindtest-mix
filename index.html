@@ -5245,6 +5245,12 @@ async function loadGamesFromCloud() {
             const detail =
                 await detailResponse.json();
 
+           console.log(
+    "D1 - participants de la partie",
+    detail.id,
+    detail.participants
+);
+
 
             /* =========================
                PARTICIPANTS
