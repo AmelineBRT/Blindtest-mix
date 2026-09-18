@@ -2325,18 +2325,28 @@ label {
     margin: 4px 0 8px 0;
 }
 
-   .creator-info {
+.creator-info {
     display: flex;
     align-items: center;
-    gap: 4px;
+    flex-wrap: nowrap;
     white-space: nowrap;
+    gap: 4px;
 }
 
-.creator-info .creator-name {
+.creator-info .creator-name,
+#gameCreatorDisplay .creator-name {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    flex-wrap: nowrap;
     white-space: nowrap;
+    gap: 3px;
+}
+
+.creator-info .participant-person-icon,
+#gameCreatorDisplay .participant-person-icon {
+    transform: scale(0.85);
+    transform-origin: left center;
+    flex: 0 0 auto;
 }
 
 /* =========================================================
@@ -3746,10 +3756,19 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
             type="text"
             placeholder="🔎 Rechercher..."
             oninput="filterCreatorBank('game', this.value)"
-            onfocus="renderCreatorBank('game', this.value)"
         >
 
     </div>
+
+    <button
+        type="button"
+        id="gameCreatePersonButton"
+        class="participant-new-person-button"
+        onclick="createPersonFromCreatorSearch('game')"
+        title="Créer une nouvelle personne"
+    >
+        ＋👤
+    </button>
 
 </div>
 
@@ -4094,13 +4113,21 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
             type="text"
             placeholder="🔎 Rechercher..."
             oninput="filterCreatorBank('edit', this.value)"
-            onfocus="renderCreatorBank('edit', this.value)"
         >
 
     </div>
 
-</div>
+    <button
+        type="button"
+        id="editGameCreatePersonButton"
+        class="participant-new-person-button"
+        onclick="createPersonFromCreatorSearch('edit')"
+        title="Créer une nouvelle personne"
+    >
+        ＋👤
+    </button>
 
+</div>
 <div
     id="editGameCreatorSelected"
     class="creator-selected-person">
@@ -8494,12 +8521,24 @@ function selectCreator(type, name) {
 
     input.value = name;
 
-    searchInput.value = name;
+searchInput.value = "";
 
-    selected.innerHTML = `
-        ${getParticipantIconHTML(name)}
-        <span>${escapeHTML(name)}</span>
-    `;
+selected.innerHTML = `
+    ${getParticipantIconHTML(name)}
+    <span>${escapeHTML(name)}</span>
+`;
+
+const bank =
+    document.getElementById(
+        type === "game"
+            ? "gameCreatorBank"
+            : "editGameCreatorBank"
+    );
+
+if (bank) {
+    bank.innerHTML = "";
+    bank.style.display = "none";
+}
 }
 
 
@@ -11452,13 +11491,8 @@ document.getElementById("editGameCreatorSelected").innerHTML = `
     <span>${escapeHTML(game.creator)}</span>
 `;
 
-renderCreatorBank(
-    "edit",
-    game.creator
-);
-
-    document.getElementById("editGameCreatorSearch").value =
-        game.creator;
+document.getElementById("editGameCreatorSearch").value =
+    "";
 
     document.getElementById("editGameCreatorSelected").innerHTML = `
         ${getParticipantIconHTML(game.creator)}
