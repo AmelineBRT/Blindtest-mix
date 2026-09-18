@@ -6944,7 +6944,9 @@ function toggleFilters() {
 
 
    
-function renderFilters() {
+async function renderFilters() {
+
+    await loadPeopleFromCloud();
 
     const container =
         document.getElementById(
@@ -7351,25 +7353,18 @@ participantMenu.className =
     "multi-filter-menu";
 
 
+/* Liste des personnes de la banque */
+
 const participants =
     [...new Map(
-        games
-            .flatMap(function(game) {
-                return Array.isArray(game.participants)
-                    ? game.participants
-                    : [];
+        (Array.isArray(people) ? people : [])
+            .filter(function(person) {
+                return person && person.nom;
             })
-            .concat(
-                groups.flatMap(function(group) {
-                    return Array.isArray(group.participants)
-                        ? group.participants
-                        : [];
-                })
-            )
-            .map(function(name) {
+            .map(function(person) {
                 return [
-                    name.toLowerCase(),
-                    name
+                    person.nom.toLowerCase(),
+                    person.nom
                 ];
             })
     ).values()]
@@ -7427,8 +7422,10 @@ if (participants.length === 0) {
                     if (
                         !selectedParticipants.some(
                             function(item) {
+
                                 return item.toLowerCase() ===
                                        participant.toLowerCase();
+
                             }
                         )
                     ) {
@@ -7462,8 +7459,10 @@ if (participants.length === 0) {
         const text =
             document.createElement("span");
 
-        text.textContent =
-            "👥 " + participant;
+        text.innerHTML =
+            getParticipantIconHTML(participant) +
+            " " +
+            escapeHTML(participant);
 
         label.appendChild(
             checkbox
@@ -7501,6 +7500,9 @@ filterRow.appendChild(
 
 }
 
+
+
+   
 function toggleMultiFilterMenu(menuId) {
 
     const menu =
