@@ -620,21 +620,24 @@ button:disabled {
     color: white;
 }
 
-#participantFilterMenu .multi-filter-option {
+#participantFilterMenu .participant-person-icon,
+#creatorFilterMenu .participant-person-icon {
     display: flex;
     align-items: center;
     flex-wrap: nowrap;
     white-space: nowrap;
 }
 
-#participantFilterMenu .multi-filter-option span {
+#participantFilterMenu .participant-person-icon,
+#creatorFilterMenu .participant-person-icon {
     display: inline-flex;
     align-items: center;
     flex-wrap: nowrap;
     white-space: nowrap;
 }
 
-#participantFilterMenu .participant-person-icon {
+#participantFilterMenu .participant-person-icon,
+#creatorFilterMenu .participant-person-icon {
     transform: scale(0.65);
     transform-origin: center;
     flex: 0 0 auto;
@@ -2012,6 +2015,13 @@ label {
     color: #888;
     font-size: 13px;
 }
+
+
+.multi-filter-menu {
+    max-width: calc(100vw - 10px);
+    box-sizing: border-box;
+}
+   
    
 .filter-container {
     margin-top: 15px;
@@ -2142,6 +2152,18 @@ label {
     background: transparent;
     color: inherit;
     font-size: 16px;
+}
+
+   .active-filter-creator {
+    background: #fff4c7;
+}
+
+.active-filter-group {
+    background: #dcecff;
+}
+
+.active-filter-participant {
+    background: #eadcf0;
 }
 
 .reset-filters {
@@ -7043,24 +7065,30 @@ async function renderFilters() {
 
     /* Liste des créateurs */
 
-    const creators =
-        [...new Set(
-            games
-                .map(function(game) {
-                    return game.creator;
-                })
-                .filter(Boolean)
-        )].sort(
-            function(a, b) {
-                return a.localeCompare(
-                    b,
-                    "fr",
-                    {
-                        sensitivity: "base"
-                    }
-                );
+   const creators =
+    [...new Map(
+        (Array.isArray(people) ? people : [])
+            .filter(function(person) {
+                return person && person.nom;
+            })
+            .map(function(person) {
+                return [
+                    person.nom.toLowerCase(),
+                    person.nom
+                ];
+            })
+    ).values()]
+    .sort(function(a, b) {
+
+        return a.localeCompare(
+            b,
+            "fr",
+            {
+                sensitivity: "base"
             }
         );
+
+    });
 
 
     if (creators.length === 0) {
@@ -7122,10 +7150,12 @@ async function renderFilters() {
                 };
 
             const text =
-                document.createElement("span");
+    document.createElement("span");
 
-            text.textContent =
-                "💡 " + creator;
+text.innerHTML =
+    getParticipantIconHTML(creator) +
+    " " +
+    escapeHTML(creator);
 
             label.appendChild(
                 checkbox
@@ -7554,82 +7584,126 @@ function toggleMultiFilterMenu(menuId) {
                     "visible"
                 );
 
-                otherMenu.style.marginLeft = "0px";
-                otherMenu.style.marginTop = "0px";
+                otherMenu.style.left = "";
+                otherMenu.style.top = "";
+                otherMenu.style.position = "";
 
             }
 
         });
 
-    menu.style.marginLeft = "0px";
-    menu.style.marginTop = "0px";
+    const willOpen =
+        !menu.classList.contains("visible");
 
     menu.classList.toggle(
-        "visible"
+        "visible",
+        willOpen
     );
 
-    if (!menu.classList.contains("visible")) {
+    if (!willOpen) {
         return;
     }
 
+    const wrapper =
+        menu.closest(".multi-filter-wrapper");
+
+    const button =
+        wrapper
+            ? wrapper.querySelector(
+                ".multi-filter-button"
+            )
+            : null;
+
+    if (!button) {
+        return;
+    }
+
+    menu.style.position = "fixed";
+    menu.style.left = "0px";
+    menu.style.top = "0px";
+    menu.style.right = "auto";
+    menu.style.bottom = "auto";
+    menu.style.margin = "0";
+    menu.style.transform = "none";
+
     requestAnimationFrame(function() {
 
-        const rect =
+        const buttonRect =
+            button.getBoundingClientRect();
+
+        const menuRect =
             menu.getBoundingClientRect();
 
         const margin =
             5;
 
-        let offsetX =
-            0;
+        const gap =
+            4;
 
-        let offsetY =
-            0;
+        let left =
+            buttonRect.left;
+
+        let top =
+            buttonRect.bottom + gap;
 
 
-        if (rect.right > window.innerWidth - margin) {
+        /* =========================
+           DÉCALAGE HORIZONTAL
+           ========================= */
 
-            offsetX =
+        if (
+            left +
+            menuRect.width >
+            window.innerWidth -
+            margin
+        ) {
+
+            left =
                 window.innerWidth -
                 margin -
-                rect.right;
+                menuRect.width;
+
+        }
+
+        if (left < margin) {
+
+            left =
+                margin;
 
         }
 
 
-        if (rect.left + offsetX < margin) {
+        /* =========================
+           DÉCALAGE VERTICAL
+           ========================= */
 
-            offsetX =
-                margin -
-                (rect.left + offsetX);
+        if (
+            top +
+            menuRect.height >
+            window.innerHeight -
+            margin
+        ) {
+
+            top =
+                buttonRect.top -
+                menuRect.height -
+                gap;
+
+        }
+
+        if (top < margin) {
+
+            top =
+                margin;
 
         }
 
 
-        if (rect.bottom > window.innerHeight - margin) {
+        menu.style.left =
+            left + "px";
 
-            offsetY =
-                window.innerHeight -
-                margin -
-                rect.bottom;
-
-        }
-
-
-        if (rect.top + offsetY < margin) {
-
-            offsetY =
-                margin -
-                (rect.top + offsetY);
-
-        }
-
-
-        menu.style.marginLeft =
-            offsetX + "px";
-
-        menu.style.marginTop =
-            offsetY + "px";
+        menu.style.top =
+            top + "px";
 
     });
 
@@ -7711,8 +7785,8 @@ function renderActiveFilters() {
         const chip =
             document.createElement("div");
 
-        chip.className =
-            "active-filter";
+chip.className =
+    "active-filter active-filter-creator";
 
        chip.innerHTML =
     "<span class=\"active-filter-person\">💡 " +
@@ -7756,8 +7830,8 @@ selectedGroups.forEach(function(groupId) {
         const chip =
             document.createElement("div");
 
-        chip.className =
-            "active-filter";
+chip.className =
+    "active-filter active-filter-group";
 
         chip.innerHTML =
             "<span>🎭 Indépendant</span>" +
@@ -7797,8 +7871,8 @@ selectedGroups.forEach(function(groupId) {
         const chip =
             document.createElement("div");
 
-        chip.className =
-            "active-filter";
+chip.className =
+    "active-filter active-filter-group";
 
         chip.innerHTML =
             "<span>🎉 " +
@@ -7838,8 +7912,8 @@ selectedParticipants.forEach(
         const chip =
             document.createElement("div");
 
-        chip.className =
-            "active-filter";
+chip.className =
+    "active-filter active-filter-participant";
 
         chip.innerHTML =
     "<span class=\"active-filter-person\">👥 " +
