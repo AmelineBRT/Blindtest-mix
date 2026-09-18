@@ -2162,6 +2162,10 @@ label {
     background: #eef7ff;
 }
 
+   .active-filter-group .active-filter-category-icon {
+    top: -7px;
+}
+
 .active-filter-participant {
     background: #f3ebf6;
 }
@@ -7058,6 +7062,154 @@ async function renderFilters() {
 
     container.innerHTML = "";
 
+
+    /* ==================================================
+       OUTIL : VÉRIFIER SI UNE PARTIE CORRESPOND
+       AUX AUTRES FILTRES
+       ================================================== */
+
+    function gameMatchesFilters(
+        game,
+        ignoreFilter
+    ) {
+
+        const normalizedGroupId =
+            game.groupId || "";
+
+
+        const matchesCreator =
+            ignoreFilter === "creator" ||
+            selectedCreators.length === 0 ||
+            selectedCreators.some(
+                function(creator) {
+
+                    return creator.toLowerCase() ===
+                           (game.creator || "").toLowerCase();
+
+                }
+            );
+
+
+        const matchesGroup =
+            ignoreFilter === "group" ||
+            selectedGroups.length === 0 ||
+            selectedGroups.includes(
+                normalizedGroupId
+            );
+
+
+        const matchesParticipant =
+            ignoreFilter === "participant" ||
+            selectedParticipants.length === 0 ||
+            selectedParticipants.some(
+                function(selectedParticipant) {
+
+                    return Array.isArray(
+                        game.participants
+                    ) &&
+                    game.participants.some(
+                        function(participant) {
+
+                            return participant.toLowerCase() ===
+                                   selectedParticipant.toLowerCase();
+
+                        }
+                    );
+
+                }
+            );
+
+
+        return (
+            matchesCreator &&
+            matchesGroup &&
+            matchesParticipant
+        );
+
+    }
+
+
+    /* ==================================================
+       OUTIL : VÉRIFIER SI UN GROUPE CORRESPOND
+       AUX AUTRES FILTRES
+       ================================================== */
+
+    function groupMatchesFilters(
+        group,
+        ignoreFilter
+    ) {
+
+        const matchesGroup =
+            ignoreFilter === "group" ||
+            selectedGroups.length === 0 ||
+            selectedGroups.includes(
+                group.id
+            );
+
+
+        const matchesParticipant =
+            ignoreFilter === "participant" ||
+            selectedParticipants.length === 0 ||
+            (
+                Array.isArray(group.participants) &&
+                selectedParticipants.some(
+                    function(selectedParticipant) {
+
+                        return group.participants.some(
+                            function(participant) {
+
+                                return participant.toLowerCase() ===
+                                       selectedParticipant.toLowerCase();
+
+                            }
+                        );
+
+                    }
+                )
+            );
+
+
+        let matchesCreator = true;
+
+
+        if (
+            ignoreFilter !== "creator" &&
+            selectedCreators.length > 0
+        ) {
+
+            matchesCreator =
+                games.some(
+                    function(game) {
+
+                        return (
+                            (game.groupId || "") ===
+                            group.id
+                            &&
+                            selectedCreators.some(
+                                function(creator) {
+
+                                    return creator.toLowerCase() ===
+                                           (game.creator || "").toLowerCase();
+
+                                }
+                            )
+                        );
+
+                    }
+                );
+
+        }
+
+
+        return (
+            matchesGroup &&
+            matchesParticipant &&
+            matchesCreator
+        );
+
+    }
+
+
     /* ==================================================
        LIGNE DES BOUTONS DE FILTRE
        ================================================== */
@@ -7079,14 +7231,15 @@ async function renderFilters() {
     creatorWrapper.className =
         "multi-filter-wrapper";
 
+
     const creatorButton =
         document.createElement("button");
 
     creatorButton.type =
         "button";
 
-creatorButton.className =
-    "multi-filter-button creator-filter-button";
+    creatorButton.className =
+        "multi-filter-button creator-filter-button";
 
     creatorButton.textContent =
         "💡 Créateur ▼";
@@ -7102,6 +7255,7 @@ creatorButton.className =
 
         };
 
+
     const creatorMenu =
         document.createElement("div");
 
@@ -7112,32 +7266,90 @@ creatorButton.className =
         "multi-filter-menu";
 
 
-    /* Liste des créateurs */
+    /* ==================================================
+       PERSONNES DISPONIBLES COMME CRÉATEURS
+       ================================================== */
 
-   const creators =
-    [...new Map(
-        (Array.isArray(people) ? people : [])
-            .filter(function(person) {
-                return person && person.nom;
-            })
-            .map(function(person) {
-                return [
-                    person.nom.toLowerCase(),
-                    person.nom
-                ];
-            })
-    ).values()]
-    .sort(function(a, b) {
+    const compatibleGamesForCreators =
+        games.filter(
+            function(game) {
 
-        return a.localeCompare(
-            b,
-            "fr",
-            {
-                sensitivity: "base"
+                return gameMatchesFilters(
+                    game,
+                    "creator"
+                );
+
             }
         );
 
-    });
+
+    const creatorNames =
+        new Set();
+
+
+    compatibleGamesForCreators.forEach(
+        function(game) {
+
+            if (game.creator) {
+
+                creatorNames.add(
+                    game.creator.toLowerCase()
+                );
+
+            }
+
+        }
+    );
+
+
+    /* Garder les créateurs déjà sélectionnés */
+
+    selectedCreators.forEach(
+        function(creator) {
+
+            creatorNames.add(
+                creator.toLowerCase()
+            );
+
+        }
+    );
+
+
+    const creators =
+        people
+            .filter(
+                function(person) {
+
+                    return (
+                        person &&
+                        person.nom &&
+                        creatorNames.has(
+                            person.nom.toLowerCase()
+                        )
+                    );
+
+                }
+            )
+            .map(
+                function(person) {
+
+                    return person.nom;
+
+                }
+            )
+            .sort(
+                function(a, b) {
+
+                    return a.localeCompare(
+                        b,
+                        "fr",
+                        {
+                            sensitivity: "base"
+                        }
+                    );
+
+                }
+            );
 
 
     if (creators.length === 0) {
@@ -7149,78 +7361,107 @@ creatorButton.className =
 
     } else {
 
-        creators.forEach(function(creator) {
+        creators.forEach(
+            function(creator) {
 
-            const label =
-                document.createElement("label");
+                const label =
+                    document.createElement("label");
 
-            label.className =
-                "multi-filter-option";
+                label.className =
+                    "multi-filter-option";
 
-            const checkbox =
-                document.createElement("input");
 
-            checkbox.type =
-                "checkbox";
+                const checkbox =
+                    document.createElement("input");
 
-            checkbox.checked =
-                selectedCreators.includes(
-                    creator
+                checkbox.type =
+                    "checkbox";
+
+                checkbox.checked =
+                    selectedCreators.some(
+                        function(item) {
+
+                            return item.toLowerCase() ===
+                                   creator.toLowerCase();
+
+                        }
+                    );
+
+
+                checkbox.onchange =
+                    function() {
+
+                        if (this.checked) {
+
+                            if (
+                                !selectedCreators.some(
+                                    function(item) {
+
+                                        return item.toLowerCase() ===
+                                               creator.toLowerCase();
+
+                                    }
+                                )
+                            ) {
+
+                                selectedCreators.push(
+                                    creator
+                                );
+
+                            }
+
+                        } else {
+
+                            selectedCreators =
+                                selectedCreators.filter(
+                                    function(item) {
+
+                                        return item.toLowerCase() !==
+                                               creator.toLowerCase();
+
+                                    }
+                                );
+
+                        }
+
+
+                        renderActiveFilters();
+                        renderFilters();
+                        renderGames();
+
+                    };
+
+
+                const text =
+                    document.createElement("span");
+
+                text.innerHTML =
+                    getParticipantIconHTML(
+                        creator
+                    ) +
+                    " " +
+                    escapeHTML(
+                        creator
+                    );
+
+
+                label.appendChild(
+                    checkbox
                 );
 
-            checkbox.onchange =
-                function() {
+                label.appendChild(
+                    text
+                );
 
-                    if (
-                        this.checked &&
-                        !selectedCreators.includes(
-                            creator
-                        )
-                    ) {
+                creatorMenu.appendChild(
+                    label
+                );
 
-                        selectedCreators.push(
-                            creator
-                        );
-
-                    } else {
-
-                        selectedCreators =
-                            selectedCreators.filter(
-                                function(item) {
-                                    return item !== creator;
-                                }
-                            );
-
-                    }
-
-                    renderActiveFilters();
-                    renderGames();
-
-                };
-
-            const text =
-    document.createElement("span");
-
-text.innerHTML =
-    getParticipantIconHTML(creator) +
-    " " +
-    escapeHTML(creator);
-
-            label.appendChild(
-                checkbox
-            );
-
-            label.appendChild(
-                text
-            );
-
-            creatorMenu.appendChild(
-                label
-            );
-
-        });
+            }
+        );
 
     }
+
 
     creatorWrapper.appendChild(
         creatorButton
@@ -7239,7 +7480,89 @@ text.innerHTML =
        BOUTON GROUPE
        ================================================== */
 
-    if (groups.length > 0) {
+    const availableGroups =
+        groups.filter(
+            function(group) {
+
+                return groupMatchesFilters(
+                    group,
+                    "group"
+                );
+
+            }
+        );
+
+
+    /* Garder les groupes actuellement sélectionnés */
+
+    selectedGroups.forEach(
+        function(groupId) {
+
+            if (groupId === "") {
+                return;
+            }
+
+            const alreadyExists =
+                availableGroups.some(
+                    function(group) {
+
+                        return group.id ===
+                               groupId;
+
+                    }
+                );
+
+
+            if (!alreadyExists) {
+
+                const selectedGroup =
+                    groups.find(
+                        function(group) {
+
+                            return group.id ===
+                                   groupId;
+
+                        }
+                    );
+
+                if (selectedGroup) {
+
+                    availableGroups.push(
+                        selectedGroup
+                    );
+
+                }
+
+            }
+
+        }
+    );
+
+
+    const independentAvailable =
+        games.some(
+            function(game) {
+
+                return (
+                    !game.groupId &&
+                    gameMatchesFilters(
+                        game,
+                        "group"
+                    )
+                );
+
+            }
+        );
+
+
+    if (
+        groups.length > 0 &&
+        (
+            availableGroups.length > 0 ||
+            independentAvailable ||
+            selectedGroups.includes("")
+        )
+    ) {
 
         const groupWrapper =
             document.createElement("div");
@@ -7247,14 +7570,15 @@ text.innerHTML =
         groupWrapper.className =
             "multi-filter-wrapper";
 
+
         const groupButton =
             document.createElement("button");
 
         groupButton.type =
             "button";
 
-groupButton.className =
-    "multi-filter-button group-filter-button";
+        groupButton.className =
+            "multi-filter-button group-filter-button";
 
         groupButton.textContent =
             "🎉 Groupe ▼";
@@ -7270,6 +7594,7 @@ groupButton.className =
 
             };
 
+
         const groupMenu =
             document.createElement("div");
 
@@ -7279,134 +7604,193 @@ groupButton.className =
         groupMenu.className =
             "multi-filter-menu";
 
-const independentLabel =
-    document.createElement("label");
 
-independentLabel.className =
-    "multi-filter-option";
+        /* =========================
+           GROUPE INDÉPENDANT
+           ========================= */
 
-const independentCheckbox =
-    document.createElement("input");
+        if (
+            independentAvailable ||
+            selectedGroups.includes("")
+        ) {
 
-independentCheckbox.type =
-    "checkbox";
-
-independentCheckbox.checked =
-    selectedGroups.includes("");
-
-independentCheckbox.onchange =
-    function() {
-
-        if (this.checked) {
-
-            if (!selectedGroups.includes("")) {
-
-                selectedGroups.push("");
-
-            }
-
-        } else {
-
-            selectedGroups =
-                selectedGroups.filter(
-                    function(item) {
-                        return item !== "";
-                    }
-                );
-
-        }
-
-        renderActiveFilters();
-        renderGames();
-
-    };
-
-const independentText =
-    document.createElement("span");
-
-independentText.textContent =
-    "🎭 Indépendant";
-
-independentLabel.appendChild(
-    independentCheckbox
-);
-
-independentLabel.appendChild(
-    independentText
-);
-
-groupMenu.appendChild(
-    independentLabel
-);
-       
-        groups.forEach(function(group) {
-
-            const label =
+            const independentLabel =
                 document.createElement("label");
 
-            label.className =
+            independentLabel.className =
                 "multi-filter-option";
 
-            const checkbox =
+
+            const independentCheckbox =
                 document.createElement("input");
 
-            checkbox.type =
+            independentCheckbox.type =
                 "checkbox";
 
-            checkbox.checked =
-                selectedGroups.includes(
-                    group.id
-                );
+            independentCheckbox.checked =
+                selectedGroups.includes("");
 
-            checkbox.onchange =
+
+            independentCheckbox.onchange =
                 function() {
 
-                    if (
-                        this.checked &&
-                        !selectedGroups.includes(
-                            group.id
-                        )
-                    ) {
+                    if (this.checked) {
 
-                        selectedGroups.push(
-                            group.id
-                        );
+                        if (
+                            !selectedGroups.includes("")
+                        ) {
+
+                            selectedGroups.push(
+                                ""
+                            );
+
+                        }
 
                     } else {
 
                         selectedGroups =
                             selectedGroups.filter(
                                 function(item) {
-                                    return item !== group.id;
+
+                                    return item !== "";
+
                                 }
                             );
 
                     }
 
+
                     renderActiveFilters();
+                    renderFilters();
                     renderGames();
 
                 };
 
-            const text =
+
+            const independentText =
                 document.createElement("span");
 
-            text.textContent =
-                "🎉 " + group.name;
+            independentText.textContent =
+                "🎭 Indépendant";
 
-            label.appendChild(
-                checkbox
+
+            independentLabel.appendChild(
+                independentCheckbox
             );
 
-            label.appendChild(
-                text
+            independentLabel.appendChild(
+                independentText
             );
 
             groupMenu.appendChild(
-                label
+                independentLabel
             );
 
-        });
+        }
+
+
+        /* =========================
+           GROUPES DISPONIBLES
+           ========================= */
+
+        availableGroups
+            .sort(
+                function(a, b) {
+
+                    return a.name.localeCompare(
+                        b.name,
+                        "fr",
+                        {
+                            sensitivity: "base"
+                        }
+                    );
+
+                }
+            )
+            .forEach(
+                function(group) {
+
+                    const label =
+                        document.createElement("label");
+
+                    label.className =
+                        "multi-filter-option";
+
+
+                    const checkbox =
+                        document.createElement("input");
+
+                    checkbox.type =
+                        "checkbox";
+
+                    checkbox.checked =
+                        selectedGroups.includes(
+                            group.id
+                        );
+
+
+                    checkbox.onchange =
+                        function() {
+
+                            if (this.checked) {
+
+                                if (
+                                    !selectedGroups.includes(
+                                        group.id
+                                    )
+                                ) {
+
+                                    selectedGroups.push(
+                                        group.id
+                                    );
+
+                                }
+
+                            } else {
+
+                                selectedGroups =
+                                    selectedGroups.filter(
+                                        function(item) {
+
+                                            return item !==
+                                                   group.id;
+
+                                        }
+                                    );
+
+                            }
+
+
+                            renderActiveFilters();
+                            renderFilters();
+                            renderGames();
+
+                        };
+
+
+                    const text =
+                        document.createElement("span");
+
+                    text.textContent =
+                        "🎉 " +
+                        group.name;
+
+
+                    label.appendChild(
+                        checkbox
+                    );
+
+                    label.appendChild(
+                        text
+                    );
+
+                    groupMenu.appendChild(
+                        label
+                    );
+
+                }
+            );
+
 
         groupWrapper.appendChild(
             groupButton
@@ -7421,196 +7805,328 @@ groupMenu.appendChild(
         );
 
     }
-/* ==================================================
-   BOUTON PARTICIPANTS
-   ================================================== */
-
-const participantWrapper =
-    document.createElement("div");
-
-participantWrapper.className =
-    "multi-filter-wrapper";
-
-const participantButton =
-    document.createElement("button");
-
-participantButton.type =
-    "button";
-
-participantButton.className =
-    "multi-filter-button participant-filter-button";
-
-participantButton.textContent =
-    "👥 " + "Participants ▼";
-
-participantButton.onclick =
-    function(event) {
-
-        event.stopPropagation();
-
-        toggleMultiFilterMenu(
-            "participantFilterMenu"
-        );
-
-    };
-
-const participantMenu =
-    document.createElement("div");
-
-participantMenu.id =
-    "participantFilterMenu";
-
-participantMenu.className =
-    "multi-filter-menu";
 
 
-/* Liste des personnes de la banque */
+    /* ==================================================
+       BOUTON PARTICIPANTS
+       ================================================== */
 
-const participants =
-    [...new Map(
-        (Array.isArray(people) ? people : [])
-            .filter(function(person) {
-                return person && person.nom;
-            })
-            .map(function(person) {
-                return [
-                    person.nom.toLowerCase(),
-                    person.nom
-                ];
-            })
-    ).values()]
-    .sort(function(a, b) {
+    const participantWrapper =
+        document.createElement("div");
 
-        return a.localeCompare(
-            b,
-            "fr",
-            {
-                sensitivity: "base"
+    participantWrapper.className =
+        "multi-filter-wrapper";
+
+
+    const participantButton =
+        document.createElement("button");
+
+    participantButton.type =
+        "button";
+
+    participantButton.className =
+        "multi-filter-button participant-filter-button";
+
+    participantButton.textContent =
+        "👥 Participants ▼";
+
+    participantButton.onclick =
+        function(event) {
+
+            event.stopPropagation();
+
+            toggleMultiFilterMenu(
+                "participantFilterMenu"
+            );
+
+        };
+
+
+    const participantMenu =
+        document.createElement("div");
+
+    participantMenu.id =
+        "participantFilterMenu";
+
+    participantMenu.className =
+        "multi-filter-menu";
+
+
+    /* ==================================================
+       PERSONNES DISPONIBLES COMME PARTICIPANTS
+       ================================================== */
+
+    const participantNames =
+        new Set();
+
+
+    /* Participants des parties compatibles */
+
+    const compatibleGamesForParticipants =
+        games.filter(
+            function(game) {
+
+                return gameMatchesFilters(
+                    game,
+                    "participant"
+                );
+
             }
         );
 
-    });
+
+    compatibleGamesForParticipants.forEach(
+        function(game) {
+
+            if (
+                Array.isArray(
+                    game.participants
+                )
+            ) {
+
+                game.participants.forEach(
+                    function(name) {
+
+                        participantNames.add(
+                            name.toLowerCase()
+                        );
+
+                    }
+                );
+
+            }
+
+        }
+    );
 
 
-if (participants.length === 0) {
+    /* Participants des groupes compatibles */
 
-    participantMenu.innerHTML =
-        "<div class='multi-filter-empty'>" +
-        "Aucun participant disponible." +
-        "</div>";
+    const compatibleGroupsForParticipants =
+        groups.filter(
+            function(group) {
 
-} else {
+                return groupMatchesFilters(
+                    group,
+                    "participant"
+                );
 
-    participants.forEach(function(participant) {
+            }
+        );
 
-        const label =
-            document.createElement("label");
 
-        label.className =
-            "multi-filter-option";
+    compatibleGroupsForParticipants.forEach(
+        function(group) {
 
-        const checkbox =
-            document.createElement("input");
+            if (
+                Array.isArray(
+                    group.participants
+                )
+            ) {
 
-        checkbox.type =
-            "checkbox";
+                group.participants.forEach(
+                    function(name) {
 
-        checkbox.checked =
-            selectedParticipants.some(
-                function(item) {
+                        participantNames.add(
+                            name.toLowerCase()
+                        );
 
-                    return item.toLowerCase() ===
-                           participant.toLowerCase();
+                    }
+                );
+
+            }
+
+        }
+    );
+
+
+    /* Garder les participants actuellement sélectionnés */
+
+    selectedParticipants.forEach(
+        function(participant) {
+
+            participantNames.add(
+                participant.toLowerCase()
+            );
+
+        }
+    );
+
+
+    const participants =
+        people
+            .filter(
+                function(person) {
+
+                    return (
+                        person &&
+                        person.nom &&
+                        participantNames.has(
+                            person.nom.toLowerCase()
+                        )
+                    );
+
+                }
+            )
+            .map(
+                function(person) {
+
+                    return person.nom;
+
+                }
+            )
+            .sort(
+                function(a, b) {
+
+                    return a.localeCompare(
+                        b,
+                        "fr",
+                        {
+                            sensitivity: "base"
+                        }
+                    );
 
                 }
             );
 
-        checkbox.onchange =
-            function() {
 
-                if (this.checked) {
+    if (participants.length === 0) {
 
-                    if (
-                        !selectedParticipants.some(
-                            function(item) {
+        participantMenu.innerHTML =
+            "<div class='multi-filter-empty'>" +
+            "Aucun participant disponible." +
+            "</div>";
 
-                                return item.toLowerCase() ===
-                                       participant.toLowerCase();
+    } else {
+
+        participants.forEach(
+            function(participant) {
+
+                const label =
+                    document.createElement("label");
+
+                label.className =
+                    "multi-filter-option";
+
+
+                const checkbox =
+                    document.createElement("input");
+
+                checkbox.type =
+                    "checkbox";
+
+
+                checkbox.checked =
+                    selectedParticipants.some(
+                        function(item) {
+
+                            return item.toLowerCase() ===
+                                   participant.toLowerCase();
+
+                        }
+                    );
+
+
+                checkbox.onchange =
+                    function() {
+
+                        if (this.checked) {
+
+                            if (
+                                !selectedParticipants.some(
+                                    function(item) {
+
+                                        return item.toLowerCase() ===
+                                               participant.toLowerCase();
+
+                                    }
+                                )
+                            ) {
+
+                                selectedParticipants.push(
+                                    participant
+                                );
 
                             }
-                        )
-                    ) {
 
-                        selectedParticipants.push(
-                            participant
-                        );
+                        } else {
 
-                    }
+                            selectedParticipants =
+                                selectedParticipants.filter(
+                                    function(item) {
 
-                } else {
+                                        return item.toLowerCase() !==
+                                               participant.toLowerCase();
 
-                    selectedParticipants =
-                        selectedParticipants.filter(
-                            function(item) {
+                                    }
+                                );
 
-                                return item.toLowerCase() !==
-                                       participant.toLowerCase();
-
-                            }
-                        );
-
-                }
-
-                renderActiveFilters();
-                renderGames();
-
-            };
+                        }
 
 
-        const text =
-            document.createElement("span");
+                        renderActiveFilters();
+                        renderFilters();
+                        renderGames();
 
-        text.innerHTML =
-            getParticipantIconHTML(participant) +
-            " " +
-            escapeHTML(participant);
+                    };
 
-        label.appendChild(
-            checkbox
+
+                const text =
+                    document.createElement("span");
+
+                text.innerHTML =
+                    getParticipantIconHTML(
+                        participant
+                    ) +
+                    " " +
+                    escapeHTML(
+                        participant
+                    );
+
+
+                label.appendChild(
+                    checkbox
+                );
+
+                label.appendChild(
+                    text
+                );
+
+                participantMenu.appendChild(
+                    label
+                );
+
+            }
         );
 
-        label.appendChild(
-            text
-        );
+    }
 
-        participantMenu.appendChild(
-            label
-        );
 
-    });
+    participantWrapper.appendChild(
+        participantButton
+    );
 
-}
+    participantWrapper.appendChild(
+        participantMenu
+    );
 
-participantWrapper.appendChild(
-    participantButton
-);
+    filterRow.appendChild(
+        participantWrapper
+    );
 
-participantWrapper.appendChild(
-    participantMenu
-);
 
-filterRow.appendChild(
-    participantWrapper
-);
+    /* ==================================================
+       AFFICHER LA LIGNE
+       ================================================== */
 
     container.appendChild(
         filterRow
     );
 
+
     renderActiveFilters();
 
 }
-
 
 
    
