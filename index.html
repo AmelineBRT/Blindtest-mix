@@ -11871,7 +11871,9 @@ async function addExistingPersonToParticipants(type, personId) {
 
 }
 
- async function addParticipant(type) {
+async function addParticipant(type) {
+
+    await loadPeopleFromCloud();
 
     const item =
         type === "game"
@@ -11889,16 +11891,52 @@ async function addExistingPersonToParticipants(type, personId) {
             type + "ParticipantInput"
         );
 
-    const name =
-        input.value.trim();
+    const searchText =
+        input
+            ? input.value.trim()
+            : "";
 
-    if (!name) {
+    if (!searchText) {
         return;
     }
 
-    if (!Array.isArray(item.participants)) {
-        item.participants = [];
+
+    /* ========================================================
+       RETROUVER LA VRAIE PERSONNE DANS LA BANQUE
+       ======================================================== */
+
+    const person =
+        people.find(function(person) {
+
+            return person.nom.toLowerCase() ===
+                   searchText.toLowerCase();
+
+        });
+
+
+    if (!person) {
+
+        alert(
+            "Cette personne n'existe pas dans la banque des participants."
+        );
+
+        input.focus();
+
+        return;
+
     }
+
+
+    const name =
+        person.nom;
+
+
+    if (!Array.isArray(item.participants)) {
+
+        item.participants = [];
+
+    }
+
 
     const alreadyExists =
         item.participants.some(function(participant) {
@@ -11907,6 +11945,7 @@ async function addExistingPersonToParticipants(type, personId) {
                    name.toLowerCase();
 
         });
+
 
     if (alreadyExists) {
 
@@ -11920,7 +11959,10 @@ async function addExistingPersonToParticipants(type, personId) {
 
     }
 
-    item.participants.push(name);
+
+    item.participants.push(
+        name
+    );
 
 
     /*
@@ -11938,7 +11980,9 @@ async function addExistingPersonToParticipants(type, personId) {
             }
 
             if (!Array.isArray(game.participants)) {
+
                 game.participants = [];
+
             }
 
             const alreadyInGame =
@@ -11951,9 +11995,12 @@ async function addExistingPersonToParticipants(type, personId) {
                     }
                 );
 
+
             if (!alreadyInGame) {
 
-                game.participants.push(name);
+                game.participants.push(
+                    name
+                );
 
             }
 
@@ -11977,12 +12024,6 @@ async function addExistingPersonToParticipants(type, personId) {
 
         if (type === "game") {
 
-            const personneId =
-                Date.now().toString() +
-                Math.random()
-                    .toString(36)
-                    .substring(2, 7);
-
             const response =
                 await fetch(
                     "https://blindtestmix.amelinebrt.workers.dev/partie-personnes",
@@ -11999,10 +12040,10 @@ async function addExistingPersonToParticipants(type, personId) {
                                 item.id,
 
                             personne_id:
-                                personneId,
+                                person.id,
 
                             nom:
-                                name
+                                person.nom
 
                         })
 
@@ -12032,13 +12073,6 @@ async function addExistingPersonToParticipants(type, personId) {
 
         if (type === "group") {
 
-            const personneId =
-                Date.now().toString() +
-                Math.random()
-                    .toString(36)
-                    .substring(2, 7);
-
-
             const groupResponse =
                 await fetch(
                     "https://blindtestmix.amelinebrt.workers.dev/group-personnes",
@@ -12055,10 +12089,10 @@ async function addExistingPersonToParticipants(type, personId) {
                                 item.id,
 
                             personne_id:
-                                personneId,
+                                person.id,
 
                             nom:
-                                name
+                                person.nom
 
                         })
 
@@ -12102,12 +12136,6 @@ async function addExistingPersonToParticipants(type, personId) {
                     continue;
                 }
 
-                const alreadyInCloud =
-                    false;
-
-                const gamePersonId =
-                    personneId;
-
 
                 const gameResponse =
                     await fetch(
@@ -12125,10 +12153,10 @@ async function addExistingPersonToParticipants(type, personId) {
                                     game.id,
 
                                 personne_id:
-                                    gamePersonId,
+                                    person.id,
 
                                 nom:
-                                    name
+                                    person.nom
 
                             })
 
