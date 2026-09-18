@@ -3422,7 +3422,20 @@ background: #ffffff;
 
 }
 
-   
+   .active-filter-person {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+}
+
+.active-filter-person .participant-person-icon {
+    transform: scale(0.65);
+    transform-origin: center;
+    flex: 0 0 auto;
+    margin-left: -2px;
+    margin-right: -5px;
+}
    
 
    
@@ -7527,6 +7540,10 @@ function toggleMultiFilterMenu(menuId) {
     const menu =
         document.getElementById(menuId);
 
+    if (!menu) {
+        return;
+    }
+
     document
         .querySelectorAll(".multi-filter-menu")
         .forEach(function(otherMenu) {
@@ -7537,42 +7554,86 @@ function toggleMultiFilterMenu(menuId) {
                     "visible"
                 );
 
+                otherMenu.style.marginLeft = "0px";
+                otherMenu.style.marginTop = "0px";
+
             }
 
         });
+
+    menu.style.marginLeft = "0px";
+    menu.style.marginTop = "0px";
 
     menu.classList.toggle(
         "visible"
     );
 
-}
+    if (!menu.classList.contains("visible")) {
+        return;
+    }
 
-document.addEventListener(
-    "click",
-    function(event) {
+    requestAnimationFrame(function() {
 
-        if (
-            !event.target.closest(
-                ".multi-filter-wrapper"
-            )
-        ) {
+        const rect =
+            menu.getBoundingClientRect();
 
-            document
-                .querySelectorAll(
-                    ".multi-filter-menu"
-                )
-                .forEach(function(menu) {
+        const margin =
+            5;
 
-                    menu.classList.remove(
-                        "visible"
-                    );
+        let offsetX =
+            0;
 
-                });
+        let offsetY =
+            0;
+
+
+        if (rect.right > window.innerWidth - margin) {
+
+            offsetX =
+                window.innerWidth -
+                margin -
+                rect.right;
 
         }
 
-    }
-);
+
+        if (rect.left + offsetX < margin) {
+
+            offsetX =
+                margin -
+                (rect.left + offsetX);
+
+        }
+
+
+        if (rect.bottom > window.innerHeight - margin) {
+
+            offsetY =
+                window.innerHeight -
+                margin -
+                rect.bottom;
+
+        }
+
+
+        if (rect.top + offsetY < margin) {
+
+            offsetY =
+                margin -
+                (rect.top + offsetY);
+
+        }
+
+
+        menu.style.marginLeft =
+            offsetX + "px";
+
+        menu.style.marginTop =
+            offsetY + "px";
+
+    });
+
+}
    
 function toggleCreatorFilter(creator) {
 
@@ -7653,13 +7714,16 @@ function renderActiveFilters() {
         chip.className =
             "active-filter";
 
-        chip.innerHTML =
-            "<span>💡 " +
-            escapeHTML(creator) +
-            "</span>" +
-            "<button type=\"button\" title=\"Supprimer ce filtre\">×</button>";
-
+       chip.innerHTML =
+    "<span class=\"active-filter-person\">💡 " +
+    getParticipantIconHTML(creator) +
+    " " +
+    escapeHTML(creator) +
+    "</span>" +
+    "<button type=\"button\" title=\"Supprimer ce filtre\">×</button>";
+       
         chip.querySelector("button").onclick =
+           
             function() {
 
                 selectedCreators =
@@ -7778,10 +7842,12 @@ selectedParticipants.forEach(
             "active-filter";
 
         chip.innerHTML =
-            "<span>👥 " +
-            escapeHTML(participant) +
-            "</span>" +
-            "<button type=\"button\" title=\"Supprimer ce filtre\">×</button>";
+    "<span class=\"active-filter-person\">👥 " +
+    getParticipantIconHTML(participant) +
+    " " +
+    escapeHTML(participant) +
+    "</span>" +
+    "<button type=\"button\" title=\"Supprimer ce filtre\">×</button>";
 
         chip.querySelector("button").onclick =
             function() {
