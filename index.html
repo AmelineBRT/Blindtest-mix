@@ -1204,6 +1204,65 @@ max-height: calc(100vh - 90px);
     z-index: 1;
 }
 
+   .person-selector {
+    position: relative;
+    width: 100%;
+    min-height: 38px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    background: white;
+    cursor: pointer;
+}
+
+.person-selector-placeholder {
+    color: #888;
+}
+
+.person-selector-options {
+    display: none;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: -5px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    background: white;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.person-selector-options.visible {
+    display: block;
+}
+
+.person-selector-option {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border: none;
+    border-bottom: 1px solid #eee;
+    background: white;
+    text-align: left;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.person-selector-option:last-child {
+    border-bottom: none;
+}
+
+.person-selector-option:hover {
+    background: #f5f5f5;
+}
+
 .people-bank-emoji-character {
     position: relative;
 
@@ -3957,10 +4016,27 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
     <input id="editGameName" type="text">
 
-    <label>Créé par</label>
+   <label>Créé par</label>
 
-    <input id="editGameCreator" type="text">
+<input
+    id="editGameCreator"
+    type="hidden">
 
+<div
+    id="editGameCreatorSelector"
+    class="person-selector"
+    onclick="toggleCreatorSelector('edit')">
+
+    <span class="person-selector-placeholder">
+        Choisir une personne
+    </span>
+
+</div>
+
+<div
+    id="editGameCreatorOptions"
+    class="person-selector-options">
+</div>
     <label>Groupe</label>
 
     <select id="editGameGroup">
@@ -8237,6 +8313,127 @@ return (
 
 }
 
+
+function updateCreatorSelector(type, name) {
+
+    const selector =
+        document.getElementById(
+            type === "game"
+                ? "gameCreatorSelector"
+                : "editGameCreatorSelector"
+        );
+
+    const input =
+        document.getElementById(
+            type === "game"
+                ? "gameCreator"
+                : "editGameCreator"
+        );
+
+    if (!selector || !input) {
+        return;
+    }
+
+    input.value = name || "";
+
+    if (!name) {
+
+        selector.innerHTML = `
+            <span class="person-selector-placeholder">
+                Choisir une personne
+            </span>
+        `;
+
+        return;
+    }
+
+    selector.innerHTML = `
+        ${getParticipantIconHTML(name)}
+        <span>${escapeHTML(name)}</span>
+    `;
+}
+
+
+async function renderCreatorOptions(type) {
+
+    await loadPeopleFromCloud();
+
+    const options =
+        document.getElementById(
+            type === "game"
+                ? "gameCreatorOptions"
+                : "editGameCreatorOptions"
+        );
+
+    if (!options) {
+        return;
+    }
+
+    options.innerHTML = "";
+
+    people.forEach(function(person) {
+
+        const option =
+            document.createElement("button");
+
+        option.type = "button";
+
+        option.className =
+            "person-selector-option";
+
+        option.innerHTML = `
+            ${getParticipantIconHTML(person.nom)}
+            <span>${escapeHTML(person.nom)}</span>
+        `;
+
+        option.addEventListener(
+            "click",
+            function(event) {
+
+                event.stopPropagation();
+
+                updateCreatorSelector(
+                    type,
+                    person.nom
+                );
+
+                options.classList.remove("visible");
+
+            }
+        );
+
+        options.appendChild(option);
+
+    });
+}
+
+
+async function toggleCreatorSelector(type) {
+
+    const options =
+        document.getElementById(
+            type === "game"
+                ? "gameCreatorOptions"
+                : "editGameCreatorOptions"
+        );
+
+    if (!options) {
+        return;
+    }
+
+    if (options.classList.contains("visible")) {
+
+        options.classList.remove("visible");
+
+        return;
+    }
+
+    await renderCreatorOptions(type);
+
+    options.classList.add("visible");
+}
+   
+
    
 async function createGame() {
 
@@ -11160,7 +11357,7 @@ function toggleParticipantDelete(type, index) {
    MODIFIER UNE PARTIE
    ======================================================== */
 
-function showEditGame() {
+async function showEditGame() {
 
     const game = getCurrentGame();
 
@@ -11168,11 +11365,15 @@ function showEditGame() {
         return;
     }
 
+    await loadPeopleFromCloud();
+
     document.getElementById("editGameName").value =
         game.name;
 
-    document.getElementById("editGameCreator").value =
-        game.creator;
+    updateCreatorSelector(
+        "edit",
+        game.creator
+    );
 
     updateGroupSelect(
         "editGameGroup",
@@ -11190,7 +11391,6 @@ function showEditGame() {
     showScreen("editGameScreen");
 
 }
-
 
 function toggleEditEmailRequirement() {
 
