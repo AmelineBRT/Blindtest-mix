@@ -2349,6 +2349,29 @@ label {
     flex: 0 0 auto;
 }
 
+   .creator-person-option {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px;
+    margin: 2px 0;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    background: transparent;
+    text-align: left;
+    font-size: 13px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.creator-person-option.selected {
+    border-color: #720038;
+    background: rgba(114, 0, 56, 0.08);
+    font-weight: 700;
+}
+
+   
 /* =========================================================
    GROUPES
    ========================================================= */
@@ -3772,17 +3795,10 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
 </div>
 
-<div
-    id="gameCreatorSelected"
-    class="creator-selected-person">
-</div>
 
 <div
     id="gameCreatorBank"
     class="participant-bank creator-person-bank">
-</div>
-    id="gameCreatorOptions"
-    class="person-selector-options">
 </div>
 
     <label>Groupe (facultatif)</label>
@@ -4127,10 +4143,6 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
         ＋👤
     </button>
 
-</div>
-<div
-    id="editGameCreatorSelected"
-    class="creator-selected-person">
 </div>
 
 <div
@@ -8437,6 +8449,13 @@ async function renderCreatorBank(type, search) {
     const searchText =
         (search || "").trim().toLowerCase();
 
+    const selectedName =
+        document.getElementById(
+            type === "game"
+                ? "gameCreator"
+                : "editGameCreator"
+        ).value.trim().toLowerCase();
+
     const filteredPeople =
         people.filter(function(person) {
 
@@ -8447,43 +8466,86 @@ async function renderCreatorBank(type, search) {
         });
 
     bank.innerHTML = "";
-   bank.style.display = "block";
 
-    filteredPeople.forEach(function(person) {
+    if (filteredPeople.length === 0) {
 
-        const option =
-            document.createElement("button");
-
-        option.type = "button";
-
-        option.className =
-            "creator-person-option";
-
-        option.innerHTML = `
-            ${getParticipantIconHTML(person.nom)}
-            <span>${escapeHTML(person.nom)}</span>
+        bank.innerHTML = `
+            <div class="password-help">
+                Aucune personne trouvée.
+            </div>
         `;
 
-        option.addEventListener(
-            "click",
-            function() {
+    } else {
 
-                selectCreator(
-                    type,
-                    person.nom
-                );
+        filteredPeople.forEach(function(person) {
 
-            }
-        );
+            const isSelected =
+                person.nom.toLowerCase() ===
+                selectedName;
 
-        bank.appendChild(option);
+            const option =
+                document.createElement("div");
 
-    });
+            option.className =
+                "creator-person-option" +
+                (isSelected
+                    ? " selected"
+                    : "");
+
+            option.innerHTML = `
+                ${getParticipantIconHTML(person.nom)}
+                <span>${escapeHTML(person.nom)}</span>
+            `;
+
+            option.addEventListener(
+                "click",
+                function(event) {
+
+                    event.stopPropagation();
+
+                    selectCreator(
+                        type,
+                        person.nom
+                    );
+
+                }
+            );
+
+            bank.appendChild(option);
+
+        });
+
+    }
 
 }
 
+   function updateCreatorNewPersonButton(type, search) {
+
+    const button =
+        document.getElementById(
+            type === "game"
+                ? "gameCreatePersonButton"
+                : "editGameCreatePersonButton"
+        );
+
+    if (!button) {
+        return;
+    }
+
+    if ((search || "").trim()) {
+        button.classList.add("has-search-text");
+    } else {
+        button.classList.remove("has-search-text");
+    }
+
+}
 
 function filterCreatorBank(type, search) {
+
+    updateCreatorNewPersonButton(
+        type,
+        search
+    );
 
     renderCreatorBank(
         type,
@@ -8509,38 +8571,20 @@ function selectCreator(type, name) {
                 : "editGameCreatorSearch"
         );
 
-    const selected =
-        document.getElementById(
-            type === "game"
-                ? "gameCreatorSelected"
-                : "editGameCreatorSelected"
-        );
-
-    if (!input || !searchInput || !selected) {
+    if (!input || !searchInput) {
         return;
     }
 
     input.value = name;
 
-searchInput.value = "";
+    searchInput.value = "";
 
-selected.innerHTML = `
-    ${getParticipantIconHTML(name)}
-    <span>${escapeHTML(name)}</span>
-`;
-
-const bank =
-    document.getElementById(
-        type === "game"
-            ? "gameCreatorBank"
-            : "editGameCreatorBank"
+    renderCreatorBank(
+        type,
+        ""
     );
 
-if (bank) {
-bank.innerHTML = "";
 }
-}
-
 
 
 
@@ -11484,27 +11528,14 @@ async function showEditGame() {
         game.name;
 
     document.getElementById("editGameCreator").value =
-    game.creator;
+        game.creator;
 
-document.getElementById("editGameCreatorSearch").value =
-    game.creator;
-
-document.getElementById("editGameCreatorSelected").innerHTML = `
-    ${getParticipantIconHTML(game.creator)}
-    <span>${escapeHTML(game.creator)}</span>
-`;
-
-document.getElementById("editGameCreatorSearch").value =
-    "";
-
-    document.getElementById("editGameCreatorSelected").innerHTML = `
-        ${getParticipantIconHTML(game.creator)}
-        <span>${escapeHTML(game.creator)}</span>
-    `;
+    document.getElementById("editGameCreatorSearch").value =
+        "";
 
     renderCreatorBank(
         "edit",
-        game.creator
+        ""
     );
 
     updateGroupSelect(
@@ -11524,6 +11555,7 @@ document.getElementById("editGameCreatorSearch").value =
 
 }
 
+   
 function toggleEditEmailRequirement() {
 
     const password =
