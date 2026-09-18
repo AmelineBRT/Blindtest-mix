@@ -2166,32 +2166,41 @@ label {
     background: #f3ebf6;
 }
 
-   .active-filter-content {
+ .active-filter-content {
     position: relative;
     display: inline-flex;
     align-items: center;
+    flex-wrap: nowrap;
     white-space: nowrap;
-    padding-top: 2px;
+}
+
+.active-filter-value {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    white-space: nowrap;
 }
 
 .active-filter-category-icon {
     position: absolute;
     top: -5px;
-    right: -4px;
+    right: -8px;
     font-size: 9px;
     line-height: 1;
-    transform: scale(0.85);
     pointer-events: none;
 }
 
-.active-filter-content .participant-person-icon {
+.active-filter-value .participant-person-icon {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
     transform: scale(0.65);
     transform-origin: center;
-    flex: 0 0 auto;
     margin-left: -2px;
     margin-right: -5px;
 }
 
+   
 .reset-filters {
     width: 30px !important;
     height: 30px !important;
@@ -7748,6 +7757,50 @@ function toggleMultiFilterMenu(menuId) {
     });
 
 }
+
+
+document.addEventListener(
+    "click",
+    function(event) {
+
+        const clickedInsideMenu =
+            event.target.closest(
+                ".multi-filter-menu"
+            );
+
+        const clickedFilterButton =
+            event.target.closest(
+                ".multi-filter-button"
+            );
+
+        if (
+            clickedInsideMenu ||
+            clickedFilterButton
+        ) {
+
+            return;
+
+        }
+
+        document
+            .querySelectorAll(
+                ".multi-filter-menu.visible"
+            )
+            .forEach(function(menu) {
+
+                menu.classList.remove(
+                    "visible"
+                );
+
+                menu.style.left = "";
+                menu.style.top = "";
+                menu.style.position = "";
+
+            });
+
+    }
+);
+   
    
 function toggleCreatorFilter(creator) {
 
@@ -7830,12 +7883,12 @@ chip.className =
 
 chip.innerHTML =
     "<span class=\"active-filter-content\">" +
-        "<span class=\"active-filter-category-icon\">💡</span>" +
-        "<span>" +
+        "<span class=\"active-filter-value\">" +
             getParticipantIconHTML(creator) +
             " " +
             escapeHTML(creator) +
         "</span>" +
+        "<span class=\"active-filter-category-icon\">💡</span>" +
     "</span>" +
     "<button type=\"button\" title=\"Supprimer ce filtre\">×</button>";
        
@@ -7919,10 +7972,10 @@ chip.className =
 
 chip.innerHTML =
     "<span class=\"active-filter-content\">" +
-        "<span class=\"active-filter-category-icon\">🎉</span>" +
-        "<span>" +
+        "<span class=\"active-filter-value\">" +
             escapeHTML(group.name) +
         "</span>" +
+        "<span class=\"active-filter-category-icon\">🎉</span>" +
     "</span>" +
     "<button type=\"button\" title=\"Supprimer ce filtre\">×</button>";
 
@@ -7963,12 +8016,12 @@ chip.className =
 
 chip.innerHTML =
     "<span class=\"active-filter-content\">" +
-        "<span class=\"active-filter-category-icon\">👥</span>" +
-        "<span>" +
+        "<span class=\"active-filter-value\">" +
             getParticipantIconHTML(participant) +
             " " +
             escapeHTML(participant) +
         "</span>" +
+        "<span class=\"active-filter-category-icon\">👥</span>" +
     "</span>" +
     "<button type=\"button\" title=\"Supprimer ce filtre\">×</button>";
 
@@ -13410,8 +13463,8 @@ renderDuplicateGames();
             const chip =
                 document.createElement("div");
 
-            chip.className =
-                "active-filter";
+chip.className =
+    "active-filter active-filter-group";
 
             chip.innerHTML =
                 "<span>🎭 Indépendant</span>" +
