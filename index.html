@@ -2154,16 +2154,42 @@ label {
     font-size: 16px;
 }
 
-   .active-filter-creator {
-    background: #fff4c7;
+.active-filter-creator {
+    background: #fff8df;
 }
 
 .active-filter-group {
-    background: #dcecff;
+    background: #eef7ff;
 }
 
 .active-filter-participant {
-    background: #eadcf0;
+    background: #f3ebf6;
+}
+
+   .active-filter-content {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    padding-top: 2px;
+}
+
+.active-filter-category-icon {
+    position: absolute;
+    top: -5px;
+    right: -4px;
+    font-size: 9px;
+    line-height: 1;
+    transform: scale(0.85);
+    pointer-events: none;
+}
+
+.active-filter-content .participant-person-icon {
+    transform: scale(0.65);
+    transform-origin: center;
+    flex: 0 0 auto;
+    margin-left: -2px;
+    margin-right: -5px;
 }
 
 .reset-filters {
@@ -2412,6 +2438,20 @@ label {
     font-weight: 700;
 }
 
+
+   .creator-filter-button {
+    background: #f3df8a;
+}
+
+.group-filter-button {
+    background: #a9cff2;
+}
+
+.participant-filter-button {
+    background: #b99ac7;
+}
+
+   
    
 /* =========================================================
    GROUPES
@@ -7036,8 +7076,8 @@ async function renderFilters() {
     creatorButton.type =
         "button";
 
-    creatorButton.className =
-        "multi-filter-button";
+creatorButton.className =
+    "multi-filter-button creator-filter-button";
 
     creatorButton.textContent =
         "💡 Créateur ▼";
@@ -7204,8 +7244,8 @@ text.innerHTML =
         groupButton.type =
             "button";
 
-        groupButton.className =
-            "multi-filter-button";
+groupButton.className =
+    "multi-filter-button group-filter-button";
 
         groupButton.textContent =
             "🎉 Groupe ▼";
@@ -7389,7 +7429,7 @@ participantButton.type =
     "button";
 
 participantButton.className =
-    "multi-filter-button";
+    "multi-filter-button participant-filter-button";
 
 participantButton.textContent =
     "👥 " + "Participants ▼";
@@ -7788,11 +7828,14 @@ function renderActiveFilters() {
 chip.className =
     "active-filter active-filter-creator";
 
-       chip.innerHTML =
-    "<span class=\"active-filter-person\">💡 " +
-    getParticipantIconHTML(creator) +
-    " " +
-    escapeHTML(creator) +
+chip.innerHTML =
+    "<span class=\"active-filter-content\">" +
+        "<span class=\"active-filter-category-icon\">💡</span>" +
+        "<span>" +
+            getParticipantIconHTML(creator) +
+            " " +
+            escapeHTML(creator) +
+        "</span>" +
     "</span>" +
     "<button type=\"button\" title=\"Supprimer ce filtre\">×</button>";
        
@@ -7874,11 +7917,14 @@ chip.className =
 chip.className =
     "active-filter active-filter-group";
 
-        chip.innerHTML =
-            "<span>🎉 " +
+chip.innerHTML =
+    "<span class=\"active-filter-content\">" +
+        "<span class=\"active-filter-category-icon\">🎉</span>" +
+        "<span>" +
             escapeHTML(group.name) +
-            "</span>" +
-            "<button type=\"button\" title=\"Supprimer ce filtre\">×</button>";
+        "</span>" +
+    "</span>" +
+    "<button type=\"button\" title=\"Supprimer ce filtre\">×</button>";
 
         chip.querySelector("button").onclick =
             function() {
@@ -7915,11 +7961,14 @@ selectedParticipants.forEach(
 chip.className =
     "active-filter active-filter-participant";
 
-        chip.innerHTML =
-    "<span class=\"active-filter-person\">👥 " +
-    getParticipantIconHTML(participant) +
-    " " +
-    escapeHTML(participant) +
+chip.innerHTML =
+    "<span class=\"active-filter-content\">" +
+        "<span class=\"active-filter-category-icon\">👥</span>" +
+        "<span>" +
+            getParticipantIconHTML(participant) +
+            " " +
+            escapeHTML(participant) +
+        "</span>" +
     "</span>" +
     "<button type=\"button\" title=\"Supprimer ce filtre\">×</button>";
 
