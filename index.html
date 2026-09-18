@@ -8225,12 +8225,33 @@ return (
    
 async function createGame() {
 
+    await loadPeopleFromCloud();
+
     const name =
         document.getElementById("gameName").value.trim();
 
-    const creator =
+    const creatorName =
         document.getElementById("gameCreator").value.trim();
 
+    const creatorPerson =
+        people.find(function(person) {
+            return person.nom.toLowerCase() ===
+                   creatorName.toLowerCase();
+        });
+
+    if (!creatorPerson) {
+
+        alert(
+            "Le créateur doit être choisi parmi les personnes de la banque."
+        );
+
+        return;
+
+    }
+
+    const creator =
+        creatorPerson.nom;
+   
     const groupId =
         document.getElementById("gameGroup").value;
 
