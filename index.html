@@ -9283,6 +9283,11 @@ async function createGame() {
 
     await loadPeopleFromCloud();
 
+
+    /* ==================================================
+       RÉCUPÉRATION DU FORMULAIRE
+       ================================================== */
+
     const name =
         document.getElementById("gameName").value.trim();
 
@@ -9291,9 +9296,43 @@ async function createGame() {
 
     const creatorPerson =
         people.find(function(person) {
+
             return person.nom.toLowerCase() ===
                    creatorName.toLowerCase();
+
         });
+
+
+    const groupId =
+        document.getElementById(
+            "gameGroup"
+        ).value;
+
+    const password =
+        document.getElementById(
+            "gamePassword"
+        ).value;
+
+    const email =
+        document.getElementById(
+            "gameEmail"
+        ).value.trim();
+
+
+    /* ==================================================
+       VÉRIFICATIONS
+       ================================================== */
+
+    if (!name) {
+
+        alert(
+            "Donne un nom à ta partie."
+        );
+
+        return;
+
+    }
+
 
     if (!creatorPerson) {
 
@@ -9305,48 +9344,34 @@ async function createGame() {
 
     }
 
-    const creator =
-        creatorPerson.nom;
-   
-    const groupId =
-        document.getElementById("gameGroup").value;
-
-    const password =
-        document.getElementById("gamePassword").value;
-
-    const email =
-        document.getElementById("gameEmail").value.trim();
-
-    if (!name) {
-        alert("Donne un nom à ta partie.");
-        return;
-    }
-
-    if (!creator) {
-        alert("Indique qui a créé la partie.");
-        return;
-    }
 
     if (password && !email) {
+
         alert(
             "Une adresse e-mail est obligatoire lorsque tu utilises un mot de passe."
         );
+
         return;
+
     }
 
 
-    /* =========================
-       PARTICIPANTS
-       ========================= */
+    /* ==================================================
+       PARTICIPANTS DE LA PARTIE
+       ================================================== */
 
-    let participants = [creator];
+    let participants = [
+        creatorPerson.nom
+    ];
+
 
     if (groupId) {
 
         const group =
             groups.find(function(group) {
 
-                return group.id === groupId;
+                return group.id ===
+                       groupId;
 
             });
 
@@ -9356,33 +9381,84 @@ async function createGame() {
             Array.isArray(group.participants)
         ) {
 
-            group.participants.forEach(function(name) {
+            group.participants.forEach(
+                function(name) {
 
-                const alreadyExists =
-                    participants.some(function(participant) {
+                    const alreadyExists =
+                        participants.some(
+                            function(participant) {
 
-                        return participant.toLowerCase() ===
-                               name.toLowerCase();
+                                return participant.toLowerCase() ===
+                                       name.toLowerCase();
 
-                    });
+                            }
+                        );
 
 
-                if (!alreadyExists) {
+                    if (!alreadyExists) {
 
-                    participants.push(name);
+                        participants.push(
+                            name
+                        );
+
+                    }
 
                 }
-
-            });
+            );
 
         }
 
     }
 
 
-    /* =========================
+    /* ==================================================
+       VÉRIFIER QUE TOUS LES PARTICIPANTS
+       EXISTENT DANS LA BANQUE
+       ================================================== */
+
+    const participantPeople =
+        participants.map(
+            function(name) {
+
+                return people.find(
+                    function(person) {
+
+                        return person.nom.toLowerCase() ===
+                               name.toLowerCase();
+
+                    }
+                );
+
+            }
+        );
+
+
+    const missingPersonIndex =
+        participantPeople.findIndex(
+            function(person) {
+
+                return !person;
+
+            }
+        );
+
+
+    if (
+        missingPersonIndex !== -1
+    ) {
+
+        alert(
+            "Une personne utilisée par cette partie n'existe plus dans la banque des participants."
+        );
+
+        return;
+
+    }
+
+
+    /* ==================================================
        CRÉATION DE LA PARTIE
-       ========================= */
+       ================================================== */
 
     const game = {
 
@@ -9393,7 +9469,7 @@ async function createGame() {
             name,
 
         creator:
-            creator,
+            creatorPerson.nom,
 
         groupId:
             groupId,
@@ -9413,14 +9489,20 @@ async function createGame() {
     };
 
 
-    games.push(game);
+    /* ==================================================
+       SAUVEGARDE LOCALE
+       ================================================== */
+
+    games.push(
+        game
+    );
 
     saveData();
 
 
-    /* =========================
-       ENREGISTREMENT DE LA PARTIE
-       ========================= */
+    /* ==================================================
+       SAUVEGARDE DE LA PARTIE DANS D1
+       ================================================== */
 
     try {
 
@@ -9470,28 +9552,23 @@ async function createGame() {
 
 
         console.log(
-            "Partie enregistrée en ligne."
+            "Partie enregistrée en ligne :",
+            game.id
         );
 
 
-        /* =========================
-           ENREGISTREMENT DES PARTICIPANTS
-           ========================= */
+        /* ==================================================
+           ENREGISTREMENT DES PARTICIPANTS DANS D1
+           ================================================== */
 
         for (
-            let index = 0;
-            index < participants.length;
-            index++
+            let i = 0;
+            i < participantPeople.length;
+            i++
         ) {
 
-            const participant =
-                participants[index];
-
-
-            const personneId =
-                game.id +
-                "-person-" +
-                index;
+            const person =
+                participantPeople[i];
 
 
             const participantResponse =
@@ -9510,10 +9587,10 @@ async function createGame() {
                                 game.id,
 
                             personne_id:
-                                personneId,
+                                person.id,
 
                             nom:
-                                participant
+                                person.nom
 
                         })
 
@@ -9524,7 +9601,7 @@ async function createGame() {
             if (!participantResponse.ok) {
 
                 throw new Error(
-                    "Erreur lors de l'enregistrement d'un participant."
+                    "Erreur lors de l'enregistrement d'un participant de la partie."
                 );
 
             }
@@ -9533,7 +9610,7 @@ async function createGame() {
 
 
         console.log(
-            "Participants enregistrés en ligne :",
+            "Participants de la partie enregistrés en ligne :",
             participants.length
         );
 
@@ -9556,10 +9633,10 @@ async function createGame() {
     currentGameId =
         game.id;
 
+
     showGame();
 
 }
-
 
 
 
