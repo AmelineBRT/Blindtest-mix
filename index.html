@@ -5475,6 +5475,634 @@ function saveData() {
 }
 
 
+async function migrateLocalDataToCloud() {
+
+    const baseURL =
+        "https://blindtestmix.amelinebrt.workers.dev";
+
+
+    async function postJSON(route, data) {
+
+        const response =
+            await fetch(
+                baseURL + route,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify(data)
+                }
+            );
+
+
+        if (!response.ok) {
+
+            const errorText =
+                await response.text();
+
+            throw new Error(
+                route +
+                " → " +
+                response.status +
+                " : " +
+                errorText
+            );
+
+        }
+
+        return response.json();
+
+    }
+
+
+    /* ==================================================
+       RÉCUPÉRER LA BANQUE DE PERSONNES DE D1
+       ================================================== */
+
+    const peopleResponse =
+        await fetch(
+            baseURL + "/people"
+        );
+
+
+    if (!peopleResponse.ok) {
+
+        throw new Error(
+            "Impossible de récupérer la banque de personnes."
+        );
+
+    }
+
+
+    const cloudPeople =
+        await peopleResponse.json();
+
+
+    const peopleByName =
+        new Map();
+
+
+    cloudPeople.forEach(function(person) {
+
+        peopleByName.set(
+            person.nom.trim().toLowerCase(),
+            person
+        );
+
+    });
+
+
+    /* ==================================================
+       VÉRIFICATION DES PERSONNES NÉCESSAIRES
+       ================================================== */
+
+    const namesToCheck =
+        new Set();
+
+
+    groups.forEach(function(group) {
+
+        if (
+            Array.isArray(
+                group.participants
+            )
+        ) {
+
+            group.participants.forEach(
+                function(name) {
+
+                    namesToCheck.add(
+                        String(name)
+                            .trim()
+                            .toLowerCase()
+                    );
+
+                }
+            );
+
+        }
+
+    });
+
+
+    games.forEach(function(game) {
+
+        if (game.creator) {
+
+            namesToCheck.add(
+                game.creator
+                    .trim()
+                    .toLowerCase()
+            );
+
+        }
+
+
+        if (
+            Array.isArray(
+                game.participants
+            )
+        ) {
+
+            game.participants.forEach(
+                function(name) {
+
+                    namesToCheck.add(
+                        String(name)
+                            .trim()
+                            .toLowerCase()
+                    );
+
+                }
+            );
+
+        }
+
+    });
+
+
+    const missingPeople = [];
+
+
+    namesToCheck.forEach(function(name) {
+
+        if (
+            !peopleByName.has(name)
+        ) {
+
+            missingPeople.push(name);
+
+        }
+
+    });
+
+
+    if (missingPeople.length > 0) {
+
+        throw new Error(
+            "Ces personnes utilisées par tes données locales " +
+            "n'existent pas dans la banque D1 :\n\n" +
+            missingPeople.join("\n")
+        );
+
+    }
+
+
+    /* ==================================================
+       MIGRATION DES GROUPES
+       ================================================== */
+
+    let groupCount = 0;
+    let groupParticipantCount = 0;
+
+
+    for (
+        let i = 0;
+        i < groups.length;
+        i++
+    ) {
+
+        const group =
+            groups[i];
+
+
+        await postJSON(
+            "/groups",
+            {
+                id:
+                    group.id,
+
+                nom:
+                    group.name || "",
+
+                commentaire:
+                    group.comment || null,
+
+                couleur:
+                    group.color || null
+            }
+        );
+
+
+        groupCount++;
+
+
+        if (
+            Array.isArray(
+                group.participants
+            )
+        ) {
+
+            for (
+                let j = 0;
+                j < group.participants.length;
+                j++
+            ) {
+
+                const name =
+                    group.participants[j];
+
+
+                const person =
+                    peopleByName.get(
+                        name.trim().toLowerCase()
+                    );
+
+
+                await postJSON(
+                    "/group-personnes",
+                    {
+                        groupe_id:
+                            group.id,
+
+                        personne_id:
+                            person.id,
+
+                        nom:
+                            person.nom
+                    }
+                );
+
+
+                groupParticipantCount++;
+
+            }
+
+        }
+
+    }
+
+
+    /* ==================================================
+       MIGRATION DES PARTIES
+       ================================================== */
+
+    let gameCount = 0;
+    let gameParticipantCount = 0;
+    let roundCount = 0;
+    let trackCount = 0;
+
+
+    for (
+        let i = 0;
+        i < games.length;
+        i++
+    ) {
+
+        const game =
+            games[i];
+
+
+        await postJSON(
+            "/parties",
+            {
+                id:
+                    game.id,
+
+                nom:
+                    game.name || "",
+
+                createur:
+                    game.creator || "",
+
+                groupe_id:
+                    game.groupId || null,
+
+                mot_de_passe:
+                    game.password || null,
+
+                email_recuperation:
+                    game.email || null
+            }
+        );
+
+
+        gameCount++;
+
+
+        /* =========================
+           PARTICIPANTS
+           ========================= */
+
+        let participantNames =
+            Array.isArray(
+                game.participants
+            )
+                ? [...game.participants]
+                : [];
+
+
+        if (
+            game.creator &&
+            !participantNames.some(
+                function(name) {
+
+                    return name.toLowerCase() ===
+                           game.creator.toLowerCase();
+
+                }
+            )
+        ) {
+
+            participantNames.unshift(
+                game.creator
+            );
+
+        }
+
+
+        for (
+            let j = 0;
+            j < participantNames.length;
+            j++
+        ) {
+
+            const name =
+                participantNames[j];
+
+
+            const person =
+                peopleByName.get(
+                    name.trim().toLowerCase()
+                );
+
+
+            await postJSON(
+                "/partie-personnes",
+                {
+                    partie_id:
+                        game.id,
+
+                    personne_id:
+                        person.id,
+
+                    nom:
+                        person.nom
+                }
+            );
+
+
+            gameParticipantCount++;
+
+        }
+
+
+        /* =========================
+           MANCHES
+           ========================= */
+
+        if (
+            Array.isArray(
+                game.rounds
+            )
+        ) {
+
+            for (
+                let j = 0;
+                j < game.rounds.length;
+                j++
+            ) {
+
+                const round =
+                    game.rounds[j];
+
+
+                const roundId =
+                    round.id ||
+                    game.id +
+                    "-round-" +
+                    j;
+
+
+                await postJSON(
+                    "/rounds",
+                    {
+                        id:
+                            roundId,
+
+                        partie_id:
+                            game.id,
+
+                        nom:
+                            round.name || "",
+
+                        ordre:
+                            j
+                    }
+                );
+
+
+                roundCount++;
+
+
+                /* =========================
+                   PISTES
+                   ========================= */
+
+                if (
+                    Array.isArray(
+                        round.tracks
+                    )
+                ) {
+
+                    for (
+                        let k = 0;
+                        k < round.tracks.length;
+                        k++
+                    ) {
+
+                        const track =
+                            round.tracks[k];
+
+
+                        const trackId =
+                            track.id ||
+                            roundId +
+                            "-track-" +
+                            k;
+
+
+                        await postJSON(
+                            "/tracks",
+                            {
+                                id:
+                                    trackId,
+
+                                manche_id:
+                                    roundId,
+
+                                titre:
+                                    track.title || "",
+
+                                url:
+                                    track.url || null,
+
+                                ordre:
+                                    k
+                            }
+                        );
+
+
+                        trackCount++;
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+
+    console.log(
+        "✅ Migration D1 terminée",
+        {
+            groupes: groupCount,
+            participantsGroupes:
+                groupParticipantCount,
+            parties: gameCount,
+            participantsParties:
+                gameParticipantCount,
+            manches:
+                roundCount,
+            pistes:
+                trackCount
+        }
+    );
+
+
+    alert(
+        "Migration terminée !\n\n" +
+        "Groupes : " + groupCount + "\n" +
+        "Participants des groupes : " +
+        groupParticipantCount + "\n" +
+        "Parties : " + gameCount + "\n" +
+        "Participants des parties : " +
+        gameParticipantCount + "\n" +
+        "Manches : " + roundCount + "\n" +
+        "Pistes : " + trackCount
+    );
+
+}
+
+   function showMigrationButton() {
+
+    if (
+        document.getElementById(
+            "migrationDataButton"
+        )
+    ) {
+        return;
+    }
+
+
+    const button =
+        document.createElement("button");
+
+    button.id =
+        "migrationDataButton";
+
+    button.type =
+        "button";
+
+    button.textContent =
+        "☁️ Migrer mes données vers D1";
+
+
+    button.style.position =
+        "fixed";
+
+    button.style.left =
+        "15px";
+
+    button.style.right =
+        "15px";
+
+    button.style.bottom =
+        "15px";
+
+    button.style.zIndex =
+        "99999";
+
+    button.style.background =
+        "#720038";
+
+    button.style.color =
+        "white";
+
+    button.style.padding =
+        "14px";
+
+    button.style.borderRadius =
+        "10px";
+
+    button.style.fontSize =
+        "15px";
+
+
+    button.onclick =
+        async function() {
+
+            const confirmed =
+                confirm(
+                    "Cette opération va envoyer vers D1 les parties, groupes, participants, manches et pistes actuellement présents sur ce téléphone.\n\nAucune donnée locale ne sera supprimée.\n\nContinuer ?"
+                );
+
+
+            if (!confirmed) {
+                return;
+            }
+
+
+            button.disabled =
+                true;
+
+            button.textContent =
+                "☁️ Migration en cours...";
+
+
+            try {
+
+                await migrateLocalDataToCloud();
+
+                button.remove();
+
+            } catch (error) {
+
+                console.error(
+                    "Erreur migration :",
+                    error
+                );
+
+
+                alert(
+                    "La migration a été arrêtée :\n\n" +
+                    error.message
+                );
+
+
+                button.disabled =
+                    false;
+
+                button.textContent =
+                    "☁️ Réessayer la migration";
+
+            }
+
+        };
+
+
+    document.body.appendChild(
+        button
+    );
+
+}
+
 /* ========================================================
    CHANGER D'ÉCRAN
    ======================================================== */
@@ -5654,7 +6282,17 @@ function quitApp() {
 
 loadTheme();
 loadData();
-loadGamesFromCloud();
+
+const migrationMode =
+    new URLSearchParams(
+        location.search
+    ).get("migration") === "1";
+
+if (!migrationMode) {
+
+    loadGamesFromCloud();
+
+}
 
 history.replaceState(
     {
@@ -5679,6 +6317,20 @@ history.pushState(
 isBrowserBack = true;
 showGames();
 isBrowserBack = false;
+
+   loadTheme();
+loadData();
+
+const migrationMode =
+    new URLSearchParams(
+        location.search
+    ).get("migration") === "1";
+
+if (!migrationMode) {
+
+    loadGamesFromCloud();
+
+}
 
 function showGroups() {
 
