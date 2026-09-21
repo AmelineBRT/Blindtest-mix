@@ -3513,35 +3513,6 @@ background: #ffffff;
 }
    
 
-   @media (max-width: 600px) {
-
-    #gameScreen > .participants-panel {
-        position: absolute !important;
-        top: 155px !important;
-        left: 15px !important;
-        right: 15px !important;
-        width: auto !important;
-        max-width: none !important;
-        transform: none !important;
-        border-radius: 10px !important;
-    }
-
-    #groupScreen > .participants-panel {
-        position: absolute !important;
-        top: 135px !important;
-        left: 15px !important;
-        right: 15px !important;
-        width: auto !important;
-        max-width: none !important;
-        transform: none !important;
-        border-radius: 10px !important;
-    }
-
-}
-
-
-
-   
    
 /* ==================================================
    FIN DES CSS et DEBUT DES HTML
@@ -5131,27 +5102,6 @@ async function loadGamesFromCloud() {
         const onlineGames =
             await response.json();
 
-       /* ==================================================
-   SUPPRIMER LOCALEMENT LES PARTIES
-   QUI N'EXISTENT PLUS DANS D1
-   ================================================== */
-
-const onlineGameIds =
-    new Set(
-        onlineGames.map(function(game) {
-            return game.id;
-        })
-    );
-
-games =
-    games.filter(function(game) {
-
-        return onlineGameIds.has(
-            game.id
-        );
-
-    });
-
 
         /* ==================================================
            CHARGEMENT DES GROUPES
@@ -5172,27 +5122,6 @@ games =
 
         const onlineGroups =
             await groupsResponse.json();
-
-       /* ==================================================
-   SUPPRIMER LOCALEMENT LES GROUPES
-   QUI N'EXISTENT PLUS DANS D1
-   ================================================== */
-
-const onlineGroupIds =
-    new Set(
-        onlineGroups.map(function(group) {
-            return group.id;
-        })
-    );
-
-groups =
-    groups.filter(function(group) {
-
-        return onlineGroupIds.has(
-            group.id
-        );
-
-    });
 
 
         /* ==================================================
