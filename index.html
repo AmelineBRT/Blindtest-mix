@@ -6282,17 +6282,7 @@ function quitApp() {
 
 loadTheme();
 loadData();
-
-const migrationMode =
-    new URLSearchParams(
-        location.search
-    ).get("migration") === "1";
-
-if (!migrationMode) {
-
-    loadGamesFromCloud();
-
-}
+loadGamesFromCloud();
 
 history.replaceState(
     {
@@ -6318,19 +6308,57 @@ isBrowserBack = true;
 showGames();
 isBrowserBack = false;
 
-   loadTheme();
-loadData();
 
-const migrationMode =
-    new URLSearchParams(
-        location.search
-    ).get("migration") === "1";
+function showGroups() {
 
-if (!migrationMode) {
+    gamesView = "groups";
 
-    loadGamesFromCloud();
+    document.getElementById(
+        "gamesViewTitle"
+    ).textContent =
+        "🎉 Groupes";
+
+    document.getElementById(
+        "gamesViewToggle"
+    ).textContent =
+        "🎶 Voir les parties";
+
+    isAppNavigation = true;
+
+    showScreen("gamesScreen");
+
+    isAppNavigation = false;
+
+    renderFilters();
+    renderGames();
 
 }
+
+
+async function showGames() {
+
+    gamesView = "games";
+
+    await loadPeopleFromCloud();
+
+    document.getElementById(
+        "gamesViewTitle"
+    ).textContent =
+        "🎶 Parties";
+
+    document.getElementById(
+        "gamesViewToggle"
+    ).textContent =
+        "🎉 Voir les groupes";
+
+    showScreen("gamesScreen");
+
+    renderFilters();
+    renderGames();
+
+}
+
+
 
 function showGroups() {
 
