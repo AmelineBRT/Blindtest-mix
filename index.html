@@ -6302,16 +6302,40 @@ if (new URLSearchParams(location.search).get("migration") === "1") {
         migrationButton.style.background = "#ffffff";
         migrationButton.style.boxShadow = "0 3px 12px rgba(0,0,0,0.3)";
 
-        migrationButton.onclick = async () => {
+       migrationButton.onclick = async () => {
 
-            if (typeof migrateLocalDataToCloud !== "function") {
-                alert("La fonction de migration est introuvable.");
-                return;
-            }
+    migrationButton.disabled = true;
+    migrationButton.textContent = "☁️ Migration en cours...";
 
-            await migrateLocalDataToCloud();
+    try {
 
-        };
+        if (typeof migrateLocalDataToCloud !== "function") {
+            throw new Error(
+                "La fonction de migration est introuvable."
+            );
+        }
+
+        await migrateLocalDataToCloud();
+
+    } catch (error) {
+
+        console.error(
+            "❌ Erreur pendant la migration :",
+            error
+        );
+
+        alert(
+            "❌ La migration a rencontré une erreur :\n\n" +
+            error.message
+        );
+
+        migrationButton.disabled = false;
+        migrationButton.textContent =
+            "☁️ Réessayer la migration";
+
+    }
+
+};
 
         document.body.appendChild(migrationButton);
 
