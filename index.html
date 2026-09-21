@@ -11555,6 +11555,7 @@ async function addExistingPersonToParticipants(type, personId) {
         return;
     }
 
+
     const item =
         type === "game"
             ? getCurrentGame()
@@ -11565,6 +11566,7 @@ async function addExistingPersonToParticipants(type, personId) {
     if (!item) {
         return;
     }
+
 
     if (!Array.isArray(item.participants)) {
         item.participants = [];
@@ -11607,6 +11609,7 @@ async function addExistingPersonToParticipants(type, personId) {
                 game.participants = [];
             }
 
+
             const alreadyInGame =
                 game.participants.some(
                     function(name) {
@@ -11631,17 +11634,197 @@ async function addExistingPersonToParticipants(type, personId) {
     }
 
 
+    /*
+     * Sauvegarde locale
+     */
+
     saveData();
 
 
     /*
-     * On conserve le panneau ouvert
-     * et on le reconstruit.
+     * Sauvegarde dans Cloudflare D1
+     */
+
+    try {
+
+        if (type === "game") {
+
+            const response =
+                await fetch(
+                    "https://blindtestmix.amelinebrt.workers.dev/partie-personnes",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            partie_id:
+                                item.id,
+
+                            personne_id:
+                                person.id,
+
+                            nom:
+                                person.nom
+
+                        })
+
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Erreur lors de l'enregistrement du participant dans la partie."
+                );
+
+            }
+
+
+            const result =
+                await response.json();
+
+            console.log(
+                "Participant de la banque enregistré en ligne :",
+                result
+            );
+
+        }
+
+
+        if (type === "group") {
+
+            /*
+             * Enregistrer la personne dans le groupe
+             */
+
+            const groupResponse =
+                await fetch(
+                    "https://blindtestmix.amelinebrt.workers.dev/group-personnes",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            groupe_id:
+                                item.id,
+
+                            personne_id:
+                                person.id,
+
+                            nom:
+                                person.nom
+
+                        })
+
+                    }
+                );
+
+
+            if (!groupResponse.ok) {
+
+                throw new Error(
+                    "Erreur lors de l'enregistrement du participant dans le groupe."
+                );
+
+            }
+
+
+            /*
+             * Enregistrer également la personne
+             * dans toutes les parties du groupe
+             */
+
+            for (
+                let i = 0;
+                i < games.length;
+                i++
+            ) {
+
+                const game =
+                    games[i];
+
+                if (game.groupId !== item.id) {
+                    continue;
+                }
+
+
+                const gameResponse =
+                    await fetch(
+                        "https://blindtestmix.amelinebrt.workers.dev/partie-personnes",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+
+                            body: JSON.stringify({
+
+                                partie_id:
+                                    game.id,
+
+                                personne_id:
+                                    person.id,
+
+                                nom:
+                                    person.nom
+
+                            })
+
+                        }
+                    );
+
+
+                if (!gameResponse.ok) {
+
+                    throw new Error(
+                        "Erreur lors de l'enregistrement du participant dans une partie."
+                    );
+
+                }
+
+            }
+
+
+            console.log(
+                "Participant de la banque enregistré dans le groupe et ses parties."
+            );
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Erreur sauvegarde du participant D1 :",
+            error
+        );
+
+        alert(
+            "La personne a été ajoutée sur cet appareil, mais elle n'a pas pu être enregistrée complètement en ligne."
+        );
+
+    }
+
+
+    /*
+     * Reconstruire la fenêtre Participants
      */
 
     renderParticipants(type);
 
 }
+
+   
 
 async function addParticipant(type) {
 
