@@ -6190,31 +6190,34 @@ function quitApp() {
 
 loadTheme();
 loadData();
-loadGamesFromCloud();
 
-history.replaceState(
-    {
-        exitSentinel: true
-    },
-    "",
-    location.href
-);
+loadGamesFromCloud().then(function() {
 
-history.pushState(
-    {
-        screen: "gamesScreen",
-        gameId: null,
-        groupId: null,
-        roundId: null,
-        view: "games"
-    },
-    "",
-    "#gamesScreen"
-);
+    history.replaceState(
+        {
+            exitSentinel: true
+        },
+        "",
+        location.href
+    );
 
-isBrowserBack = true;
-showGames();
-isBrowserBack = false;
+    history.pushState(
+        {
+            screen: "gamesScreen",
+            gameId: null,
+            groupId: null,
+            roundId: null,
+            view: "games"
+        },
+        "",
+        "#gamesScreen"
+    );
+
+    isBrowserBack = true;
+    showGames();
+    isBrowserBack = false;
+
+});
 
 function showGroups() {
 
