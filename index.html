@@ -9998,13 +9998,18 @@ if (!searchText) {
 
     bank.innerHTML = "";
 
-    if (filteredPeople.length === 0) {
+if (filteredPeople.length === 0) {
 
-        bank.innerHTML = `
-            <div class="password-help">
-                Aucune personne trouvée.
-            </div>
-        `;
+    bank.innerHTML = `
+        <div class="password-help">
+            Aucune personne trouvée.<br>
+            Merci de cliquer sur
+            <span class="participant-new-person-plus">＋</span><span class="participant-new-person-icon">👤</span>
+            ci-dessus.
+        </div>
+    `;
+
+}
 
     } else {
 
@@ -12431,6 +12436,10 @@ function filterParticipantBank(type, searchText) {
         bank.querySelector(
             ".participant-bank-item"
         ) !== null;
+
+   console.log("RECHERCHE :", searchText);
+console.log("PERSONNES DISPONIBLES :", hasAvailablePeople);
+console.log("BOUTON :", createButton);
 
     if (
         hasSearchText &&
