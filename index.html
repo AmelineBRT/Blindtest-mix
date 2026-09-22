@@ -12253,7 +12253,7 @@ function renderParticipants(type) {
 
                         <button
                             type="button"
-                            id="${type}CreatePersonButton"
+                            id="${type}ParticipantCreatePersonButton"
                             class="participant-new-person-button"
                             onclick="event.stopPropagation(); createPersonFromParticipantSearch('${type}')"
                             title="Créer une nouvelle personne"
@@ -12422,10 +12422,10 @@ function filterParticipantBank(type, searchText) {
             searchText
         );
 
-    const createButton =
-        document.getElementById(
-            type + "CreatePersonButton"
-        );
+const createButton =
+    document.getElementById(
+        type + "ParticipantCreatePersonButton"
+    );
 
     if (!createButton) {
         return;
