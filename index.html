@@ -14598,6 +14598,8 @@ if (
 
 }
 
+   
+
 async function saveRound() {
 
     const game = getCurrentGame();
@@ -15914,66 +15916,138 @@ for (const checkbox of selected) {
      * Sauvegarde de la manche dupliquée dans Cloudflare D1
      */
 
-    try {
+          try {
 
-        const response =
-            await fetch(
-                "https://blindtestmix.amelinebrt.workers.dev/rounds",
-                {
-                    method: "POST",
+            /*
+             * Sauvegarde de la manche dans Cloudflare D1
+             */
 
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
+            const roundResponse =
+                await fetch(
+                    "https://blindtestmix.amelinebrt.workers.dev/rounds",
+                    {
+                        method: "POST",
 
-                    body: JSON.stringify({
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
 
-                        id:
-                            copy.id,
+                        body: JSON.stringify({
 
-                        partie_id:
-                            targetGame.id,
+                            id:
+                                copy.id,
 
-                        nom:
-                            copy.name || "",
+                            partie_id:
+                                targetGame.id,
 
-                        ordre:
-                            targetGame.rounds.length
+                            nom:
+                                copy.name || "",
 
-                    })
+                            ordre:
+                                targetGame.rounds.length
+
+                        })
+
+                    }
+                );
+
+
+            if (!roundResponse.ok) {
+
+                throw new Error(
+                    "Erreur lors de l'enregistrement de la manche dupliquée."
+                );
+
+            }
+
+
+            console.log(
+                "Manche dupliquée enregistrée en ligne."
+            );
+
+
+            /*
+             * Sauvegarde des pistes dans Cloudflare D1
+             */
+
+            for (
+                let index = 0;
+                index < copy.tracks.length;
+                index++
+            ) {
+
+                const track =
+                    copy.tracks[index];
+
+                if (
+                    !track.title &&
+                    !track.url
+                ) {
+                    continue;
+                }
+
+
+                const trackResponse =
+                    await fetch(
+                        "https://blindtestmix.amelinebrt.workers.dev/tracks",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+
+                            body: JSON.stringify({
+
+                                id:
+                                    copy.id +
+                                    "-track-" +
+                                    index,
+
+                                manche_id:
+                                    copy.id,
+
+                                titre:
+                                    track.title || null,
+
+                                url:
+                                    track.url || null,
+
+                                ordre:
+                                    index + 1
+
+                            })
+
+                        }
+                    );
+
+
+                if (!trackResponse.ok) {
+
+                    throw new Error(
+                        "Erreur lors de l'enregistrement d'une piste dupliquée."
+                    );
 
                 }
+
+
+                console.log(
+                    "Piste dupliquée enregistrée en ligne."
+                );
+
+            }
+
+
+        } catch (error) {
+
+            console.error(
+                "Erreur sauvegarde duplication D1 :",
+                error
             );
 
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Erreur lors de l'enregistrement de la manche dupliquée."
-            );
+            onlineErrors++;
 
         }
-
-
-        const result =
-            await response.json();
-
-        console.log(
-            "Manche dupliquée enregistrée en ligne :",
-            result
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "Erreur sauvegarde duplication D1 :",
-            error
-        );
-
-        onlineErrors++;
-
-    }
 
 }
 
