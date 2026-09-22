@@ -12297,14 +12297,68 @@ function renderParticipants(type) {
    ======================================================== */
 
 function normalizePersonSearch(text) {
-
     return String(text || "")
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
         .toLowerCase()
+        .replace(/2/g, "e")
         .trim();
-
 }
+
+
+function isPersonSearchMatch(personName, search) {
+
+    const name = normalizePersonSearch(personName);
+
+    if (!search) {
+        return true;
+    }
+
+    // Correspondance normale : "rem" dans "remy"
+    if (name.includes(search)) {
+        return true;
+    }
+
+    // Petites fautes de frappe
+    if (search.length >= 3 && name.length >= 3) {
+
+        const maxDistance =
+            search.length <= 4 ? 1 : 2;
+
+        let previousRow =
+            Array.from(
+                { length: name.length + 1 },
+                (_, index) => index
+            );
+
+        for (let i = 1; i <= search.length; i++) {
+
+            const currentRow = [i];
+
+            for (let j = 1; j <= name.length; j++) {
+
+                const cost =
+                    search[i - 1] === name[j - 1]
+                        ? 0
+                        : 1;
+
+                currentRow[j] =
+                    Math.min(
+                        currentRow[j - 1] + 1,
+                        previousRow[j] + 1,
+                        previousRow[j - 1] + cost
+                    );
+            }
+
+            previousRow = currentRow;
+        }
+
+        return previousRow[name.length] <= maxDistance;
+    }
+
+    return false;
+}
+
    
 function getParticipantBankHTML(type, searchText = "") {
 
@@ -12348,8 +12402,10 @@ if (alreadyAdded) {
                 return true;
             }
 
-return normalizePersonSearch(person.nom)
-    .includes(search);
+return isPersonSearchMatch(
+    person.nom,
+    search
+);
 
         });
 
