@@ -3930,7 +3930,7 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
         onclick="createPersonFromCreatorSearch('game')"
         title="Créer une nouvelle personne"
     >
-        ＋👤
+        <span class="participant-new-person-plus">＋</span><span class="participant-new-person-icon">👤</span>
     </button>
 
 </div>
@@ -4280,7 +4280,7 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
         onclick="createPersonFromCreatorSearch('edit')"
         title="Créer une nouvelle personne"
     >
-        ＋👤
+        <span class="participant-new-person-plus">＋</span><span class="participant-new-person-icon">👤</span>
     </button>
 
 </div>
@@ -10539,6 +10539,7 @@ function isDarkColor(hex) {
 
 }
 
+   
 function showCreateGroup() {
 
     document.getElementById(
@@ -11024,6 +11025,9 @@ async function createGroup() {
     showGames();
 
 }
+
+
+   
 function updateGroupSelect(
     selectId,
     selectedId = ""
@@ -12208,7 +12212,7 @@ function renderParticipants(type) {
                             onclick="event.stopPropagation(); createPersonFromParticipantSearch('${type}')"
                             title="Créer une nouvelle personne"
                         >
-                            ＋👤
+                            <span class="participant-new-person-plus">＋</span><span class="participant-new-person-icon">👤</span>
                         </button>
 
                     </div>
@@ -12310,7 +12314,7 @@ return normalizePersonSearch(person.nom)
             <div class="participant-bank-empty">
                 ${
                     search
-                        ? "Aucune personne trouvée.<br>Merci de cliquer sur +👤 ci-dessus."
+                        ? "Aucune personne trouvée.<br>Merci de cliquer sur <span class="participant-new-person-plus">＋</span><span class="participant-new-person-icon">👤</span> ci-dessus."
                         : "Tous les participants sont déjà ajoutés."
                 }
             </div>
