@@ -12231,6 +12231,16 @@ function renderParticipants(type) {
    BANQUE DES PARTICIPANTS DISPONIBLES
    ======================================================== */
 
+function normalizePersonSearch(text) {
+
+    return String(text || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+
+}
+   
 function getParticipantBankHTML(type, searchText = "") {
 
     const item =
@@ -12248,8 +12258,8 @@ function getParticipantBankHTML(type, searchText = "") {
         item.participants = [];
     }
 
-    const search =
-        searchText.trim().toLowerCase();
+const search =
+    normalizePersonSearch(searchText);
 
 
     const availablePeople =
@@ -12261,8 +12271,8 @@ console.log("PERSONNES DISPONIBLES :", people);
             const alreadyAdded =
     item.participants.some(function(name) {
 
-        return String(name).trim().toLowerCase() ===
-               String(person.nom).trim().toLowerCase();
+return normalizePersonSearch(name) ===
+       normalizePersonSearch(person.nom);
 
     });
 
@@ -12273,9 +12283,8 @@ if (alreadyAdded) {
                 return true;
             }
 
-            return person.nom
-                .toLowerCase()
-                .includes(search);
+return normalizePersonSearch(person.nom)
+    .includes(search);
 
         });
 
@@ -12473,8 +12482,8 @@ async function addExistingPersonToParticipants(type, personId) {
     const alreadyExists =
         item.participants.some(function(name) {
 
-            return name.toLowerCase() ===
-                   person.nom.toLowerCase();
+return normalizePersonSearch(name) ===
+       normalizePersonSearch(person.nom);
 
         });
 
@@ -12511,8 +12520,8 @@ async function addExistingPersonToParticipants(type, personId) {
                 game.participants.some(
                     function(name) {
 
-                        return name.toLowerCase() ===
-                               person.nom.toLowerCase();
+return normalizePersonSearch(name) ===
+       normalizePersonSearch(person.nom);
 
                     }
                 );
@@ -12760,8 +12769,8 @@ async function addParticipant(type) {
     const person =
         people.find(function(person) {
 
-            return person.nom.toLowerCase() ===
-                   searchText.toLowerCase();
+return normalizePersonSearch(person.nom) ===
+       normalizePersonSearch(searchText);
 
         });
 
@@ -12793,8 +12802,8 @@ async function addParticipant(type) {
     const alreadyExists =
         item.participants.some(function(participant) {
 
-            return participant.toLowerCase() ===
-                   name.toLowerCase();
+return normalizePersonSearch(participant) ===
+       normalizePersonSearch(name);
 
         });
 
@@ -12841,8 +12850,8 @@ async function addParticipant(type) {
                 game.participants.some(
                     function(participant) {
 
-                        return participant.toLowerCase() ===
-                               name.toLowerCase();
+return normalizePersonSearch(participant) ===
+       normalizePersonSearch(name);
 
                     }
                 );
