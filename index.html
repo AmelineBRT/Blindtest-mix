@@ -625,6 +625,14 @@ button:disabled {
     color: white;
 }
 
+  .participant-new-person-plus {
+    color: #999;
+}
+
+.participant-new-person-icon {
+    filter: brightness(1.5);
+} 
+
 #participantFilterMenu .participant-person-icon,
 #creatorFilterMenu .participant-person-icon {
     display: flex;
@@ -10591,7 +10599,7 @@ function showEditGroup(groupId) {
     document.getElementById(
         "editGroupColor"
     ).value =
-        group.color || "#ff0000";
+         group.color || "#B8DCD7";
 
     showScreen(
         "editGroupScreen"
