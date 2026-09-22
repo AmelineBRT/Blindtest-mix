@@ -7361,89 +7361,79 @@ function filterPersonEmoji(input) {
 
 async function deletePerson() {
 
-    if (!editingPersonId) {
-        return;
-    }
+   if (!editingPersonId) {
+    return;
+}
 
-    const person =
-        people.find(function(person) {
-            return person.id === editingPersonId;
-        });
+const person =
+    people.find(function(person) {
+        return person.id === editingPersonId;
+    });
 
-    if (!person) {
-        return;
-    }
+if (!person) {
+    return;
+}
 
-    const confirmation =
-        confirm(
-            '⚠️ Voulez-vous vraiment supprimer le participant "' +
-            person.nom +
-            '" ?\n\n' +
-            'Il sera retiré de toutes les parties et de tous les groupes.\n\n' +
-            'Une seconde confirmation sera demandée.'
-        );
-
-    if (!confirmation) {
-        return;
-    }
-
-    const verification =
-        prompt(
-            'Pour confirmer la suppression du participant, écris exactement : SUPPRIMER'
-        );
-
-    if (verification !== "SUPPRIMER") {
-        alert("Suppression annulée.");
-        return;
-    }
-
-    try {
-
-        const response =
-            await fetch(
-                "https://blindtestmix.amelinebrt.workers.dev/people/" +
-                encodeURIComponent(editingPersonId),
-                {
-                    method: "DELETE"
-                }
-            );
-
-        if (!response.ok) {
-            throw new Error(
-                "Erreur lors de la suppression du participant."
-            );
-        }
-
-    } catch (error) {
-
-        console.error(
-            "Erreur suppression participant D1 :",
-            error
-        );
-
-        alert(
-            "Le participant n'a pas pu être supprimé en ligne."
-        );
-
-        return;
-    }
-
-    people =
-        people.filter(function(person) {
-            return person.id !== editingPersonId;
-        });
-
-    editingPersonId = null;
-
-    saveData();
-
-    renderPeopleBank();
-
-    alert(
-        "Le participant a été supprimé."
+const confirmation =
+    confirm(
+        '⚠️ Voulez-vous vraiment supprimer le participant "' +
+        person.nom +
+        '" ?\n\n' +
+        'Il sera retiré de toutes les parties et de tous les groupes.'
     );
 
+if (!confirmation) {
+    return;
+}
+
+try {
+
+    const response =
+        await fetch(
+            "https://blindtestmix.amelinebrt.workers.dev/people/" +
+            encodeURIComponent(editingPersonId),
+            {
+                method: "DELETE"
+            }
+        );
+
+    if (!response.ok) {
+        throw new Error(
+            "Erreur lors de la suppression du participant."
+        );
+    }
+
+} catch (error) {
+
+    console.error(
+        "Erreur suppression participant D1 :",
+        error
+    );
+
+    alert(
+        "Le participant n'a pas pu être supprimé en ligne."
+    );
+
+    return;
+}
+
+people =
+    people.filter(function(person) {
+        return person.id !== editingPersonId;
+    });
+
+editingPersonId = null;
+
+saveData();
+
+renderPeopleBank();
+
+alert(
+    "Le participant a été supprimé."
+);
+
 history.back();
+   
 }
 
    
@@ -10789,28 +10779,12 @@ const confirmation =
         group.name +
         '" ?\n\n' +
         'Les parties du groupe ne seront pas supprimées. ' +
-        'Elles deviendront simplement indépendantes.\n\n' +
-        'Une seconde confirmation sera demandée.'
+        'Elles deviendront simplement indépendantes.'
     );
 
 if (!confirmation) {
     return;
 }
-
-const verification =
-    prompt(
-        'Pour confirmer la suppression du groupe, écris exactement : SUPPRIMER'
-    );
-
-if (verification !== "SUPPRIMER") {
-    alert("Suppression annulée.");
-    return;
-}
-
-
-/* ==================================================
-   SUPPRESSION DU GROUPE DANS CLOUDFLARE D1
-   ================================================== */
 
 try {
 
@@ -10848,18 +10822,13 @@ try {
         error
     );
 
-alert(
-    "Erreur suppression groupe D1 :\n\n" +
-    error.message
-);
+    alert(
+        "Erreur suppression groupe D1 :\n\n" +
+        error.message
+    );
 
     return;
 }
-
-
-/* ==================================================
-   SUPPRESSION LOCALE
-   ================================================== */
 
 games.forEach(function(game) {
 
@@ -10883,7 +10852,7 @@ alert(
 );
 
 showGroups();
-
+   
 }
 
    
@@ -15814,90 +15783,80 @@ function cancelDuplicateRound() {
 
 async function deleteRound(roundId) {
 
-    if (!confirm("⚠️ Voulez-vous vraiment supprimer cette manche de la partie ?\n\nCette action est définitive.")) {
-        return;
-    }
-
-    const confirmation = prompt(
-        'Pour confirmer la suppression, écrivez "SUPPRIMER" en majuscules :'
+    const confirmation =
+    confirm(
+        "⚠️ Voulez-vous vraiment supprimer cette manche de la partie ?\n\n" +
+        "Cette action est définitive."
     );
 
-    if (
-        confirmation === null ||
-        confirmation.trim() !== "SUPPRIMER"
-    ) {
-        alert("Suppression annulée.");
-        return;
-    }
+if (!confirmation) {
+    return;
+}
 
-    const game = getCurrentGame();
+const game =
+    getCurrentGame();
 
-    game.rounds =
-        game.rounds.filter(function(round) {
-            return round.id !== roundId;
-        });
+if (!game) {
+    return;
+}
 
+game.rounds =
+    game.rounds.filter(function(round) {
+        return round.id !== roundId;
+    });
 
-    /*
-     * Suppression de la manche dans Cloudflare D1
-     */
+/*
+ * Suppression de la manche dans Cloudflare D1
+ */
 
-    try {
+try {
 
-        const response =
-            await fetch(
-                "https://blindtestmix.amelinebrt.workers.dev/rounds",
-                {
-                    method: "DELETE",
-
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        id: roundId
-                    })
-
-                }
-            );
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Erreur lors de la suppression de la manche en ligne."
-            );
-
-        }
-
-
-        const result =
-            await response.json();
-
-        console.log(
-            "Manche supprimée en ligne :",
-            result
+    const response =
+        await fetch(
+            "https://blindtestmix.amelinebrt.workers.dev/rounds",
+            {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    id: roundId
+                })
+            }
         );
 
+    if (!response.ok) {
 
-    } catch (error) {
-
-        console.error(
-            "Erreur suppression manche D1 :",
-            error
-        );
-
-        alert(
-            "La manche a été supprimée sur cet appareil, mais elle n'a pas pu être supprimée en ligne."
+        throw new Error(
+            "Erreur lors de la suppression de la manche en ligne."
         );
 
     }
 
+    const result =
+        await response.json();
 
-    saveData();
+    console.log(
+        "Manche supprimée en ligne :",
+        result
+    );
 
-    renderRounds();
+} catch (error) {
 
+    console.error(
+        "Erreur suppression manche D1 :",
+        error
+    );
+
+    alert(
+        "La manche a été supprimée sur cet appareil, mais elle n'a pas pu être supprimée en ligne."
+    );
+
+}
+
+saveData();
+
+renderRounds();
 }
 
 /* ========================================================
