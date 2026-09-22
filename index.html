@@ -1028,20 +1028,22 @@ max-height: calc(100vh - 90px);
     border-radius: 6px;
 }
 
-   .participant-item.selected {
+.creator-person-option.selected {
     background: rgba(184, 220, 215, 0.55);
     border: 2px solid #78BFB7;
     box-sizing: border-box;
     position: relative;
 }
 
-   
-.participant-item.selected::after {
+.creator-person-option.selected::after {
     content: "✓";
     color: #238B82;
     font-weight: bold;
     font-size: 18px;
-    margin-left: 6px;
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
    
