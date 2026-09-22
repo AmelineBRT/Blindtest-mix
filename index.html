@@ -10670,7 +10670,7 @@ function shareGroup(groupId) {
 
 }
 
-function deleteCurrentGroup() {
+async function deleteCurrentGroup() {
 
     const group =
         groups.find(function(g) {
@@ -10681,30 +10681,76 @@ function deleteCurrentGroup() {
         return;
     }
 
-const confirmation =
-    confirm(
-        '⚠️ Voulez-vous vraiment supprimer le groupe "' +
-        group.name +
-        '" ?\n\n' +
-        'Les parties du groupe ne seront pas supprimées. ' +
-        'Elles deviendront simplement indépendantes.\n\n' +
-        'Une seconde confirmation sera demandée.'
-    );
+    const confirmation =
+        confirm(
+            '⚠️ Voulez-vous vraiment supprimer le groupe "' +
+            group.name +
+            '" ?\n\n' +
+            'Les parties du groupe ne seront pas supprimées. ' +
+            'Elles deviendront simplement indépendantes.\n\n' +
+            'Une seconde confirmation sera demandée.'
+        );
 
-if (!confirmation) {
-    return;
-}
+    if (!confirmation) {
+        return;
+    }
 
-const verification =
-    prompt(
-        'Pour confirmer la suppression du groupe, écris exactement : SUPPRIMER'
-    );
+    const verification =
+        prompt(
+            'Pour confirmer la suppression du groupe, écris exactement : SUPPRIMER'
+        );
 
-if (verification !== "SUPPRIMER") {
-    alert("Suppression annulée.");
-    return;
-}
+    if (verification !== "SUPPRIMER") {
+        alert("Suppression annulée.");
+        return;
+    }
 
+    /* ==================================================
+       SUPPRESSION DU GROUPE DANS CLOUDFLARE D1
+       ================================================== */
+
+    try {
+
+        const response =
+            await fetch(
+                "https://blindtestmix.amelinebrt.workers.dev/groups/" +
+                encodeURIComponent(group.id),
+                {
+                    method: "DELETE"
+                }
+            );
+
+        if (!response.ok) {
+
+            const errorText =
+                await response.text();
+
+            throw new Error(
+                response.status +
+                " : " +
+                errorText
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Erreur suppression groupe D1 :",
+            error
+        );
+
+        alert(
+            "Le groupe n'a pas pu être supprimé en ligne.\n\n" +
+            "Il n'a donc pas été supprimé sur cet appareil."
+        );
+
+        return;
+    }
+
+    /* ==================================================
+       SUPPRESSION LOCALE
+       ================================================== */
 
     games.forEach(function(game) {
 
@@ -13565,7 +13611,7 @@ if (groupId) {
    SUPPRIMER PARTIE ACTUELLE
    ======================================================== */
 
-function deleteCurrentGame() {
+async function deleteCurrentGame() {
 
     const game = getCurrentGame();
 
@@ -13589,8 +13635,54 @@ function deleteCurrentGame() {
         );
 
         return;
-
     }
+
+    /* ==================================================
+       SUPPRESSION DE LA PARTIE DANS CLOUDFLARE D1
+       ================================================== */
+
+    try {
+
+        const response =
+            await fetch(
+                "https://blindtestmix.amelinebrt.workers.dev/parties/" +
+                encodeURIComponent(game.id),
+                {
+                    method: "DELETE"
+                }
+            );
+
+        if (!response.ok) {
+
+            const errorText =
+                await response.text();
+
+            throw new Error(
+                response.status +
+                " : " +
+                errorText
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Erreur suppression partie D1 :",
+            error
+        );
+
+        alert(
+            "La partie n'a pas pu être supprimée en ligne.\n\n" +
+            "Elle n'a donc pas été supprimée sur cet appareil."
+        );
+
+        return;
+    }
+
+    /* ==================================================
+       SUPPRESSION LOCALE
+       ================================================== */
 
     games =
         games.filter(function(g) {
