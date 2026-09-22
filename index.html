@@ -15286,6 +15286,9 @@ renderDuplicateGames();
 
 }
 
+
+   
+
    function renderDuplicateActiveFilters() {
 
     const container =
@@ -15844,68 +15847,149 @@ function renderDuplicateGames() {
 
 }
 
-function confirmDuplicateRound() {
+   
+async function confirmDuplicateRound() {
 
-    const sourceGame =
-        games.find(function(game) {
-            return game.id === duplicateSourceGameId;
-        });
-
-    if (!sourceGame) {
-        return;
-    }
-
-    const original =
-        sourceGame.rounds.find(function(round) {
-            return round.id === duplicateRoundId;
-        });
-
-    if (!original) {
-        return;
-    }
-
-    const selected =
-        document.querySelectorAll(
-            ".duplicate-target:checked"
-        );
-
-    if (selected.length === 0) {
-
-        alert(
-            "Sélectionne au moins une partie."
-        );
-
-        return;
-
-    }
-
-    selected.forEach(function(checkbox) {
-
-        const targetGame =
-            games.find(function(game) {
-                return game.id === checkbox.value;
-            });
-
-        if (!targetGame) {
-            return;
-        }
-
-        const copy =
-            JSON.parse(
-                JSON.stringify(original)
-            );
-
-        copy.id =
-            Date.now().toString() +
-            Math.random()
-                .toString(36)
-                .substring(2, 7);
-
-        targetGame.rounds.push(copy);
-
+const sourceGame =
+    games.find(function(game) {
+        return game.id === duplicateSourceGameId;
     });
 
-    saveData();
+if (!sourceGame) {
+    return;
+}
+
+const original =
+    sourceGame.rounds.find(function(round) {
+        return round.id === duplicateRoundId;
+    });
+
+if (!original) {
+    return;
+}
+
+const selected =
+    document.querySelectorAll(
+        ".duplicate-target:checked"
+    );
+
+if (selected.length === 0) {
+
+    alert(
+        "Sélectionne au moins une partie."
+    );
+
+    return;
+
+}
+
+let onlineErrors = 0;
+
+for (const checkbox of selected) {
+
+    const targetGame =
+        games.find(function(game) {
+            return game.id === checkbox.value;
+        });
+
+    if (!targetGame) {
+        continue;
+    }
+
+    const copy =
+        JSON.parse(
+            JSON.stringify(original)
+        );
+
+    copy.id =
+        Date.now().toString() +
+        Math.random()
+            .toString(36)
+            .substring(2, 7);
+
+    targetGame.rounds.push(copy);
+
+
+    /*
+     * Sauvegarde de la manche dupliquée dans Cloudflare D1
+     */
+
+    try {
+
+        const response =
+            await fetch(
+                "https://blindtestmix.amelinebrt.workers.dev/rounds",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        id:
+                            copy.id,
+
+                        partie_id:
+                            targetGame.id,
+
+                        nom:
+                            copy.name || "",
+
+                        ordre:
+                            targetGame.rounds.length
+
+                    })
+
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Erreur lors de l'enregistrement de la manche dupliquée."
+            );
+
+        }
+
+
+        const result =
+            await response.json();
+
+        console.log(
+            "Manche dupliquée enregistrée en ligne :",
+            result
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Erreur sauvegarde duplication D1 :",
+            error
+        );
+
+        onlineErrors++;
+
+    }
+
+}
+
+
+saveData();
+
+
+if (onlineErrors > 0) {
+
+    alert(
+        "La manche a été dupliquée, mais " +
+        onlineErrors +
+        " copie(s) n'ont pas pu être enregistrée(s) en ligne."
+    );
+
+} else {
 
     alert(
         "Manche dupliquée dans " +
@@ -15913,12 +15997,15 @@ function confirmDuplicateRound() {
         " partie(s) !"
     );
 
-    duplicateRoundId = null;
+}
 
-    currentGameId =
-        duplicateSourceGameId;
 
-    showGame();
+duplicateRoundId = null;
+
+currentGameId =
+    duplicateSourceGameId;
+
+showGame();
 
 }
 
