@@ -10757,110 +10757,118 @@ function shareGroup(groupId) {
 
 async function deleteCurrentGroup() {
 
-    const group =
-        groups.find(function(g) {
-            return g.id === currentGroupId;
-        });
-
-    if (!group) {
-        return;
-    }
-
-    const confirmation =
-        confirm(
-            '⚠️ Voulez-vous vraiment supprimer le groupe "' +
-            group.name +
-            '" ?\n\n' +
-            'Les parties du groupe ne seront pas supprimées. ' +
-            'Elles deviendront simplement indépendantes.\n\n' +
-            'Une seconde confirmation sera demandée.'
-        );
-
-    if (!confirmation) {
-        return;
-    }
-
-    const verification =
-        prompt(
-            'Pour confirmer la suppression du groupe, écris exactement : SUPPRIMER'
-        );
-
-    if (verification !== "SUPPRIMER") {
-        alert("Suppression annulée.");
-        return;
-    }
-
-    /* ==================================================
-       SUPPRESSION DU GROUPE DANS CLOUDFLARE D1
-       ================================================== */
-
-    try {
-
-        const response =
-            await fetch(
-                "https://blindtestmix.amelinebrt.workers.dev/groups/" +
-                encodeURIComponent(group.id),
-                {
-                    method: "DELETE"
-                }
-            );
-
-        if (!response.ok) {
-
-            const errorText =
-                await response.text();
-
-            throw new Error(
-                response.status +
-                " : " +
-                errorText
-            );
-
-        }
-
-    } catch (error) {
-
-        console.error(
-            "Erreur suppression groupe D1 :",
-            error
-        );
-
-        alert(
-            "Le groupe n'a pas pu être supprimé en ligne.\n\n" +
-            "Il n'a donc pas été supprimé sur cet appareil."
-        );
-
-        return;
-    }
-
-    /* ==================================================
-       SUPPRESSION LOCALE
-       ================================================== */
-
-    games.forEach(function(game) {
-
-        if (game.groupId === group.id) {
-            game.groupId = "";
-        }
-
+const group =
+    groups.find(function(g) {
+        return g.id === currentGroupId;
     });
 
-    groups =
-        groups.filter(function(g) {
-            return g.id !== group.id;
-        });
+if (!group) {
+    return;
+}
 
-    currentGroupId = null;
-
-    saveData();
-
-    alert(
-        "Le groupe a été supprimé."
+const confirmation =
+    confirm(
+        '⚠️ Voulez-vous vraiment supprimer le groupe "' +
+        group.name +
+        '" ?\n\n' +
+        'Les parties du groupe ne seront pas supprimées. ' +
+        'Elles deviendront simplement indépendantes.\n\n' +
+        'Une seconde confirmation sera demandée.'
     );
 
-    showGroups();
+if (!confirmation) {
+    return;
+}
+
+const verification =
+    prompt(
+        'Pour confirmer la suppression du groupe, écris exactement : SUPPRIMER'
+    );
+
+if (verification !== "SUPPRIMER") {
+    alert("Suppression annulée.");
+    return;
+}
+
+
+/* ==================================================
+   SUPPRESSION DU GROUPE DANS CLOUDFLARE D1
+   ================================================== */
+
+try {
+
+    const response =
+        await fetch(
+            "https://blindtestmix.amelinebrt.workers.dev/groups",
+            {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    id: group.id
+                })
+            }
+        );
+
+    if (!response.ok) {
+
+        const errorText =
+            await response.text();
+
+        throw new Error(
+            response.status +
+            " : " +
+            errorText
+        );
+
+    }
+
+} catch (error) {
+
+    console.error(
+        "Erreur suppression groupe D1 :",
+        error
+    );
+
+    alert(
+        "Le groupe n'a pas pu être supprimé en ligne.\n\n" +
+        "Il n'a donc pas été supprimé sur cet appareil."
+    );
+
+    return;
+}
+
+
+/* ==================================================
+   SUPPRESSION LOCALE
+   ================================================== */
+
+games.forEach(function(game) {
+
+    if (game.groupId === group.id) {
+        game.groupId = "";
+    }
+
+});
+
+groups =
+    groups.filter(function(g) {
+        return g.id !== group.id;
+    });
+
+currentGroupId = null;
+
+saveData();
+
+alert(
+    "Le groupe a été supprimé."
+);
+
+showGroups();
 
 }
+
    
 
 
