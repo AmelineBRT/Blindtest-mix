@@ -620,22 +620,9 @@ button:disabled {
     white-space: nowrap;
 }
 
-.participant-new-person-button.has-search-text {
-    background: #720038;
-    color: white;
-}
 
-  .participant-new-person-plus {
-    color: #999;
-}
 
-.participant-new-person-icon {
-    filter: brightness(2.5);
-} 
 
-   .participant-new-person-button.has-search-text .participant-new-person-icon {
-    filter: none;
-}
 
 #participantFilterMenu .participant-person-icon,
 #creatorFilterMenu .participant-person-icon {
@@ -2479,9 +2466,19 @@ label {
 }
 
 .creator-person-option.selected {
-    border-color: #720038;
-    background: rgba(114, 0, 56, 0.08);
+    border: 2px solid #78BFB7;
+    background: rgba(184, 220, 215, 0.55);
     font-weight: 700;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.creator-person-option.selected::after {
+    content: "✓";
+    color: #238B82;
+    font-weight: bold;
+    font-size: 18px;
+    margin-left: 6px;
 }
 
 
