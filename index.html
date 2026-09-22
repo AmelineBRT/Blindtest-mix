@@ -5078,6 +5078,8 @@ if (!Array.isArray(group.participants)) {
 
 }
 
+   
+
 async function loadGamesFromCloud() {
 
     try {
@@ -5424,12 +5426,28 @@ async function loadGamesFromCloud() {
 
 
         /* ==================================================
+           SUPPRESSION DES PARTIES ABSENTES DE D1
+           ================================================== */
+
+        games =
+            games.filter(function(game) {
+
+                return onlineGames.some(
+                    function(cloudGame) {
+
+                        return cloudGame.id === game.id;
+
+                    }
+                );
+
+            });
+
+
+        /* ==================================================
            SAUVEGARDE LOCALE
            ================================================== */
 
         saveData();
-
-
         console.log(
             "Synchronisation Cloudflare terminée."
         );
