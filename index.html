@@ -7375,14 +7375,17 @@ if (!person) {
 }
 
 const confirmation =
-    confirm(
-        '⚠️ Voulez-vous vraiment supprimer le participant "' +
+    prompt(
+        '⚠️ ATTENTION\n\n' +
+        'Cette action supprimera définitivement le participant "' +
         person.nom +
-        '" ?\n\n' +
-        'Il sera retiré de toutes les parties et de tous les groupes.'
+        '".\n\n' +
+        'Il sera retiré de toutes les parties et de tous les groupes.\n\n' +
+        'Pour confirmer, écris exactement : SUPPRIMER'
     );
 
-if (!confirmation) {
+if (confirmation !== "SUPPRIMER") {
+    alert("Suppression annulée.");
     return;
 }
 
@@ -10774,15 +10777,18 @@ if (!group) {
 }
 
 const confirmation =
-    confirm(
-        '⚠️ Voulez-vous vraiment supprimer le groupe "' +
+    prompt(
+        '⚠️ ATTENTION\n\n' +
+        'Cette action supprimera définitivement le groupe "' +
         group.name +
-        '" ?\n\n' +
+        '".\n\n' +
         'Les parties du groupe ne seront pas supprimées. ' +
-        'Elles deviendront simplement indépendantes.'
+        'Elles deviendront simplement indépendantes.\n\n' +
+        'Pour confirmer, écris exactement : SUPPRIMER'
     );
 
-if (!confirmation) {
+if (confirmation !== "SUPPRIMER") {
+    alert("Suppression annulée.");
     return;
 }
 
@@ -15783,13 +15789,15 @@ function cancelDuplicateRound() {
 
 async function deleteRound(roundId) {
 
-    const confirmation =
-    confirm(
-        "⚠️ Voulez-vous vraiment supprimer cette manche de la partie ?\n\n" +
-        "Cette action est définitive."
+const confirmation =
+    prompt(
+        "⚠️ ATTENTION\n\n" +
+        "Cette action supprimera définitivement cette manche de la partie.\n\n" +
+        "Pour confirmer, écris exactement : SUPPRIMER"
     );
 
-if (!confirmation) {
+if (confirmation !== "SUPPRIMER") {
+    alert("Suppression annulée.");
     return;
 }
 
