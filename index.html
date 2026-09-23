@@ -11453,10 +11453,10 @@ div.style.background =
         };
 
 
-    const passwordIcon =
-        game.password
-        ? " 🔒"
-        : "";
+const passwordIcon =
+    game.has_password
+    ? " 🔒"
+    : "";
 
 
     const groupHeader =
@@ -11953,10 +11953,13 @@ function showForgotPassword(gameId) {
         gameId;
 
     document.getElementById(
-        "forgotPasswordGameName"
-    ).textContent =
-        "Partie : " + game.name;
-
+    "forgotPasswordGameName"
+).innerHTML =
+    "<strong>Partie :</strong> " +
+    game.name +
+    "<br>" +
+    "<strong>Créée par :</strong> " +
+    game.creator;
 
     const questionElement =
         document.getElementById(
@@ -12060,22 +12063,26 @@ async function recoverPassword() {
             await response.json();
 
 
-        if (!result.success) {
+       if (!result.success) {
 
-            alert(
-                result.error ||
-                "Réponse incorrecte."
-            );
+    alert(
+        "Bien essayé, mais ce n'est pas la bonne réponse 😰\n\n" +
+        "Les majuscules, minuscules, accents et tirets ne sont pas pris en compte et ne comptent pas comme une erreur."
+    );
 
-            return;
-        }
+    return;
+}
 
 
-        alert(
-            "Réponse correcte !\n\n" +
-            "Mot de passe de la partie : " +
-            result.mot_de_passe
-        );
+alert(
+    "En effet, tu as raison ! 🙂‍↕️\n\n" +
+    "Le mot de passe de la partie " +
+    game.name +
+    " créée par " +
+    game.creator +
+    " est :\n\n" +
+    result.mot_de_passe
+);
 
 
         recoveryGameId =
