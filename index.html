@@ -4859,14 +4859,35 @@ onclick="history.back()"
 
     <p id="emailHint" class="password-help"></p>
 
-    <input
-        id="recoveryEmail"
-        type="email"
-        placeholder="Votre adresse e-mail">
+<div id="passkeyRecoverySection">
 
-    <button class="primary" onclick="recoverPassword()">
-        Vérifier mon adresse
+    <button
+        class="primary"
+        onclick="recoverWithDevice()">
+        🔐 Utiliser cet appareil
     </button>
+
+    <p class="password-help">
+        Si cet appareil a déjà été autorisé pour cette partie,
+        tu peux récupérer l'accès sans saisir le mot de passe.
+    </p>
+
+</div>
+
+<hr>
+
+<p>
+    Ou saisir l'adresse e-mail renseignée au moment de la création de cette partie.
+</p>
+
+<input
+    id="recoveryEmail"
+    type="email"
+    placeholder="Votre adresse e-mail">
+
+<button class="primary" onclick="recoverPassword()">
+    Vérifier mon adresse
+</button>
 
 </div>
 
