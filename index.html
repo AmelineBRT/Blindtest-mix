@@ -11924,27 +11924,38 @@ function showForgotPassword(gameId) {
         return;
     }
 
-    recoveryGameId = gameId;
+    recoveryGameId =
+        gameId;
 
     document.getElementById(
         "forgotPasswordGameName"
     ).textContent =
         "Partie : " + game.name;
 
-    document.getElementById(
-        "recoveryEmail"
-    ).value = "";
 
-    document.getElementById(
-        "emailHint"
-    ).textContent =
-        game.email
-        ? "Adresse enregistrée : " +
-          maskEmail(game.email)
-        : "Aucune adresse e-mail de récupération n'a été renseignée pour cette ancienne partie.";
+    const questionElement =
+        document.getElementById(
+            "recoveryQuestionText"
+        );
 
-    showScreen("forgotPasswordScreen");
+    const answerElement =
+        document.getElementById(
+            "recoveryAnswer"
+        );
 
+
+    questionElement.textContent =
+        game.recoveryQuestion
+        ? game.recoveryQuestion
+        : "Aucune question de récupération n'a été définie pour cette partie.";
+
+
+    answerElement.value = "";
+
+
+    showScreen(
+        "forgotPasswordScreen"
+    );
 }
 
 
@@ -11974,61 +11985,91 @@ function maskEmail(email) {
    RÉCUPÉRER MOT DE PASSE
    ======================================================== */
 
-function recoverPassword() {
+async function recoverPassword() {
 
-    const game =
-        games.find(function(g) {
-            return g.id === recoveryGameId;
-        });
-
-    if (!game) {
+    if (!recoveryGameId) {
         return;
     }
 
-    const email =
+    const answer =
         document
-            .getElementById("recoveryEmail")
+            .getElementById("recoveryAnswer")
             .value
-            .trim()
-            .toLowerCase();
+            .trim();
 
-    if (!email) {
-
-        alert("Veuillez saisir votre adresse e-mail.");
-
-        return;
-
-    }
-
-    const masterEmail =
-        "launay.ameline@gmail.com";
-
-    if (
-        email !== masterEmail &&
-        (
-            !game.email ||
-            email !== game.email.toLowerCase()
-        )
-    ) {
+    if (!answer) {
 
         alert(
-            "Cette adresse e-mail ne correspond pas à celle enregistrée pour cette partie."
+            "Veuillez saisir votre réponse."
         );
 
         return;
-
     }
 
-    alert(
-        "Adresse vérifiée !\n\n" +
-        "Mot de passe de la partie : " +
-        game.password
-    );
 
-    recoveryGameId = null;
+    try {
 
-    showGames();
+        const response =
+            await fetch(
+                "https://blindtestmix.amelinebrt.workers.dev/recover-password",
+                {
+                    method: "POST",
 
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        partie_id:
+                            recoveryGameId,
+
+                        reponse_recuperation:
+                            answer
+                    })
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!result.success) {
+
+            alert(
+                result.error ||
+                "Réponse incorrecte."
+            );
+
+            return;
+        }
+
+
+        alert(
+            "Réponse correcte !\n\n" +
+            "Mot de passe de la partie : " +
+            result.mot_de_passe
+        );
+
+
+        recoveryGameId =
+            null;
+
+        showGames();
+
+
+    } catch (error) {
+
+        console.error(
+            "Erreur récupération mot de passe :",
+            error
+        );
+
+        alert(
+            "Impossible de contacter le serveur. Vérifie ta connexion internet."
+        );
+    }
 }
 
 
