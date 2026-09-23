@@ -4847,49 +4847,30 @@ onclick="history.back()"
 
 <section id="forgotPasswordScreen" class="screen">
 
-<div class="card">
+    <div class="card">
 
-    <h2>🔐 Mot de passe oublié</h2>
+        <h2>🔐 Mot de passe oublié</h2>
 
-    <p id="forgotPasswordGameName"></p>
+        <p id="forgotPasswordGameName"></p>
 
-    <p>
-        Veuillez saisir l'adresse e-mail renseignée au moment de la création de cette partie.
-    </p>
+        <div id="recoveryQuestionSection">
 
-    <p id="emailHint" class="password-help"></p>
+            <p id="recoveryQuestionText"></p>
 
-<div id="passkeyRecoverySection">
+            <input
+                id="recoveryAnswer"
+                type="text"
+                placeholder="Votre réponse">
 
-    <button
-        class="primary"
-        onclick="recoverWithDevice()">
-        🔐 Utiliser cet appareil
-    </button>
+            <button
+                class="primary"
+                onclick="recoverPassword()">
+                Vérifier ma réponse
+            </button>
 
-    <p class="password-help">
-        Si cet appareil a déjà été autorisé pour cette partie,
-        tu peux récupérer l'accès sans saisir le mot de passe.
-    </p>
+        </div>
 
-</div>
-
-<hr>
-
-<p>
-    Ou saisir l'adresse e-mail renseignée au moment de la création de cette partie.
-</p>
-
-<input
-    id="recoveryEmail"
-    type="email"
-    placeholder="Votre adresse e-mail">
-
-<button class="primary" onclick="recoverPassword()">
-    Vérifier mon adresse
-</button>
-
-</div>
+    </div>
 
 </section>
 
@@ -5488,15 +5469,17 @@ groups =
                     groupId:
                         detail.groupe_id || "",
 
-                   has_password:
+has_password:
     detail.has_password === true,
 
 email:
     detail.email_recuperation || "",
 
-                    participants:
-                        participants,
+recoveryQuestion:
+    detail.question_recuperation || "",
 
+participants:
+    participants,
                     rounds:
                         rounds
 
@@ -5529,6 +5512,8 @@ email:
 
 localGame.email =
     detail.email_recuperation || "";
+           localGame.recoveryQuestion =
+    detail.question_recuperation || "";
             localGame.participants =
                 participants;
 
@@ -10193,6 +10178,15 @@ async function createGame() {
             "gameEmail"
         ).value.trim();
 
+   const recoveryQuestion =
+    document.getElementById(
+        "gameRecoveryQuestion"
+    ).value.trim();
+
+const recoveryAnswer =
+    document.getElementById(
+        "gameRecoveryAnswer"
+    ).value.trim();
 
     /* ==================================================
        VÉRIFICATIONS
@@ -10220,15 +10214,15 @@ async function createGame() {
     }
 
 
-    if (password && !email) {
+if (password && (!recoveryQuestion || !recoveryAnswer)) {
 
-        alert(
-            "Une adresse e-mail est obligatoire lorsque tu utilises un mot de passe."
-        );
+    alert(
+        "Une question et une réponse de récupération sont obligatoires lorsque tu utilises un mot de passe."
+    );
 
-        return;
+    return;
 
-    }
+}
 
 
     /* ==================================================
@@ -10355,7 +10349,10 @@ has_password:
 email:
     email,
 
-        participants:
+recoveryQuestion:
+    recoveryQuestion,
+
+participants:
             participants,
 
         rounds:
