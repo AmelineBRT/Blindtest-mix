@@ -4008,7 +4008,7 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
                 id="gamePassword"
                 type="password"
                 placeholder="Laisser vide si aucun mot de passe"
-                oninput="toggleEmailRequirement()">
+                oninput="toggleRecoveryRequirement()"
 
             <button
                 type="button"
@@ -4021,19 +4021,28 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
         </div>
 
-        <div id="emailCreationContainer" style="display:none;">
+             <div id="recoveryCreationContainer" style="display:none;">
 
             <label>
-                Adresse e-mail de récupération
+                Question de récupération
             </label>
 
             <input
-                id="gameEmail"
-                type="email"
-                placeholder="Ex : monadresse@email.com">
+                id="gameRecoveryQuestion"
+                type="text"
+                placeholder="Ex : Quel est le nom de mon premier chien ?">
+
+            <label>
+                Réponse de récupération
+            </label>
+
+            <input
+                id="gameRecoveryAnswer"
+                type="text"
+                placeholder="Votre réponse">
 
             <p class="password-help">
-                Cette adresse permettra de récupérer le mot de passe en cas d'oubli.
+                Cette question permettra de récupérer le mot de passe en cas d'oubli.
             </p>
 
         </div>
@@ -11275,19 +11284,19 @@ function showCreateGame() {
 }
 
 
-function toggleEmailRequirement() {
+function toggleRecoveryRequirement() {
 
     const password =
         document.getElementById("gamePassword").value;
 
     document.getElementById(
-        "emailCreationContainer"
+        "recoveryCreationContainer"
     ).style.display =
         password ? "block" : "none";
 
 }
 
-
+   
 function createGameCard(game, group = null) {
 
     const div =
