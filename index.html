@@ -12030,11 +12030,30 @@ async function recoverPassword() {
         return;
     }
 
+
+    const game =
+        games.find(function(g) {
+            return g.id === recoveryGameId;
+        });
+
+
+    if (!game) {
+
+        alert(
+            "Partie introuvable."
+        );
+
+        return;
+
+    }
+
+
     const answer =
         document
             .getElementById("recoveryAnswer")
             .value
             .trim();
+
 
     if (!answer) {
 
@@ -12074,26 +12093,26 @@ async function recoverPassword() {
             await response.json();
 
 
-       if (!result.success) {
+        if (!result.success) {
 
-    alert(
-        "Bien essayé, mais ce n'est pas la bonne réponse 😰\n\n" +
-        "Les majuscules, minuscules, accents et tirets ne sont pas pris en compte et ne comptent pas comme une erreur."
-    );
+            alert(
+                "Bien essayé, mais ce n'est pas la bonne réponse 😰\n\n" +
+                "Les majuscules, minuscules, accents et tirets ne sont pas pris en compte et ne comptent pas comme une erreur."
+            );
 
-    return;
-}
+            return;
+        }
 
 
-alert(
-    "En effet, tu as raison ! 🙂‍↕️\n\n" +
-    "Le mot de passe de la partie " +
-    game.name +
-    " créée par " +
-    game.creator +
-    " est :\n\n" +
-    result.mot_de_passe
-);
+        alert(
+            "En effet, tu as raison ! 🙂‍↕️\n\n" +
+            "Le mot de passe de la partie " +
+            game.name +
+            " créée par " +
+            game.creator +
+            " est :\n\n" +
+            result.mot_de_passe
+        );
 
 
         recoveryGameId =
@@ -12114,8 +12133,6 @@ alert(
         );
     }
 }
-
-
 function cancelPasswordRecovery() {
 
     recoveryGameId = null;
