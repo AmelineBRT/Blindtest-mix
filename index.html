@@ -4362,7 +4362,7 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
                 id="editGamePassword"
                 type="password"
                 placeholder="Laisser vide pour supprimer le mot de passe"
-                oninput="toggleEditEmailRequirement()">
+                oninput="toggleEditRecoveryRequirement()">
 
             <button
                 type="button"
@@ -4377,16 +4377,31 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
         <div id="editEmailContainer">
 
-            <label>
-                Adresse e-mail de récupération
-            </label>
+         <div id="editRecoveryContainer">
 
-            <input
-                id="editGameEmail"
-                type="email"
-                placeholder="Adresse utilisée pour récupérer le mot de passe">
+    <label>
+        Question de récupération
+    </label>
 
-        </div>
+    <input
+        id="editGameRecoveryQuestion"
+        type="text"
+        placeholder="Ex : Quel est le nom de mon premier chien ?">
+
+    <label>
+        Réponse de récupération
+    </label>
+
+    <input
+        id="editGameRecoveryAnswer"
+        type="text"
+        placeholder="Votre réponse">
+
+    <p class="password-help">
+        Cette question permettra de récupérer le mot de passe en cas d'oubli.
+    </p>
+
+</div>
 
     </div>
 
@@ -13984,13 +13999,16 @@ async function showEditGame() {
         game.groupId || ""
     );
 
-    document.getElementById("editGamePassword").value =
-        game.password || "";
+document.getElementById("editGamePassword").value =
+    "";
 
-    document.getElementById("editGameEmail").value =
-        game.email || "";
+document.getElementById("editGameRecoveryQuestion").value =
+    game.recoveryQuestion || "";
 
-    toggleEditEmailRequirement();
+document.getElementById("editGameRecoveryAnswer").value =
+    "";
+
+toggleEditRecoveryRequirement();
 
     showScreen("editGameScreen");
 
