@@ -10188,7 +10188,7 @@ const recoveryAnswer =
         "gameRecoveryAnswer"
     ).value.trim();
 
-    /* ==================================================
+       /* ==================================================
        VÉRIFICATIONS
        ================================================== */
 
@@ -10403,11 +10403,16 @@ participants:
                             game.groupId || null,
 
                         mot_de_passe:
-                            password || null,
+    password || null,
 
-                        email_recuperation:
-                            game.email || null
+email_recuperation:
+    game.email || null,
 
+question_recuperation:
+    recoveryQuestion || null,
+
+reponse_recuperation:
+    recoveryAnswer || null
                     })
 
                 }
@@ -14025,15 +14030,12 @@ async function saveGameChanges() {
 
     }
 
-    if (password && !email) {
-
-        alert(
-            "Une adresse e-mail est obligatoire lorsque tu utilises un mot de passe."
-        );
-
-        return;
-
-    }
+   if (password && (!recoveryQuestion || !recoveryAnswer)) {
+    alert(
+        "Une question et une réponse de récupération sont obligatoires lorsque tu utilises un mot de passe."
+    );
+    return;
+}
 
 game.name = name;
 game.creator = creator;
