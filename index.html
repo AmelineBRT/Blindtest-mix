@@ -5467,11 +5467,11 @@ groups =
                     groupId:
                         detail.groupe_id || "",
 
-                    password:
-                        detail.mot_de_passe || "",
+                   has_password:
+    detail.has_password === true,
 
-                    email:
-                        detail.email_recuperation || "",
+email:
+    detail.email_recuperation || "",
 
                     participants:
                         participants,
@@ -5503,12 +5503,11 @@ groups =
             localGame.groupId =
                 detail.groupe_id || "";
 
-            localGame.password =
-                detail.mot_de_passe || "";
+           localGame.has_password =
+    detail.has_password === true;
 
-            localGame.email =
-                detail.email_recuperation || "";
-
+localGame.email =
+    detail.email_recuperation || "";
             localGame.participants =
                 participants;
 
@@ -10329,11 +10328,11 @@ async function createGame() {
         groupId:
             groupId,
 
-        password:
-            password,
+has_password:
+    !!password,
 
-        email:
-            email,
+email:
+    email,
 
         participants:
             participants,
