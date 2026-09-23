@@ -13974,42 +13974,65 @@ async function showEditGame() {
         return;
     }
 
-    await loadPeopleFromCloud();
+    showScreen("editGameScreen");
+
+
+    try {
+
+        await loadPeopleFromCloud();
+
+    } catch (error) {
+
+        console.error(
+            "Erreur chargement des personnes :",
+            error
+        );
+
+    }
+
 
     document.getElementById("editGameName").value =
         game.name;
 
+
     document.getElementById("editGameCreator").value =
         game.creator;
 
+
     document.getElementById("editGameCreatorSearch").value =
         "";
+
 
     renderCreatorBank(
         "edit",
         ""
     );
 
+
     updateGroupSelect(
         "editGameGroup",
         game.groupId || ""
     );
 
-document.getElementById("editGamePassword").value =
-    game.password || "";
 
-document.getElementById("editGameRecoveryQuestion").value =
-    game.recoveryQuestion || "";
+    document.getElementById("editGamePassword").value =
+        game.password || "";
 
-document.getElementById("editGameRecoveryAnswer").value =
-    "";
 
-toggleEditRecoveryRequirement();
+    document.getElementById("editGameRecoveryQuestion").value =
+        game.recoveryQuestion || "";
 
-    showScreen("editGameScreen");
+
+    document.getElementById("editGameRecoveryAnswer").value =
+        "";
+
+
+    toggleEditRecoveryRequirement();
 
 }
 
+
+   
    
 function toggleEditEmailRequirement() {
 
@@ -14039,10 +14062,14 @@ async function saveGameChanges() {
     }
 
     const name =
-        document.getElementById("editGameName").value.trim();
+        document.getElementById(
+            "editGameName"
+        ).value.trim();
 
     const creator =
-        document.getElementById("editGameCreator").value.trim();
+        document.getElementById(
+            "editGameCreator"
+        ).value.trim();
 
     const groupId =
         document.getElementById(
@@ -14050,120 +14077,178 @@ async function saveGameChanges() {
         ).value;
 
     const password =
-        document.getElementById("editGamePassword").value;
+        document.getElementById(
+            "editGamePassword"
+        ).value;
 
-    const email =
-        document.getElementById("editGameEmail").value.trim();
+    const recoveryQuestion =
+        document.getElementById(
+            "editGameRecoveryQuestion"
+        ).value.trim();
+
+    const recoveryAnswer =
+        document.getElementById(
+            "editGameRecoveryAnswer"
+        ).value.trim();
+
 
     if (!name) {
 
-        alert("Donne un nom à ta partie.");
+        alert(
+            "Donne un nom à ta partie."
+        );
 
         return;
 
     }
+
 
     if (!creator) {
 
-        alert("Indique qui a créé la partie.");
+        alert(
+            "Indique qui a créé la partie."
+        );
 
         return;
 
     }
 
-   if (password && (!recoveryQuestion || !recoveryAnswer)) {
-    alert(
-        "Une question et une réponse de récupération sont obligatoires lorsque tu utilises un mot de passe."
-    );
-    return;
-}
-
-game.name = name;
-game.creator = creator;
-
-const oldGroupId =
-    game.groupId;
-
-game.groupId =
-    groupId;
-
-game.password =
-    password;
-
-game.email =
-    password ? email : "";
-
-
-/*
- * Le créateur doit toujours être présent.
- */
-if (!Array.isArray(game.participants)) {
-    game.participants = [];
-}
-
-if (
-    game.creator &&
-    !game.participants.some(function(participant) {
-
-        return participant.toLowerCase() ===
-               game.creator.toLowerCase();
-
-    })
-) {
-
-    game.participants.unshift(
-        game.creator
-    );
-
-}
-
-
-/*
- * Si la partie rejoint un groupe,
- * récupérer automatiquement les personnes
- * déjà présentes dans ce groupe.
- */
-if (groupId) {
-
-    const newGroup =
-        groups.find(function(group) {
-            return group.id === groupId;
-        });
 
     if (
-        newGroup &&
-        Array.isArray(newGroup.participants)
+        password &&
+        (
+            !recoveryQuestion ||
+            (
+                !recoveryAnswer &&
+                !game.recoveryQuestion
+            )
+        )
     ) {
 
-        newGroup.participants.forEach(
-            function(name) {
+        alert(
+            "Une question et une réponse de récupération sont obligatoires lorsque tu utilises un mot de passe."
+        );
 
-                const alreadyInGame =
-                    game.participants.some(
-                        function(participant) {
+        return;
 
-                            return participant.toLowerCase() ===
-                                   name.toLowerCase();
+    }
 
-                        }
-                    );
 
-                if (!alreadyInGame) {
+    game.name =
+        name;
 
-                    game.participants.push(name);
+    game.creator =
+        creator;
 
-                }
+
+    const oldGroupId =
+        game.groupId;
+
+
+    game.groupId =
+        groupId;
+
+
+    game.password =
+        password;
+
+
+    game.has_password =
+        !!password;
+
+
+    game.recoveryQuestion =
+        recoveryQuestion;
+
+
+    /*
+     * Le créateur doit toujours être présent.
+     */
+
+    if (!Array.isArray(game.participants)) {
+
+        game.participants = [];
+
+    }
+
+
+    if (
+        game.creator &&
+        !game.participants.some(
+            function(participant) {
+
+                return participant.toLowerCase() ===
+                       game.creator.toLowerCase();
 
             }
+        )
+    ) {
+
+        game.participants.unshift(
+            game.creator
         );
 
     }
 
-}
+
+    /*
+     * Si la partie rejoint un groupe,
+     * récupérer automatiquement les personnes
+     * déjà présentes dans ce groupe.
+     */
+
+    if (groupId) {
+
+        const newGroup =
+            groups.find(
+                function(group) {
+
+                    return group.id ===
+                           groupId;
+
+                }
+            );
+
+
+        if (
+            newGroup &&
+            Array.isArray(newGroup.participants)
+        ) {
+
+            newGroup.participants.forEach(
+                function(name) {
+
+                    const alreadyInGame =
+                        game.participants.some(
+                            function(participant) {
+
+                                return participant.toLowerCase() ===
+                                       name.toLowerCase();
+
+                            }
+                        );
+
+
+                    if (!alreadyInGame) {
+
+                        game.participants.push(
+                            name
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+    }
+
 
     saveData();
 
-       try {
+
+    try {
 
         const response =
             await fetch(
@@ -14172,7 +14257,8 @@ if (groupId) {
                     method: "POST",
 
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type":
+                            "application/json"
                     },
 
                     body: JSON.stringify({
@@ -14192,8 +14278,11 @@ if (groupId) {
                         mot_de_passe:
                             game.password || null,
 
-                        email_recuperation:
-                            game.email || null
+                        question_recuperation:
+                            recoveryQuestion || null,
+
+                        reponse_recuperation:
+                            recoveryAnswer || null
 
                     })
 
@@ -14228,12 +14317,15 @@ if (groupId) {
 
     }
 
-    alert("Partie modifiée !");
+
+    alert(
+        "Partie modifiée !"
+    );
+
 
     showGame();
 
 }
-
 
 /* ========================================================
    SUPPRIMER PARTIE ACTUELLE
