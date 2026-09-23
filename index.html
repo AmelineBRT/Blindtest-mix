@@ -14061,30 +14061,36 @@ async function saveGameChanges() {
         return;
     }
 
+
     const name =
         document.getElementById(
             "editGameName"
         ).value.trim();
+
 
     const creator =
         document.getElementById(
             "editGameCreator"
         ).value.trim();
 
+
     const groupId =
         document.getElementById(
             "editGameGroup"
         ).value;
+
 
     const password =
         document.getElementById(
             "editGamePassword"
         ).value;
 
+
     const recoveryQuestion =
         document.getElementById(
             "editGameRecoveryQuestion"
         ).value.trim();
+
 
     const recoveryAnswer =
         document.getElementById(
@@ -14114,6 +14120,11 @@ async function saveGameChanges() {
     }
 
 
+    /*
+     * Si un nouveau mot de passe est saisi,
+     * une question et une réponse sont obligatoires.
+     */
+
     if (
         password &&
         (
@@ -14134,36 +14145,45 @@ async function saveGameChanges() {
     }
 
 
+    /*
+     * Si le champ mot de passe est vide,
+     * on considère qu'on conserve le mot de passe actuel.
+     *
+     * Le mot de passe ne sera supprimé que par
+     * l'action explicite prévue à cet effet.
+     */
+
+    const keepExistingPassword =
+        !password &&
+        game.has_password;
+
+
     game.name =
         name;
 
+
     game.creator =
         creator;
-
-
-    const oldGroupId =
-        game.groupId;
 
 
     game.groupId =
         groupId;
 
 
-    game.password =
-        password;
+    if (!keepExistingPassword) {
 
+        game.password =
+            password;
 
-    game.has_password =
-        !!password;
+        game.has_password =
+            !!password;
+
+    }
 
 
     game.recoveryQuestion =
         recoveryQuestion;
 
-
-    /*
-     * Le créateur doit toujours être présent.
-     */
 
     if (!Array.isArray(game.participants)) {
 
@@ -14190,12 +14210,6 @@ async function saveGameChanges() {
 
     }
 
-
-    /*
-     * Si la partie rejoint un groupe,
-     * récupérer automatiquement les personnes
-     * déjà présentes dans ce groupe.
-     */
 
     if (groupId) {
 
@@ -14250,6 +14264,52 @@ async function saveGameChanges() {
 
     try {
 
+        const body = {
+
+            id:
+                game.id,
+
+            nom:
+                game.name,
+
+            createur:
+                game.creator,
+
+            groupe_id:
+                game.groupId || null,
+
+            question_recuperation:
+                recoveryQuestion || null
+
+        };
+
+
+        /*
+         * Si on saisit un nouveau mot de passe,
+         * on l'envoie au serveur.
+         */
+
+        if (password) {
+
+            body.mot_de_passe =
+                password;
+
+        }
+
+
+        /*
+         * Si une nouvelle réponse est saisie,
+         * on l'envoie également.
+         */
+
+        if (recoveryAnswer) {
+
+            body.reponse_recuperation =
+                recoveryAnswer;
+
+        }
+
+
         const response =
             await fetch(
                 "https://blindtestmix.amelinebrt.workers.dev/parties",
@@ -14261,30 +14321,8 @@ async function saveGameChanges() {
                             "application/json"
                     },
 
-                    body: JSON.stringify({
-
-                        id:
-                            game.id,
-
-                        nom:
-                            game.name,
-
-                        createur:
-                            game.creator,
-
-                        groupe_id:
-                            game.groupId || null,
-
-                        mot_de_passe:
-                            game.password || null,
-
-                        question_recuperation:
-                            recoveryQuestion || null,
-
-                        reponse_recuperation:
-                            recoveryAnswer || null
-
-                    })
+                    body:
+                        JSON.stringify(body)
 
                 }
             );
@@ -14310,6 +14348,7 @@ async function saveGameChanges() {
             "Erreur sauvegarde modification D1 :",
             error
         );
+
 
         alert(
             "La partie a été modifiée sur cet appareil, mais la modification n'a pas pu être enregistrée en ligne."
