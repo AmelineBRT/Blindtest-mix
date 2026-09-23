@@ -11534,7 +11534,7 @@ function togglePassword(inputId, button) {
    OUVRIR UNE PARTIE
    ======================================================== */
 
-function openGame(id) {
+async function openGame(id) {
 
     const game =
         games.find(function(g) {
@@ -11545,7 +11545,7 @@ function openGame(id) {
         return;
     }
 
-    if (game.password) {
+    if (game.has_password) {
 
         const enteredPassword =
             prompt(
@@ -11568,18 +11568,57 @@ function openGame(id) {
 
         }
 
-        if (enteredPassword !== game.password) {
+        try {
 
-            const forgot =
-                confirm(
-                    "Mot de passe incorrect.\n\nAs-tu oublié le mot de passe ?"
+            const response =
+                await fetch(
+                    "https://blindtestmix.amelinebrt.workers.dev/verify-password",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            partie_id: id,
+                            mot_de_passe: enteredPassword
+                        })
+                    }
                 );
 
-            if (forgot) {
 
-                showForgotPassword(id);
+            const result =
+                await response.json();
+
+
+            if (!result.success) {
+
+                const forgot =
+                    confirm(
+                        "Mot de passe incorrect.\n\nAs-tu oublié le mot de passe ?"
+                    );
+
+                if (forgot) {
+
+                    showForgotPassword(id);
+
+                }
+
+                return;
 
             }
+
+        } catch (error) {
+
+            console.error(
+                "Erreur lors de la vérification du mot de passe :",
+                error
+            );
+
+            alert(
+                "Impossible de vérifier le mot de passe. Vérifie ta connexion internet."
+            );
 
             return;
 
@@ -11587,12 +11626,15 @@ function openGame(id) {
 
     }
 
+
     currentGameId = id;
 
     showGame();
 
 }
 
+
+   
 /* ========================================================
    BOUTON DE RETOUR EN ARRIERE
    ======================================================== */
