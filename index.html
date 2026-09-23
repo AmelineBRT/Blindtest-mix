@@ -11269,20 +11269,26 @@ function showCreateGame() {
     document.getElementById("gameName").value = "";
     document.getElementById("gameCreator").value = "";
     document.getElementById("gamePassword").value = "";
-    document.getElementById("gameEmail").value = "";
+
+    document.getElementById(
+        "gameRecoveryQuestion"
+    ).value = "";
+
+    document.getElementById(
+        "gameRecoveryAnswer"
+    ).value = "";
 
     updateGroupSelect(
         "gameGroup"
     );
 
     document.getElementById(
-        "emailCreationContainer"
+        "recoveryCreationContainer"
     ).style.display = "none";
 
     showScreen("createGameScreen");
 
 }
-
 
 function toggleRecoveryRequirement() {
 
