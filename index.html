@@ -4375,9 +4375,7 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
         </div>
 
-        <div id="editEmailContainer">
-
-         <div id="editRecoveryContainer">
+   <div id="editRecoveryContainer">
 
     <label>
         Question de récupération
@@ -4395,16 +4393,14 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
     <input
         id="editGameRecoveryAnswer"
         type="text"
-        placeholder="Votre réponse">
+        placeholder="Laisser vide pour conserver la réponse actuelle">
 
     <p class="password-help">
-        Cette question permettra de récupérer le mot de passe en cas d'oubli.
+        La réponse actuelle n'est jamais affichée.
+        Laisser ce champ vide pour la conserver.
     </p>
 
 </div>
-
-    </div>
-
     <button class="primary" onclick="saveGameChanges()">
         💾 Enregistrer les modifications
     </button>
@@ -14000,7 +13996,7 @@ async function showEditGame() {
     );
 
 document.getElementById("editGamePassword").value =
-    "";
+    game.password || "";
 
 document.getElementById("editGameRecoveryQuestion").value =
     game.recoveryQuestion || "";
