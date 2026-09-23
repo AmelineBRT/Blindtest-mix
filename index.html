@@ -10182,10 +10182,15 @@ async function createGame() {
             "gamePassword"
         ).value;
 
-    const email =
-        document.getElementById(
-            "gameEmail"
-        ).value.trim();
+const emailElement =
+    document.getElementById(
+        "gameEmail"
+    );
+
+const email =
+    emailElement
+        ? emailElement.value.trim()
+        : "";
 
    const recoveryQuestion =
     document.getElementById(
