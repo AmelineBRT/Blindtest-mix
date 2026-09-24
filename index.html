@@ -6830,6 +6830,7 @@ showGames();
 isBrowserBack = false;
 
 
+
 function showGroups() {
 
     gamesView = "groups";
@@ -6860,37 +6861,13 @@ function showGroups() {
 }
 
 
-
-
-function showGroups() {
-
-    gamesView = "groups";
-
-    document.getElementById(
-        "gamesViewTitle"
-    ).textContent =
-        "🎉 Groupes";
-
-    document.getElementById(
-        "gamesViewToggle"
-    ).textContent =
-        "🎶 Voir les parties";
-
-    isAppNavigation = true;
-
-    showScreen("gamesScreen");
-
-    isAppNavigation = false;
-
-    renderFilters();
-    renderGames();
-
-}
-
-
    async function showGames() {
 
     gamesView = "games";
+
+      currentGroupId = null;
+
+gameReturnContext = "games";
 
     await loadPeopleFromCloud();
 
