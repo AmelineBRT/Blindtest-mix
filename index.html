@@ -4375,6 +4375,13 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
         </div>
 
+       <button
+    type="button"
+    class="danger"
+    onclick="removeEditGamePassword()">
+    🗑️ Supprimer le mot de passe
+</button>
+
    <div id="editRecoveryContainer">
 
     <label>
@@ -4393,7 +4400,21 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
     <input
         id="editGameRecoveryAnswer"
         type="text"
-        placeholder="Laisser vide pour conserver la réponse actuelle">
+     <div class="password-container">
+
+    <input
+        id="editGameRecoveryAnswer"
+        type="password"
+        placeholder="Réponse de récupération">
+
+    <button
+        type="button"
+        class="secondary"
+        onclick="togglePassword('editGameRecoveryAnswer', this)">
+        👁️
+    </button>
+
+</div>
 
     <p class="password-help">
         La réponse actuelle n'est jamais affichée.
