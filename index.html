@@ -3704,7 +3704,52 @@ background: #ffffff;
     margin: 0;
 }
 
+/* ========================================================
+   AJUSTEMENTS RÉPONSE DE RÉCUPÉRATION
+   ======================================================== */
 
+/* Même couleur et même police que les labels */
+
+.recovery-answer-toggle {
+    color: #777;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: normal;
+}
+
+
+/* Le bloc de la case ne doit prendre que sa largeur */
+
+.recovery-change-label {
+    display: inline-flex;
+    width: fit-content;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    color: #777;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: normal;
+}
+
+
+/* La case elle-même ne s'étire pas */
+
+.recovery-change-label input {
+    width: auto;
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+
+/* Même apparence que le texte d'information */
+
+.edit-recovery-answer-section .password-help {
+    color: #777;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: normal;
+}
 
 
 
