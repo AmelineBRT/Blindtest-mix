@@ -5387,8 +5387,6 @@ let isAppNavigation = false;
 let players = [];
 let playersVisible = false;
 
-let preparedRoundPlayers = {};
-
 let gamesView = "games";
 
 let selectedCreators = [];
@@ -16660,15 +16658,6 @@ function loadRoundForPlaying() {
 
     renderPlayTracks(round);
 
-   const nextRound =
-    game.rounds[roundIndex + 1];
-
-if (nextRound) {
-
-    prepareNextRound(nextRound);
-
-}
-
     updatePlayingCount();
 
     updateNavigationButton();
@@ -16989,117 +16978,6 @@ function onYouTubeIframeAPIReady() {
 
 }
 
-
-   function prepareNextRound(round) {
-
-    if (!round || !round.tracks) {
-        return;
-    }
-
-    const tracksWithVideo =
-        round.tracks.filter(function(track) {
-
-            return track.url &&
-                   track.url.trim() !== "" &&
-                   getVideoId(track.url);
-
-        });
-
-    tracksWithVideo.forEach(function(track, index) {
-
-        const videoId =
-            getVideoId(track.url);
-
-        const containerId =
-            "prepared-player-" + round.id + "-" + index;
-
-        if (
-            preparedRoundPlayers[round.id] &&
-            preparedRoundPlayers[round.id][index]
-        ) {
-            return;
-        }
-
-        let container =
-            document.getElementById(containerId);
-
-        if (!container) {
-
-            container =
-                document.createElement("div");
-
-            container.id =
-                containerId;
-
-            container.style.position =
-                "fixed";
-
-            container.style.width =
-                "1px";
-
-            container.style.height =
-                "1px";
-
-            container.style.left =
-                "-10000px";
-
-            container.style.top =
-                "0";
-
-            document.body.appendChild(
-                container
-            );
-
-        }
-
-        if (!preparedRoundPlayers[round.id]) {
-
-            preparedRoundPlayers[round.id] =
-                [];
-
-        }
-
-        const player =
-            new YT.Player(
-                containerId,
-                {
-
-                    videoId: videoId,
-
-                    playerVars: {
-
-                        autoplay: 0,
-                        controls: 0,
-                        rel: 0,
-                        playsinline: 1
-
-                    },
-
-                    events: {
-
-                        onReady: function(event) {
-
-                            event.target.setVolume(100);
-
-                            event.target.cueVideoById(
-                                videoId
-                            );
-
-                        }
-
-                    }
-
-                }
-            );
-
-        preparedRoundPlayers[round.id][index] =
-            player;
-
-    });
-
-}
-
-   
 
 /* ========================================================
    ÉTAT VISUEL DES PISTES
