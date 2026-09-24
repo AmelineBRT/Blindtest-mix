@@ -4304,44 +4304,46 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
     <label>Nom de la partie</label>
 
-    <input id="editGameName" type="text">
+    <input
+        id="editGameName"
+        type="text">
 
-   <label>Créé par</label>
+    <label>Créé par</label>
 
-<input
-    id="editGameCreator"
-    type="hidden">
+    <input
+        id="editGameCreator"
+        type="hidden">
 
-<div class="participant-search-row creator-search-row">
+    <div class="participant-search-row creator-search-row">
 
-    <div class="participant-search">
+        <div class="participant-search">
 
-        <input
-            id="editGameCreatorSearch"
-            type="text"
-            placeholder="🔎 Rechercher..."
-            oninput="filterCreatorBank('edit', this.value)"
+            <input
+                id="editGameCreatorSearch"
+                type="text"
+                placeholder="🔎 Rechercher..."
+                oninput="filterCreatorBank('edit', this.value)"
+            >
+
+        </div>
+
+        <button
+            type="button"
+            id="editGameCreatePersonButton"
+            class="participant-new-person-button"
+            onclick="createPersonFromCreatorSearch('edit')"
+            title="Créer une nouvelle personne"
         >
+            <span class="participant-new-person-plus">＋</span><span class="participant-new-person-icon">👤</span>
+        </button>
 
     </div>
 
-    <button
-        type="button"
-        id="editGameCreatePersonButton"
-        class="participant-new-person-button"
-        onclick="createPersonFromCreatorSearch('edit')"
-        title="Créer une nouvelle personne"
-    >
-        <span class="participant-new-person-plus">＋</span><span class="participant-new-person-icon">👤</span>
-    </button>
+    <div
+        id="editGameCreatorBank"
+        class="participant-bank creator-person-bank">
+    </div>
 
-</div>
-
-<div
-    id="editGameCreatorBank"
-    class="participant-bank creator-person-bank">
-</div>
-   
     <label>Groupe</label>
 
     <select id="editGameGroup">
@@ -4352,6 +4354,7 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
     </select>
 
+
     <div class="password-box">
 
         <label>🔒 Mot de passe</label>
@@ -4361,84 +4364,88 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
             <input
                 id="editGamePassword"
                 type="password"
-                placeholder="Laisser vide pour supprimer le mot de passe"
+                placeholder="Mot de passe"
                 oninput="toggleEditRecoveryRequirement()">
 
             <button
                 type="button"
                 class="secondary"
-                onclick="togglePassword('editGamePassword', this)">
-
+                onclick="togglePassword('editGamePassword', this)"
+                title="Afficher ou masquer le mot de passe">
                 👁️
+            </button>
 
+            <button
+                type="button"
+                class="secondary"
+                onclick="removeEditGamePassword()"
+                title="Supprimer le mot de passe">
+                🗑️
             </button>
 
         </div>
 
-       <button
-    type="button"
-    class="danger"
-    onclick="removeEditGamePassword()">
-    🗑️ Supprimer le mot de passe
-</button>
+    </div>
 
-   <div id="editRecoveryContainer">
 
-    <label>
-        Question de récupération
-    </label>
+    <div id="editRecoveryContainer">
 
-    <input
-        id="editGameRecoveryQuestion"
-        type="text"
-        placeholder="Ex : Quel est le nom de mon premier chien ?">
+        <label>
+            Question de récupération
+        </label>
 
-    <label>
-        Réponse de récupération
-    </label>
+        <input
+            id="editGameRecoveryQuestion"
+            type="text"
+            placeholder="Ex : Quel est le nom de mon premier chien ?">
 
-    <input
-        id="editGameRecoveryAnswer"
-        type="text"
-     <div class="password-container">
+        <label>
+            Réponse de récupération
+        </label>
 
-    <input
-        id="editGameRecoveryAnswer"
-        type="password"
-        placeholder="Réponse de récupération">
+        <div class="password-container">
+
+            <input
+                id="editGameRecoveryAnswer"
+                type="password"
+                placeholder="Réponse de récupération">
+
+            <button
+                type="button"
+                class="secondary"
+                onclick="togglePassword('editGameRecoveryAnswer', this)"
+                title="Afficher ou masquer la réponse">
+                👁️
+            </button>
+
+        </div>
+
+    </div>
+
 
     <button
-        type="button"
-        class="secondary"
-        onclick="togglePassword('editGameRecoveryAnswer', this)">
-        👁️
-    </button>
-
-</div>
-
-    <p class="password-help">
-        La réponse actuelle n'est jamais affichée.
-        Laisser ce champ vide pour la conserver.
-    </p>
-
-</div>
-    <button class="primary" onclick="saveGameChanges()">
+        class="primary"
+        onclick="saveGameChanges()">
         💾 Enregistrer les modifications
     </button>
 
-    <button class="danger" onclick="deleteCurrentGame()">
+
+    <button
+        class="danger"
+        onclick="deleteCurrentGame()">
         🗑️ Supprimer cette partie
     </button>
 
-<button
-    class="back-arrow-button"
-    onclick="showGame()"
-    title="Retour"
->
-    <svg class="back-arrow-icon">
-        <use href="#back-arrow-icon"></use>
-    </svg>
-</button>
+
+    <button
+        class="back-arrow-button"
+        onclick="showGame()"
+        title="Retour"
+    >
+        <svg class="back-arrow-icon">
+            <use href="#back-arrow-icon"></use>
+        </svg>
+    </button>
 
 </div>
 
@@ -9992,6 +9999,51 @@ return (
 
 
 
+function removeEditGamePassword() {
+
+    const passwordInput =
+        document.getElementById(
+            "editGamePassword"
+        );
+
+    if (!passwordInput) {
+        return;
+    }
+
+
+    const confirmed =
+        confirm(
+            "Supprimer le mot de passe de cette partie ?"
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    passwordInput.value = "";
+
+    passwordInput.dataset.removePassword =
+        "true";
+
+
+    const recoveryContainer =
+        document.getElementById(
+            "editRecoveryContainer"
+        );
+
+
+    if (recoveryContainer) {
+
+        recoveryContainer.style.display =
+            "none";
+
+    }
+
+}
+   
+
 async function renderCreatorBank(type, search) {
 
     await loadPeopleFromCloud();
@@ -14118,10 +14170,14 @@ async function saveGameChanges() {
         ).value;
 
 
-    const password =
+    const passwordInput =
         document.getElementById(
             "editGamePassword"
-        ).value;
+        );
+
+
+    const password =
+        passwordInput.value;
 
 
     const recoveryQuestion =
@@ -14134,6 +14190,11 @@ async function saveGameChanges() {
         document.getElementById(
             "editGameRecoveryAnswer"
         ).value.trim();
+
+
+    const removePassword =
+        passwordInput.dataset.removePassword ===
+        "true";
 
 
     if (!name) {
@@ -14159,41 +14220,69 @@ async function saveGameChanges() {
 
 
     /*
-     * Si un nouveau mot de passe est saisi,
-     * une question et une réponse sont obligatoires.
+     * Si on supprime le mot de passe,
+     * la récupération n'est plus nécessaire.
      */
 
-    if (
-        password &&
-        (
-            !recoveryQuestion ||
-            (
-                !recoveryAnswer &&
-                !game.recoveryQuestion
-            )
-        )
-    ) {
+    if (removePassword) {
 
-        alert(
-            "Une question et une réponse de récupération sont obligatoires lorsque tu utilises un mot de passe."
-        );
+        game.password =
+            "";
 
-        return;
+        game.has_password =
+            false;
+
+        game.recoveryQuestion =
+            "";
 
     }
 
 
     /*
-     * Si le champ mot de passe est vide,
-     * on considère qu'on conserve le mot de passe actuel.
-     *
-     * Le mot de passe ne sera supprimé que par
-     * l'action explicite prévue à cet effet.
+     * Nouveau mot de passe
      */
 
-    const keepExistingPassword =
-        !password &&
-        game.has_password;
+    else if (password) {
+
+        if (
+            !recoveryQuestion ||
+            !recoveryAnswer
+        ) {
+
+            alert(
+                "Une question et une réponse de récupération sont obligatoires lorsque tu utilises un mot de passe."
+            );
+
+            return;
+
+        }
+
+
+        game.password =
+            password;
+
+        game.has_password =
+            true;
+
+        game.recoveryQuestion =
+            recoveryQuestion;
+
+    }
+
+
+    /*
+     * Mot de passe conservé
+     */
+
+    else {
+
+        game.has_password =
+            true;
+
+        game.recoveryQuestion =
+            recoveryQuestion;
+
+    }
 
 
     game.name =
@@ -14206,21 +14295,6 @@ async function saveGameChanges() {
 
     game.groupId =
         groupId;
-
-
-    if (!keepExistingPassword) {
-
-        game.password =
-            password;
-
-        game.has_password =
-            !!password;
-
-    }
-
-
-    game.recoveryQuestion =
-        recoveryQuestion;
 
 
     if (!Array.isArray(game.participants)) {
@@ -14314,33 +14388,49 @@ async function saveGameChanges() {
                 game.creator,
 
             groupe_id:
-                game.groupId || null,
-
-            question_recuperation:
-                recoveryQuestion || null
+                game.groupId || null
 
         };
 
 
         /*
-         * Si on saisit un nouveau mot de passe,
-         * on l'envoie au serveur.
+         * Suppression explicite du mot de passe
          */
 
-        if (password) {
+        if (removePassword) {
 
             body.mot_de_passe =
-                password;
+                null;
 
         }
 
 
         /*
-         * Si une nouvelle réponse est saisie,
-         * on l'envoie également.
+         * Nouveau mot de passe
          */
 
-        if (recoveryAnswer) {
+        else if (password) {
+
+            body.mot_de_passe =
+                password;
+
+            body.question_recuperation =
+                recoveryQuestion;
+
+            body.reponse_recuperation =
+                recoveryAnswer;
+
+        }
+
+
+        /*
+         * Mot de passe conservé
+         */
+
+        else {
+
+            body.question_recuperation =
+                recoveryQuestion;
 
             body.reponse_recuperation =
                 recoveryAnswer;
