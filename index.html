@@ -5132,6 +5132,12 @@ onclick="history.back()"
 
         <div id="recoveryQuestionSection">
 
+            <p
+                id="recoveryQuestionHelp"
+                class="password-help">
+                Répondez à cette question pour connaître le mot de passe de la partie.
+            </p>
+
             <p id="recoveryQuestionText"></p>
 
             <input
@@ -5146,6 +5152,16 @@ onclick="history.back()"
             </button>
 
         </div>
+
+        <button
+            class="back-arrow-button"
+            onclick="showGames()"
+            title="Retour"
+        >
+            <svg class="back-arrow-icon">
+                <use href="#back-arrow-icon"></use>
+            </svg>
+        </button>
 
     </div>
 
@@ -12258,26 +12274,31 @@ function showForgotPassword(gameId) {
             return g.id === gameId;
         });
 
+
     if (!game) {
         return;
     }
 
+
     recoveryGameId =
         gameId;
 
+
     document.getElementById(
-    "forgotPasswordGameName"
-).innerHTML =
-    "<strong>Partie :</strong> " +
-    game.name +
-    "<br>" +
-    "<strong>Créée par :</strong> " +
-    game.creator;
+        "forgotPasswordGameName"
+    ).innerHTML =
+        "<strong>Partie :</strong> " +
+        game.name +
+        "<br>" +
+        "<strong>Créée par :</strong> " +
+        game.creator;
+
 
     const questionElement =
         document.getElementById(
             "recoveryQuestionText"
         );
+
 
     const answerElement =
         document.getElementById(
@@ -12285,18 +12306,24 @@ function showForgotPassword(gameId) {
         );
 
 
-    questionElement.textContent =
+    questionElement.innerHTML =
         game.recoveryQuestion
-        ? game.recoveryQuestion
-        : "Aucune question de récupération n'a été définie pour cette partie.";
+            ? "<strong>" +
+              escapeHTML(
+                  game.recoveryQuestion
+              ) +
+              "</strong>"
+            : "Aucune question de récupération n'a été définie pour cette partie.";
 
 
-    answerElement.value = "";
+    answerElement.value =
+        "";
 
 
     showScreen(
         "forgotPasswordScreen"
     );
+
 }
 
 
