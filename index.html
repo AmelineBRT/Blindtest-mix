@@ -3587,6 +3587,111 @@ background: #ffffff;
     margin-left: -2px;
     margin-right: -5px;
 }
+
+/* ========================================================
+   MODIFICATION DE PARTIE - RÉCUPÉRATION
+   ======================================================== */
+
+.password-trash-button {
+    background: none;
+    border: none;
+    padding: 6px;
+    margin: 0;
+    cursor: pointer;
+    font-size: 1.1em;
+    box-shadow: none;
+}
+
+.password-trash-button:hover {
+    background: none;
+    box-shadow: none;
+    transform: none;
+}
+
+
+/* Deux colonnes pour question / réponse */
+
+.edit-recovery-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 18px;
+}
+
+.edit-recovery-column {
+    min-width: 0;
+}
+
+
+/* Même apparence que les autres labels */
+
+.edit-recovery-column > label {
+    display: block;
+}
+
+
+/* Bouton question/réponse */
+
+.recovery-answer-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: #f5f5f5;
+    min-height: 20px;
+}
+
+.recovery-answer-toggle:hover {
+    background: #eaeaea;
+}
+
+.recovery-answer-arrow {
+    font-size: 1.25em;
+    font-weight: bold;
+    line-height: 1;
+}
+
+
+/* Zone qui apparaît sous la réponse */
+
+.edit-recovery-answer-section {
+    margin-top: 10px;
+}
+
+
+/* Case de modification */
+
+.recovery-change-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.recovery-change-label input {
+    margin: 0;
+}
+
+
+/* Sur petit écran : une colonne */
+
+@media (max-width: 600px) {
+
+    .edit-recovery-columns {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+}
+
+
+
+
    
 
    
@@ -4344,6 +4449,7 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
         class="participant-bank creator-person-bank">
     </div>
 
+
     <label>Groupe</label>
 
     <select id="editGameGroup">
@@ -4369,7 +4475,7 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
             <button
                 type="button"
-                class="secondary"
+                class="secondary password-action-button"
                 onclick="togglePassword('editGamePassword', this)"
                 title="Afficher ou masquer le mot de passe">
                 👁️
@@ -4377,7 +4483,7 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
             <button
                 type="button"
-                class="secondary"
+                class="password-trash-button"
                 onclick="removeEditGamePassword()"
                 title="Supprimer le mot de passe">
                 🗑️
@@ -4385,80 +4491,101 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
         </div>
 
-    </div>
+
+        <div id="editRecoveryContainer">
+
+            <div class="edit-recovery-columns">
 
 
-    <div id="editRecoveryContainer">
+                <!-- COLONNE QUESTION -->
 
-        <label>
-            Question de récupération
-        </label>
+                <div class="edit-recovery-column">
 
-        <input
-            id="editGameRecoveryQuestion"
-            type="text"
-            placeholder="Ex : Quel est le nom de mon premier chien ?">
-
-
-        <div
-            id="editRecoveryAnswerToggle"
-            class="recovery-answer-toggle"
-            onclick="toggleEditRecoveryAnswer()"
-        >
-
-            <span
-                id="editRecoveryAnswerArrow"
-                class="recovery-answer-arrow">
-                ▸
-            </span>
-
-            <span>
-                Réponse de récupération
-            </span>
-
-        </div>
-
-
-        <div
-            id="editRecoveryAnswerSection"
-            style="display:none;"
-        >
-
-            <p class="password-help">
-                Une réponse de récupération a déjà été enregistrée.
-            </p>
-
-            <label class="recovery-change-label">
-
-                <input
-                    id="editRecoveryAnswerChange"
-                    type="checkbox"
-                    onchange="toggleEditRecoveryAnswerInput()">
-
-                Modifier la réponse
-
-            </label>
-
-
-            <div
-                id="editRecoveryAnswerInputContainer"
-                style="display:none;"
-            >
-
-                <div class="password-container">
+                    <label>
+                        Question de récupération
+                    </label>
 
                     <input
-                        id="editGameRecoveryAnswer"
-                        type="password"
-                        placeholder="Nouvelle réponse">
+                        id="editGameRecoveryQuestion"
+                        type="text"
+                        placeholder="Ex : Quel est le nom de mon premier chien ?">
 
-                    <button
-                        type="button"
-                        class="secondary"
-                        onclick="togglePassword('editGameRecoveryAnswer', this)"
-                        title="Afficher ou masquer la réponse">
-                        👁️
-                    </button>
+                </div>
+
+
+                <!-- COLONNE RÉPONSE -->
+
+                <div class="edit-recovery-column">
+
+                    <div
+                        id="editRecoveryAnswerToggle"
+                        class="recovery-answer-toggle"
+                        onclick="toggleEditRecoveryAnswer()"
+                    >
+
+                        <span
+                            id="editRecoveryAnswerArrow"
+                            class="recovery-answer-arrow">
+                            ▸
+                        </span>
+
+                        <span>
+                            Réponse de récupération
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        id="editRecoveryAnswerSection"
+                        class="edit-recovery-answer-section"
+                        style="display:none;"
+                    >
+
+                        <p class="password-help">
+                            Une réponse de récupération a déjà été enregistrée.
+                        </p>
+
+
+                        <label class="recovery-change-label">
+
+                            <input
+                                id="editRecoveryAnswerChange"
+                                type="checkbox"
+                                onchange="toggleEditRecoveryAnswerInput()">
+
+                            <span>
+                                Modifier la réponse
+                            </span>
+
+                        </label>
+
+
+                        <div
+                            id="editRecoveryAnswerInputContainer"
+                            style="display:none;"
+                        >
+
+                            <div class="password-container">
+
+                                <input
+                                    id="editGameRecoveryAnswer"
+                                    type="password"
+                                    placeholder="Nouvelle réponse">
+
+                                <button
+                                    type="button"
+                                    class="secondary password-action-button"
+                                    onclick="togglePassword('editGameRecoveryAnswer', this)"
+                                    title="Afficher ou masquer la réponse">
+                                    👁️
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
