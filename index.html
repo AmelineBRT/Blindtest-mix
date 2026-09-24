@@ -3752,7 +3752,16 @@ background: #ffffff;
     font-weight: normal;
 }
 
+#forgotPasswordScreen .card {
+    position: relative;
+}
 
+#forgotPasswordScreen .back-arrow-button {
+    top: 0;
+    left: 0;
+}
+
+   
 
    
    
@@ -4164,10 +4173,6 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
         <label>🔒 Mot de passe (facultatif)</label>
 
-        <p class="password-help">
-            Tu peux protéger ta partie avec un mot de passe.
-        </p>
-
         <div class="password-container">
 
             <input
@@ -4199,17 +4204,25 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
                 placeholder="Ex : Quel est le nom de mon premier chien ?">
 
             <label>
-                Réponse de récupération
-            </label>
+    Réponse de récupération
+</label>
 
-            <input
-                id="gameRecoveryAnswer"
-                type="text"
-                placeholder="Votre réponse">
+<div class="password-container">
 
-            <p class="password-help">
-                Cette question permettra de récupérer le mot de passe en cas d'oubli.
-            </p>
+    <input
+        id="gameRecoveryAnswer"
+        type="password"
+        placeholder="Votre réponse">
+
+    <button
+        type="button"
+        class="secondary password-action-button"
+        onclick="togglePassword('gameRecoveryAnswer', this)"
+        title="Afficher ou masquer la réponse">
+        👁️
+    </button>
+
+</div>
 
         </div>
 
@@ -12312,29 +12325,28 @@ function showForgotPassword(gameId) {
         );
 
 
-    const answerElement =
-        document.getElementById(
-            "recoveryAnswer"
-        );
-
-
     questionElement.innerHTML =
-        game.recoveryQuestion
-            ? "<strong>" +
-              escapeHTML(
-                  game.recoveryQuestion
-              ) +
-              "</strong>"
-            : "Aucune question de récupération n'a été définie pour cette partie.";
+    game.recoveryQuestion
+        ? "<strong>" +
+          escapeHTML(
+              game.recoveryQuestion
+          ) +
+          "</strong>"
+        : "Aucune question de récupération n'a été définie pour cette partie.";
 
+const answerElement =
+    document.getElementById(
+        "recoveryAnswer"
+    );
 
+if (answerElement) {
     answerElement.value =
         "";
+}
 
-
-    showScreen(
-        "forgotPasswordScreen"
-    );
+showScreen(
+    "forgotPasswordScreen"
+);
 
 }
 
