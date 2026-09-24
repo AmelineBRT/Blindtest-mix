@@ -3764,21 +3764,14 @@ background: #ffffff;
    MOT DE PASSE OUBLIÉ
    ======================================================== */
 
-.forgot-password-game-info {
+.forgot-password-game-card-content {
     margin: 8px 0 18px 0;
-    line-height: 1.5;
-    font-size: 14px;
 }
 
-.forgot-password-game-info strong {
-    font-size: 12px;
-    color: #aaa;
+.forgot-password-game-card-content h3 {
+    margin-top: 0;
 }
-
-body.dark-mode .forgot-password-game-info strong {
-    color: #aaa;
-}
-
+   
    .forgot-password-game-card-content {
     padding: 0;
     margin: 8px 0 18px 0;
@@ -5168,16 +5161,48 @@ onclick="history.back()"
 
 <section id="forgotPasswordScreen" class="screen">
 
-    <div class="card">
+<div class="card">
 
-        <h2>🔐 Mot de passe oublié</h2>
+    <h2>🔐 Mot de passe oublié</h2>
 
-        <div
     <div
-    id="forgotPasswordGameName"
-    class="game-card-content forgot-password-game-card-content">
-</div>
-    class="forgot-password-game-info">
+        id="forgotPasswordGameName"
+        class="forgot-password-game-card-content">
+    </div>
+
+    <div id="recoveryQuestionSection">
+
+        <p
+            id="recoveryQuestionHelp"
+            class="password-help">
+            Répondez à cette question pour connaître le mot de passe de la partie.
+        </p>
+
+        <p id="recoveryQuestionText"></p>
+
+        <input
+            id="recoveryAnswer"
+            type="text"
+            placeholder="Votre réponse">
+
+        <button
+            class="primary"
+            onclick="recoverPassword()">
+            Vérifier ma réponse
+        </button>
+
+    </div>
+
+    <button
+        class="back-arrow-button"
+        onclick="showGames()"
+        title="Retour"
+    >
+        <svg class="back-arrow-icon">
+            <use href="#back-arrow-icon"></use>
+        </svg>
+    </button>
+
 </div>
 
         <div id="recoveryQuestionSection">
@@ -12352,7 +12377,6 @@ function showForgotPassword(gameId) {
 
     <h3>
         🎶 ${escapeHTML(game.name)}
-        ${game.has_password ? " 🔒" : ""}
     </h3>
 
     <div class="game-info creator-info">
