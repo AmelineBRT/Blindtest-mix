@@ -5387,6 +5387,8 @@ let isAppNavigation = false;
 let players = [];
 let playersVisible = false;
 
+ let currentRoundWarmingUp = false;  
+
 let gamesView = "games";
 
 let selectedCreators = [];
@@ -16656,9 +16658,11 @@ function loadRoundForPlaying() {
     document.getElementById("playRoundTitle").textContent =
         round.name;
 
-    renderPlayTracks(round);
+   renderPlayTracks(round);
 
-    updatePlayingCount();
+warmUpCurrentRound();
+
+updatePlayingCount();
 
     updateNavigationButton();
 
@@ -16966,6 +16970,102 @@ function createPlayer(index, videoId) {
 
             }
         );
+
+}
+
+   function warmUpCurrentRound() {
+
+    if (currentRoundWarmingUp) {
+        return;
+    }
+
+    currentRoundWarmingUp = true;
+
+    let attempts = 0;
+
+    const checkPlayers = setInterval(function() {
+
+        attempts++;
+
+        if (attempts > 100) {
+
+            clearInterval(checkPlayers);
+
+            currentRoundWarmingUp = false;
+
+            console.log(
+                "Préparation annulée : lecteurs non prêts."
+            );
+
+            return;
+
+        }
+
+        if (
+            players.length === 0 ||
+            players.some(function(player) {
+                return !player ||
+                       typeof player.playVideo !== "function" ||
+                       typeof player.pauseVideo !== "function";
+            })
+        ) {
+
+            return;
+
+        }
+
+        clearInterval(checkPlayers);
+
+        console.log(
+            "Préparation silencieuse de la manche en cours."
+        );
+
+        players.forEach(function(player) {
+
+            player.mute();
+            player.playVideo();
+
+        });
+
+        let playingCheck =
+            setInterval(function() {
+
+                const allPlaying =
+                    players.every(function(player) {
+
+                        return (
+                            typeof player.getPlayerState ===
+                            "function" &&
+                            player.getPlayerState() ===
+                            YT.PlayerState.PLAYING
+                        );
+
+                    });
+
+                if (allPlaying) {
+
+                    clearInterval(playingCheck);
+
+                    players.forEach(function(player) {
+
+                        player.pauseVideo();
+                        player.unMute();
+                        player.setVolume(100);
+
+                    });
+
+                    currentRoundWarmingUp =
+                        false;
+
+                    console.log(
+                        "Toutes les pistes ont été préparées."
+                    );
+
+                }
+
+            }, 100);
+
+    }, 100);
 
 }
 
