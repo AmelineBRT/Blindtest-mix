@@ -5389,6 +5389,8 @@ let playersVisible = false;
 
  let currentRoundWarmingUp = false;  
 
+   let preparedNextRound = null;
+
 let gamesView = "games";
 
 let selectedCreators = [];
@@ -16638,8 +16640,18 @@ function loadRoundForPlaying() {
         return;
     }
 
+const hasPreparedPlayers =
+    preparedNextRound &&
+    preparedNextRound.roundId === currentRoundId &&
+    preparedNextRound.ready;
+
+if (!hasPreparedPlayers) {
+
     players = [];
-    playersVisible = false;
+
+}
+
+playersVisible = false;
 
     const roundIndex =
         game.rounds.findIndex(function(r) {
@@ -16701,14 +16713,16 @@ function renderPlayTracks(round) {
         const div =
             document.createElement("div");
 
-        div.className = "track";
+        div.className =
+            "track";
 
-        div.id = "track-card-" + index;
+        div.id =
+            "track-card-" + index;
 
-       div.style.setProperty(
-    "--track-thumbnail",
-    `url("https://img.youtube.com/vi/${videoId}/hqdefault.jpg")`
-);
+        div.style.setProperty(
+            "--track-thumbnail",
+            `url("https://img.youtube.com/vi/${videoId}/hqdefault.jpg")`
+        );
 
         div.innerHTML = `
 
@@ -16798,7 +16812,8 @@ function renderPlayTracks(round) {
 
         if (tracksWithVideo.length <= 1) {
 
-            toggleButton.style.display = "none";
+            toggleButton.style.display =
+                "none";
 
         } else {
 
@@ -16813,7 +16828,6 @@ function renderPlayTracks(round) {
     }
 
 }
-
 
 function toggleSinglePlayer(index, button) {
 
@@ -16973,25 +16987,24 @@ function createPlayer(index, videoId) {
 
 }
 
-   function warmUpCurrentRound() {
+   function warmUpPlayers(playerList, onComplete) {
 
-    if (currentRoundWarmingUp) {
+    if (!playerList || playerList.length === 0) {
+        if (onComplete) {
+            onComplete();
+        }
         return;
     }
 
-    currentRoundWarmingUp = true;
-
     let attempts = 0;
 
-    const checkPlayers = setInterval(function() {
+    const checkReady = setInterval(function() {
 
         attempts++;
 
         if (attempts > 100) {
 
-            clearInterval(checkPlayers);
-
-            currentRoundWarmingUp = false;
+            clearInterval(checkReady);
 
             console.log(
                 "Préparation annulée : lecteurs non prêts."
@@ -17002,11 +17015,13 @@ function createPlayer(index, videoId) {
         }
 
         if (
-            players.length === 0 ||
-            players.some(function(player) {
+            playerList.some(function(player) {
+
                 return !player ||
                        typeof player.playVideo !== "function" ||
-                       typeof player.pauseVideo !== "function";
+                       typeof player.pauseVideo !== "function" ||
+                       typeof player.getPlayerState !== "function";
+
             })
         ) {
 
@@ -17014,13 +17029,9 @@ function createPlayer(index, videoId) {
 
         }
 
-        clearInterval(checkPlayers);
+        clearInterval(checkReady);
 
-        console.log(
-            "Préparation silencieuse de la manche en cours."
-        );
-
-        players.forEach(function(player) {
+        playerList.forEach(function(player) {
 
             player.mute();
             player.playVideo();
@@ -17031,11 +17042,9 @@ function createPlayer(index, videoId) {
             setInterval(function() {
 
                 const allPlaying =
-                    players.every(function(player) {
+                    playerList.every(function(player) {
 
                         return (
-                            typeof player.getPlayerState ===
-                            "function" &&
                             player.getPlayerState() ===
                             YT.PlayerState.PLAYING
                         );
@@ -17046,7 +17055,7 @@ function createPlayer(index, videoId) {
 
                     clearInterval(playingCheck);
 
-                    players.forEach(function(player) {
+                    playerList.forEach(function(player) {
 
                         player.pauseVideo();
                         player.unMute();
@@ -17054,12 +17063,13 @@ function createPlayer(index, videoId) {
 
                     });
 
-                    currentRoundWarmingUp =
-                        false;
-
                     console.log(
                         "Toutes les pistes ont été préparées."
                     );
+
+                    if (onComplete) {
+                        onComplete();
+                    }
 
                 }
 
@@ -17069,6 +17079,195 @@ function createPlayer(index, videoId) {
 
 }
 
+   function warmUpCurrentRound() {
+
+    if (currentRoundWarmingUp) {
+        return;
+    }
+
+    currentRoundWarmingUp = true;
+
+    warmUpPlayers(
+        players,
+        function() {
+
+            currentRoundWarmingUp = false;
+
+            prepareNextRound();
+
+        }
+    );
+
+}
+
+   
+function prepareNextRound() {
+
+    const game =
+        getCurrentGame();
+
+    if (!game) {
+        return;
+    }
+
+    const currentIndex =
+        game.rounds.findIndex(function(round) {
+
+            return round.id === currentRoundId;
+
+        });
+
+    if (
+        currentIndex < 0 ||
+        currentIndex >= game.rounds.length - 1
+    ) {
+
+        return;
+
+    }
+
+    const nextRound =
+        game.rounds[currentIndex + 1];
+
+    if (
+        preparedNextRound &&
+        preparedNextRound.roundId === nextRound.id
+    ) {
+
+        return;
+
+    }
+
+    const tracksWithVideo =
+        nextRound.tracks.filter(function(track) {
+
+            return track.url &&
+                   track.url.trim() !== "" &&
+                   getVideoId(track.url);
+
+        });
+
+    if (tracksWithVideo.length === 0) {
+
+        return;
+
+    }
+
+    const preparationContainer =
+        document.createElement("div");
+
+    preparationContainer.style.position =
+        "fixed";
+
+    preparationContainer.style.left =
+        "-10000px";
+
+    preparationContainer.style.top =
+        "0";
+
+    preparationContainer.style.width =
+        "1px";
+
+    preparationContainer.style.height =
+        "1px";
+
+    document.body.appendChild(
+        preparationContainer
+    );
+
+    const preparation = {
+
+        roundId: nextRound.id,
+        players: [],
+        container: preparationContainer,
+        ready: false
+
+    };
+
+    preparedNextRound =
+        preparation;
+
+    tracksWithVideo.forEach(function(track, index) {
+
+        const videoId =
+            getVideoId(track.url);
+
+        const playerContainer =
+            document.createElement("div");
+
+        playerContainer.id =
+            "prepared-player-" +
+            nextRound.id +
+            "-" +
+            index;
+
+        playerContainer.style.width =
+            "1px";
+
+        playerContainer.style.height =
+            "1px";
+
+        preparationContainer.appendChild(
+            playerContainer
+        );
+
+        const player =
+            new YT.Player(
+                playerContainer.id,
+                {
+
+                    videoId: videoId,
+
+                    playerVars: {
+
+                        autoplay: 0,
+                        controls: 0,
+                        rel: 0,
+                        playsinline: 1
+
+                    },
+
+                    events: {
+
+                        onReady: function(event) {
+
+                            event.target.setVolume(100);
+
+                        }
+
+                    }
+
+                }
+            );
+
+        preparation.players.push(
+            player
+        );
+
+    });
+
+    warmUpPlayers(
+        preparation.players,
+        function() {
+
+            if (
+                preparedNextRound === preparation
+            ) {
+
+                preparation.ready =
+                    true;
+
+                console.log(
+                    "Manche suivante prête :",
+                    nextRound.name
+                );
+
+            }
+
+        }
+    );
+
+}
 
 function onYouTubeIframeAPIReady() {
 
