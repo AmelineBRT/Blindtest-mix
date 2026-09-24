@@ -5387,6 +5387,8 @@ let isAppNavigation = false;
 let players = [];
 let playersVisible = false;
 
+   let preparedPlayers = {};
+
 let gamesView = "games";
 
 let selectedCreators = [];
@@ -16658,6 +16660,17 @@ function loadRoundForPlaying() {
 
     renderPlayTracks(round);
 
+   const nextRound =
+    game.rounds[roundIndex + 1];
+
+if (nextRound) {
+
+    prepareNextRoundPlayers(
+        nextRound
+    );
+
+}
+
     updatePlayingCount();
 
     updateNavigationButton();
@@ -16978,6 +16991,149 @@ function onYouTubeIframeAPIReady() {
 
 }
 
+
+   function prepareNextRoundPlayers(round) {
+
+    if (!round || !round.tracks) {
+        return;
+    }
+
+    const tracksWithVideo =
+        round.tracks.filter(function(track) {
+
+            return track.url &&
+                   track.url.trim() !== "" &&
+                   getVideoId(track.url);
+
+        });
+
+    if (tracksWithVideo.length === 0) {
+        return;
+    }
+
+    if (preparedPlayers[round.id]) {
+        return;
+    }
+
+    preparedPlayers[round.id] = {
+        players: [],
+        playing: 0,
+        paused: false
+    };
+
+    const preparation =
+        preparedPlayers[round.id];
+
+    tracksWithVideo.forEach(function(track, index) {
+
+        const videoId =
+            getVideoId(track.url);
+
+        const container =
+            document.createElement("div");
+
+        container.id =
+            "prepared-player-" +
+            round.id +
+            "-" +
+            index;
+
+        container.style.position =
+            "fixed";
+
+        container.style.width =
+            "1px";
+
+        container.style.height =
+            "1px";
+
+        container.style.left =
+            "-10000px";
+
+        container.style.top =
+            "0";
+
+        document.body.appendChild(
+            container
+        );
+
+        const player =
+            new YT.Player(
+                container.id,
+                {
+
+                    videoId: videoId,
+
+                    playerVars: {
+
+                        autoplay: 0,
+                        controls: 0,
+                        rel: 0,
+                        playsinline: 1
+
+                    },
+
+                    events: {
+
+                        onReady: function(event) {
+
+                            event.target.mute();
+
+                            event.target.playVideo();
+
+                        },
+
+                        onStateChange: function(event) {
+
+                            if (
+                                event.data ===
+                                YT.PlayerState.PLAYING
+                            ) {
+
+                                preparation.playing++;
+
+                                if (
+                                    preparation.playing ===
+                                    tracksWithVideo.length
+                                ) {
+
+                                    preparation.players.forEach(
+                                        function(preparedPlayer) {
+
+                                            if (
+                                                preparedPlayer &&
+                                                typeof preparedPlayer.pauseVideo ===
+                                                "function"
+                                            ) {
+
+                                                preparedPlayer.pauseVideo();
+
+                                            }
+
+                                        }
+                                    );
+
+                                    preparation.paused =
+                                        true;
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+            );
+
+        preparation.players.push(
+            player
+        );
+
+    });
+
+}
 
 /* ========================================================
    ÉTAT VISUEL DES PISTES
