@@ -6834,6 +6834,10 @@ function showGroups() {
 
     gamesView = "groups";
 
+    currentGroupId = null;
+
+    gameReturnContext = "games";
+
     document.getElementById(
         "gamesViewTitle"
     ).textContent =
@@ -11498,6 +11502,12 @@ function updateGroupSelect(
    ======================================================== */
    function showGroup(groupId) {
 
+    currentGroupId =
+        groupId;
+
+    gameReturnContext =
+        "group";
+      
     const group =
         groups.find(function(g) {
             return g.id === groupId;
@@ -11666,13 +11676,11 @@ function createGameCard(game, group = null) {
     div.className =
         "game-card clickable";
 
-
     const gameGroup =
         group ||
         groups.find(function(g) {
             return g.id === game.groupId;
         });
-
 
     const groupTextColor =
         gameGroup &&
@@ -11680,10 +11688,8 @@ function createGameCard(game, group = null) {
             ? "#ffffff"
             : "#222222";
 
-
     const showGroupHeader =
         group === null;
-
 
     if (gameGroup) {
 
@@ -11691,11 +11697,6 @@ function createGameCard(game, group = null) {
             "has-group"
         );
 
-
-        /*
-         * Dégradé uniquement dans
-         * "Voir les parties"
-         */
         if (showGroupHeader) {
 
             const lightGroupColor =
@@ -11703,7 +11704,6 @@ function createGameCard(game, group = null) {
                     gameGroup.color,
                     0.88
                 );
-
 
             div.style.setProperty(
                 "--card-base-color",
@@ -11715,18 +11715,11 @@ function createGameCard(game, group = null) {
                 lightGroupColor
             );
 
-
             div.style.background =
                 gameGroup.color;
 
-
         } else {
 
-            /*
-             * Dans "Voir les groupes",
-             * on garde la couleur claire
-             * du groupe.
-             */
             div.style.background =
                 lightenColor(
                     gameGroup.color,
@@ -11735,10 +11728,8 @@ function createGameCard(game, group = null) {
 
         }
 
-
         div.style.color =
             "#222222";
-
 
         if (showGroupHeader) {
 
@@ -11755,59 +11746,37 @@ function createGameCard(game, group = null) {
 
     }
 
-
-    /*
-     * Partie indépendante
-     */
     if (!gameGroup) {
 
         div.classList.add(
             "independent-card"
         );
 
-div.style.setProperty(
-    "--card-base-color",
-    "#e8e8e8"
-);
+        div.style.setProperty(
+            "--card-base-color",
+            "#e8e8e8"
+        );
 
-div.style.setProperty(
-    "--card-light-color",
-    "#fcfcfc"
-);
+        div.style.setProperty(
+            "--card-light-color",
+            "#fcfcfc"
+        );
 
-div.style.background =
-    "#e8e8e8";
+        div.style.background =
+            "#e8e8e8";
     }
-
 
     div.onclick =
         function() {
-
-            if (group !== null) {
-
-                gameReturnContext =
-                    "group";
-
-                currentGroupId =
-                    group.id;
-
-            } else {
-
-                gameReturnContext =
-                    "games";
-
-            }
 
             openGame(game.id);
 
         };
 
-
-const passwordIcon =
-    game.has_password
-    ? " 🔒"
-    : "";
-
+    const passwordIcon =
+        game.has_password
+        ? " 🔒"
+        : "";
 
     const groupHeader =
         !showGroupHeader
@@ -11851,7 +11820,6 @@ const passwordIcon =
 
         `;
 
-
     div.innerHTML = `
 
         ${groupHeader}
@@ -11863,18 +11831,18 @@ const passwordIcon =
                 ${passwordIcon}
             </h3>
 
-<div class="game-info creator-info">
+            <div class="game-info creator-info">
 
                 <span class="creator-label">
                     Créé par :
                 </span>
 
-<span
-    class="creator-name"
-    style="color:#555 !important;"
->
-    ${getParticipantIconHTML(game.creator)} ${escapeHTML(game.creator)}
-</span>
+                <span
+                    class="creator-name"
+                    style="color:#555 !important;"
+                >
+                    ${getParticipantIconHTML(game.creator)} ${escapeHTML(game.creator)}
+                </span>
 
             </div>
 
@@ -11885,7 +11853,6 @@ const passwordIcon =
         </div>
 
     `;
-
 
     return div;
 
