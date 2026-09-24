@@ -5928,47 +5928,6 @@ function saveData() {
 }
 
 
-async function migrateLocalDataToCloud() {
-
-    const baseURL =
-        "https://blindtestmix.amelinebrt.workers.dev";
-
-
-    async function postJSON(route, data) {
-
-        const response =
-            await fetch(
-                baseURL + route,
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-
-                    body: JSON.stringify(data)
-                }
-            );
-
-
-        if (!response.ok) {
-
-            const errorText =
-                await response.text();
-
-            throw new Error(
-                route +
-                " → " +
-                response.status +
-                " : " +
-                errorText
-            );
-
-        }
-
-        return response.json();
-
-    }
 
 
     /* ==================================================
@@ -6737,71 +6696,6 @@ function quitApp() {
 }
 
 
-/* ========================================================
-   MIGRATION DES DONNÉES LOCALES VERS LE CLOUD
-   ======================================================== */
-
-if (new URLSearchParams(location.search).get("migration") === "1") {
-
-    setTimeout(() => {
-
-        const migrationButton = document.createElement("button");
-
-        migrationButton.textContent =
-            "☁️ Envoyer mes données vers le cloud";
-
-        migrationButton.style.position = "fixed";
-        migrationButton.style.bottom = "20px";
-        migrationButton.style.left = "50%";
-        migrationButton.style.transform = "translateX(-50%)";
-        migrationButton.style.zIndex = "99999";
-        migrationButton.style.padding = "15px 20px";
-        migrationButton.style.fontSize = "16px";
-        migrationButton.style.borderRadius = "12px";
-        migrationButton.style.border = "none";
-        migrationButton.style.background = "#ffffff";
-        migrationButton.style.boxShadow = "0 3px 12px rgba(0,0,0,0.3)";
-
-       migrationButton.onclick = async () => {
-
-    migrationButton.disabled = true;
-    migrationButton.textContent = "☁️ Migration en cours...";
-
-    try {
-
-        if (typeof migrateLocalDataToCloud !== "function") {
-            throw new Error(
-                "La fonction de migration est introuvable."
-            );
-        }
-
-        await migrateLocalDataToCloud();
-
-    } catch (error) {
-
-        console.error(
-            "❌ Erreur pendant la migration :",
-            error
-        );
-
-        alert(
-            "❌ La migration a rencontré une erreur :\n\n" +
-            error.message
-        );
-
-        migrationButton.disabled = false;
-        migrationButton.textContent =
-            "☁️ Réessayer la migration";
-
-    }
-
-};
-
-        document.body.appendChild(migrationButton);
-
-    }, 1000);
-
-}
 
    
 /* ========================================================
