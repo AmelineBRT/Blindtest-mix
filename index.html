@@ -14503,6 +14503,12 @@ async function saveGameChanges() {
         ).value.trim();
 
 
+    const changeRecoveryAnswer =
+        document.getElementById(
+            "editRecoveryAnswerChange"
+        ).checked;
+
+
     const recoveryAnswer =
         document.getElementById(
             "editGameRecoveryAnswer"
@@ -14521,7 +14527,6 @@ async function saveGameChanges() {
         );
 
         return;
-
     }
 
 
@@ -14532,73 +14537,74 @@ async function saveGameChanges() {
         );
 
         return;
-
     }
 
 
     /*
-     * Si on supprime le mot de passe,
-     * la récupération n'est plus nécessaire.
+     * Si on demande à modifier la réponse,
+     * une nouvelle réponse doit être saisie.
      */
 
-    if (removePassword) {
+    if (
+        changeRecoveryAnswer &&
+        !recoveryAnswer
+    ) {
 
-        game.password =
-            "";
+        alert(
+            "Saisis une nouvelle réponse de récupération."
+        );
 
-        game.has_password =
-            false;
-
-        game.recoveryQuestion =
-            "";
-
+        return;
     }
 
 
     /*
-     * Nouveau mot de passe
+     * Si le mot de passe est conservé ou remplacé,
+     * une question de récupération doit exister.
      */
 
-    else if (password) {
-
-        if (
-            !recoveryQuestion ||
-            !recoveryAnswer
-        ) {
-
-            alert(
-                "Une question et une réponse de récupération sont obligatoires lorsque tu utilises un mot de passe."
-            );
-
-            return;
-
-        }
+    const passwordWillExist =
+        !removePassword &&
+        (
+            !!password ||
+            game.has_password
+        );
 
 
-        game.password =
-            password;
+    if (
+        passwordWillExist &&
+        !recoveryQuestion
+    ) {
 
-        game.has_password =
-            true;
+        alert(
+            "Une question de récupération est obligatoire lorsque la partie est protégée par un mot de passe."
+        );
 
-        game.recoveryQuestion =
-            recoveryQuestion;
-
+        return;
     }
 
 
     /*
-     * Mot de passe conservé
+     * Si on demande à modifier la réponse,
+     * le mot de passe doit également être présent.
      */
 
-    else {
+    if (
+        changeRecoveryAnswer &&
+        (
+            removePassword ||
+            (
+                !password &&
+                !game.has_password
+            )
+        )
+    ) {
 
-        game.has_password =
-            true;
+        alert(
+            "Impossible de modifier la réponse de récupération sans mot de passe."
+        );
 
-        game.recoveryQuestion =
-            recoveryQuestion;
-
+        return;
     }
 
 
@@ -14612,6 +14618,53 @@ async function saveGameChanges() {
 
     game.groupId =
         groupId;
+
+
+    /*
+     * Suppression explicite du mot de passe.
+     */
+
+    if (removePassword) {
+
+        game.password =
+            "";
+
+        game.has_password =
+            false;
+
+        game.recoveryQuestion =
+            "";
+
+    } else if (password) {
+
+        /*
+         * Nouveau mot de passe ou mot de passe actuel
+         * conservé dans le champ.
+         */
+
+        game.password =
+            password;
+
+        game.has_password =
+            true;
+
+        game.recoveryQuestion =
+            recoveryQuestion;
+
+    } else {
+
+        /*
+         * Champ vide sans demande de suppression :
+         * on conserve le mot de passe actuel.
+         */
+
+        game.has_password =
+            !!game.has_password;
+
+        game.recoveryQuestion =
+            recoveryQuestion;
+
+    }
 
 
     if (!Array.isArray(game.participants)) {
@@ -14705,25 +14758,29 @@ async function saveGameChanges() {
                 game.creator,
 
             groupe_id:
-                game.groupId || null
+                game.groupId || null,
+
+            question_recuperation:
+                recoveryQuestion || null
 
         };
 
 
         /*
-         * Suppression explicite du mot de passe
+         * Suppression explicite du mot de passe.
          */
 
         if (removePassword) {
 
             body.mot_de_passe =
-                null;
+                "";
 
         }
 
 
         /*
-         * Nouveau mot de passe
+         * Nouveau mot de passe ou mot de passe actuel
+         * présent dans le champ.
          */
 
         else if (password) {
@@ -14731,23 +14788,15 @@ async function saveGameChanges() {
             body.mot_de_passe =
                 password;
 
-            body.question_recuperation =
-                recoveryQuestion;
-
-            body.reponse_recuperation =
-                recoveryAnswer;
-
         }
 
 
         /*
-         * Mot de passe conservé
+         * La réponse n'est envoyée QUE si la case
+         * "Modifier la réponse" est cochée.
          */
 
-        else {
-
-            body.question_recuperation =
-                recoveryQuestion;
+        if (changeRecoveryAnswer) {
 
             body.reponse_recuperation =
                 recoveryAnswer;
@@ -14785,6 +14834,15 @@ async function saveGameChanges() {
         console.log(
             "Modification de la partie enregistrée en ligne."
         );
+
+
+        /*
+         * La suppression a été traitée :
+         * on nettoie le marqueur.
+         */
+
+        passwordInput.dataset.removePassword =
+            "false";
 
 
     } catch (error) {
