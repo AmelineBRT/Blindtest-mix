@@ -4703,11 +4703,12 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
     </button>
 
 
-    <button
-        class="back-arrow-button"
-        onclick="showGame()"
-        title="Retour"
-    >
+   <button
+    class="back-arrow-button"
+    onclick="history.back()"
+    title="Retour"
+>
+      
         <svg class="back-arrow-icon">
             <use href="#back-arrow-icon"></use>
         </svg>
@@ -6850,29 +6851,6 @@ function showGroups() {
 
 }
 
-
-async function showGames() {
-
-    gamesView = "games";
-
-    await loadPeopleFromCloud();
-
-    document.getElementById(
-        "gamesViewTitle"
-    ).textContent =
-        "🎶 Parties";
-
-    document.getElementById(
-        "gamesViewToggle"
-    ).textContent =
-        "🎉 Voir les groupes";
-
-    showScreen("gamesScreen");
-
-    renderFilters();
-    renderGames();
-
-}
 
 
 
