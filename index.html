@@ -3085,13 +3085,26 @@ textarea:focus {
     margin: 0;
 }
 
-.pause-all {
-    width: 100%;
+.play-global-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.play-global-controls button {
+    flex: 1;
     font-size: 14px;
     padding: 8px;
-    margin: 8px 0 0 0;
-    background: #B73434;
+    margin: 0;
     color: white;
+}
+
+.resume-all {
+    background: #720038;
+}
+
+.pause-all {
+    background: #B73434;
 }
 
 .play-all {
@@ -5233,6 +5246,16 @@ onclick="history.back()"
 
     </div>
 
+    <div class="play-global-controls">
+
+    <button
+        class="resume-all"
+        onclick="resumeAfterPauseAll()">
+
+        ▶️ REPRENDRE
+
+    </button>
+
     <button
         class="pause-all"
         onclick="pauseAll()">
@@ -5240,6 +5263,8 @@ onclick="history.back()"
         ⏸️ PAUSE TOUT
 
     </button>
+
+</div>
 
 </div>
 
@@ -17695,6 +17720,8 @@ function changeVolume(index, volume) {
 
 }
 
+let tracksPlayingBeforePauseAll = [];
+
 
 function playAll() {
 
@@ -17716,12 +17743,23 @@ function playAll() {
 
 function pauseAll() {
 
-    players.forEach(function(player) {
+    tracksPlayingBeforePauseAll = [];
+
+    players.forEach(function(player, index) {
 
         if (
             player &&
+            typeof player.getPlayerState === "function" &&
             typeof player.pauseVideo === "function"
         ) {
+
+            if (
+                player.getPlayerState() === YT.PlayerState.PLAYING
+            ) {
+
+                tracksPlayingBeforePauseAll.push(index);
+
+            }
 
             player.pauseVideo();
 
@@ -17732,6 +17770,26 @@ function pauseAll() {
 }
 
 
+function resumeAfterPauseAll() {
+
+    tracksPlayingBeforePauseAll.forEach(function(index) {
+
+        const player =
+            players[index];
+
+        if (
+            player &&
+            typeof player.playVideo === "function"
+        ) {
+
+            player.playVideo();
+
+        }
+
+    });
+
+}
+   
 /* ========================================================
    NAVIGATION MANCHES
    ======================================================== */
