@@ -3781,7 +3781,10 @@ background: #ffffff;
     margin-top: 0;
 }
    
-   
+#editGroupScreen .back-arrow-button {
+    top: 0px;
+    left: 0px;
+}   
    
 
    
@@ -4116,9 +4119,10 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
 <button
     class="back-arrow-button"
-    onclick="showGroups()"
+    onclick="history.back()"
     title="Retour"
 >
+   
     <svg class="back-arrow-icon">
         <use href="#back-arrow-icon"></use>
     </svg>
