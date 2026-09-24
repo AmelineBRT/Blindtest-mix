@@ -5343,9 +5343,9 @@ let duplicateRoundId = null;
 let duplicateSourceGameId = null;
 let recoveryGameId = null;
 let currentGroupId = null;
-let gameReturnContext = "games";
 
-   let isBrowserBack = false;
+   
+let isBrowserBack = false;
 let isAppNavigation = false;
    
 let players = [];
@@ -6738,9 +6738,7 @@ function showGroups() {
 
     currentGroupId = null;
 
-    gameReturnContext = "games";
-
-    document.getElementById(
+        document.getElementById(
         "gamesViewTitle"
     ).textContent =
         "🎉 Groupes";
@@ -6767,8 +6765,6 @@ function showGroups() {
     gamesView = "games";
 
       currentGroupId = null;
-
-gameReturnContext = "games";
 
     await loadPeopleFromCloud();
 
@@ -11383,9 +11379,7 @@ function updateGroupSelect(
     currentGroupId =
         groupId;
 
-    gameReturnContext =
-        "group";
-      
+
     const group =
         groups.find(function(g) {
             return g.id === groupId;
