@@ -3779,6 +3779,15 @@ body.dark-mode .forgot-password-game-info strong {
     color: #aaa;
 }
 
+   .forgot-password-game-card-content {
+    padding: 0;
+    margin: 8px 0 18px 0;
+}
+
+.forgot-password-game-card-content h3 {
+    margin-top: 0;
+}
+   
    
    
 
@@ -5164,7 +5173,10 @@ onclick="history.back()"
         <h2>🔐 Mot de passe oublié</h2>
 
         <div
+    <div
     id="forgotPasswordGameName"
+    class="game-card-content forgot-password-game-card-content">
+</div>
     class="forgot-password-game-info">
 </div>
 
@@ -12335,13 +12347,31 @@ function showForgotPassword(gameId) {
 
 
     document.getElementById(
-        "forgotPasswordGameName"
-    ).innerHTML =
-        "<strong>Partie :</strong> " +
-        game.name +
-        "<br>" +
-        "<strong>Créée par :</strong> " +
-        game.creator;
+    "forgotPasswordGameName"
+).innerHTML = `
+
+    <h3>
+        🎶 ${escapeHTML(game.name)}
+        ${game.has_password ? " 🔒" : ""}
+    </h3>
+
+    <div class="game-info creator-info">
+
+        <span class="creator-label">
+            Créé par :
+        </span>
+
+        <span
+            class="creator-name"
+            style="color:#555 !important;"
+        >
+            ${getParticipantIconHTML(game.creator)}
+            ${escapeHTML(game.creator)}
+        </span>
+
+    </div>
+
+`;
 
 
     const questionElement =
