@@ -6624,59 +6624,70 @@ window.addEventListener("popstate", function(event) {
         gamesView =
             event.state.view || "games";
 
-        if (
-            event.state.screen === "gamesScreen"
-        ) {
+        switch (event.state.screen) {
 
-            if (
-                event.state.view === "groups"
-            ) {
+            case "gamesScreen":
 
-                showGroups();
+                if (gamesView === "groups") {
 
-            } else {
+                    showGroups();
 
-                showGames();
+                } else {
 
-            }
+                    showGames();
 
-        } else if (
-            event.state.screen === "gameScreen"
-        ) {
+                }
 
-            showGame();
+                break;
 
-        } else if (
-            event.state.screen === "groupScreen"
-        ) {
 
-            if (currentGroupId) {
+            case "gameScreen":
 
-                showGroup(
-                    currentGroupId
+                showGame();
+
+                break;
+
+
+            case "groupScreen":
+
+                if (currentGroupId) {
+
+                    showGroup(
+                        currentGroupId
+                    );
+
+                } else {
+
+                    showGroups();
+
+                }
+
+                break;
+
+
+            case "peopleScreen":
+
+                showPeopleBank();
+
+                break;
+
+
+            default:
+
+                showScreen(
+                    event.state.screen
                 );
 
-            } else {
-
-                showGroups();
-
-            }
-
-        } else if (
-            event.state.screen === "peopleScreen"
-        ) {
-
-            showPeopleBank();
-
-        } else {
-
-            showScreen(
-                event.state.screen
-            );
+                break;
 
         }
 
     } else {
+
+        /*
+         * L'utilisateur essaie de quitter
+         * Blindtest Mix.
+         */
 
         history.pushState(
             {
