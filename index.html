@@ -5140,10 +5140,22 @@ onclick="history.back()"
 
             <p id="recoveryQuestionText"></p>
 
-            <input
-                id="recoveryAnswer"
-                type="text"
-                placeholder="Votre réponse">
+           <div class="password-container">
+
+    <input
+        id="gameRecoveryAnswer"
+        type="password"
+        placeholder="Votre réponse">
+
+    <button
+        type="button"
+        class="secondary password-action-button"
+        onclick="togglePassword('gameRecoveryAnswer', this)"
+        title="Afficher ou masquer la réponse">
+        👁️
+    </button>
+
+</div>
 
             <button
                 class="primary"
@@ -14373,21 +14385,81 @@ document.getElementById(
     "editGameRecoveryAnswer"
 ).value = "";
 
-document.getElementById(
-    "editRecoveryAnswerChange"
-).checked = false;
+const recoveryChangeCheckbox =
+    document.getElementById(
+        "editRecoveryAnswerChange"
+    );
 
-document.getElementById(
-    "editRecoveryAnswerInputContainer"
-).style.display = "none";
+const recoveryAnswerSection =
+    document.getElementById(
+        "editRecoveryAnswerSection"
+    );
 
-document.getElementById(
-    "editRecoveryAnswerSection"
-).style.display = "none";
+const recoveryAnswerInputContainer =
+    document.getElementById(
+        "editRecoveryAnswerInputContainer"
+    );
 
-document.getElementById(
-    "editRecoveryAnswerArrow"
-).textContent = "▸";
+const recoveryAnswerToggle =
+    document.getElementById(
+        "editRecoveryAnswerToggle"
+    );
+
+const recoveryAnswerArrow =
+    document.getElementById(
+        "editRecoveryAnswerArrow"
+    );
+
+
+if (recoveryChangeCheckbox) {
+    recoveryChangeCheckbox.checked = false;
+}
+
+
+if (game.has_password) {
+
+    /*
+     * Une réponse existe déjà :
+     * on affiche le bouton repliable.
+     */
+
+    if (recoveryAnswerToggle) {
+        recoveryAnswerToggle.style.display = "flex";
+    }
+
+    if (recoveryAnswerSection) {
+        recoveryAnswerSection.style.display = "none";
+    }
+
+    if (recoveryAnswerInputContainer) {
+        recoveryAnswerInputContainer.style.display = "none";
+    }
+
+    if (recoveryAnswerArrow) {
+        recoveryAnswerArrow.textContent = "▸";
+    }
+
+} else {
+
+    /*
+     * La partie n'avait pas de mot de passe :
+     * aucune réponse n'existe encore.
+     * On affiche directement le champ.
+     */
+
+    if (recoveryAnswerToggle) {
+        recoveryAnswerToggle.style.display = "none";
+    }
+
+    if (recoveryAnswerSection) {
+        recoveryAnswerSection.style.display = "block";
+    }
+
+    if (recoveryAnswerInputContainer) {
+        recoveryAnswerInputContainer.style.display = "block";
+    }
+
+}
 
 
     toggleEditRecoveryRequirement();
