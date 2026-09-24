@@ -2949,6 +2949,32 @@ textarea:focus {
 }
 
 
+   /* Miniatures youtube sur encadrés des pistes */
+.track {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.track::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--track-thumbnail);
+    background-size: cover;
+    background-position: center;
+    opacity: 0.30;
+    z-index: -2;
+}
+
+.track::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.70);
+    z-index: -1;
+}
+   
 /* =========================================================
    LECTEURS YOUTUBE
    ========================================================= */
@@ -16674,6 +16700,11 @@ function renderPlayTracks(round) {
         div.className = "track";
 
         div.id = "track-card-" + index;
+
+       div.style.setProperty(
+    "--track-thumbnail",
+    `url("https://img.youtube.com/vi/${videoId}/hqdefault.jpg")`
+);
 
         div.innerHTML = `
 
