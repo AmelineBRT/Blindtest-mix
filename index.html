@@ -6624,7 +6624,6 @@ window.addEventListener("popstate", function(event) {
         gamesView =
             event.state.view || "games";
 
-
         if (
             event.state.screen === "gamesScreen"
         ) {
@@ -6653,7 +6652,9 @@ window.addEventListener("popstate", function(event) {
 
             if (currentGroupId) {
 
-                showGroup(currentGroupId);
+                showGroup(
+                    currentGroupId
+                );
 
             } else {
 
@@ -6677,18 +6678,13 @@ window.addEventListener("popstate", function(event) {
 
     } else {
 
-        /*
-         * L'utilisateur essaie de quitter
-         * Blindtest Mix.
-         */
-
         history.pushState(
             {
                 screen: "gamesScreen",
                 gameId: null,
                 groupId: null,
                 roundId: null,
-                view: gamesView
+                view: "games"
             },
             "",
             "#gamesScreen"
