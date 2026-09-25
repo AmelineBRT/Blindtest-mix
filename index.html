@@ -3811,7 +3811,15 @@ background: #ffffff;
     top: 0px;
     left: 0px;
 }   
-   
+
+
+   #nextRoundTracks {
+    position: fixed;
+    left: -10000px;
+    top: 0;
+    width: 100%;
+    visibility: hidden;
+}
 
    
 
@@ -5319,6 +5327,8 @@ onclick="history.back()"
 </div>
 
 <div id="playTracks"></div>
+
+   <div id="nextRoundTracks"></div>
 
 <div class="play-navigation">
 
@@ -16906,6 +16916,418 @@ function renderPlayTracks(round) {
 
 }
 
+           
+
+function prepareNextRound() {
+
+    const game =
+        getCurrentGame();
+
+    if (!game) {
+        return;
+    }
+
+    const currentIndex =
+        game.rounds.findIndex(function(round) {
+
+            return round.id === currentRoundId;
+
+        });
+
+    if (
+        currentIndex < 0 ||
+        currentIndex >= game.rounds.length - 1
+    ) {
+        return;
+    }
+
+    const nextRound =
+        game.rounds[currentIndex + 1];
+
+    const container =
+        document.getElementById("nextRoundTracks");
+
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = "";
+
+    const tracksWithVideo =
+        nextRound.tracks.filter(function(track) {
+
+            return track.url &&
+                   track.url.trim() !== "" &&
+                   getVideoId(track.url);
+
+        });
+
+    if (tracksWithVideo.length === 0) {
+        return;
+    }
+
+    const preparedPlayers = [];
+
+    tracksWithVideo.forEach(function(track, index) {
+
+        const videoId =
+            getVideoId(track.url);
+
+        const div =
+            document.createElement("div");
+
+        div.className =
+            "track";
+
+        div.id =
+            "next-track-card-" + index;
+
+        div.style.setProperty(
+            "--track-thumbnail",
+            `url("https://img.youtube.com/vi/${videoId}/hqdefault.jpg")`
+        );
+
+        div.innerHTML = `
+
+            <h3>
+
+                <span
+                    class="track-status-icon">
+
+                    🔇
+
+                </span>
+
+                <span>
+                    ${escapeHTML(
+                        track.title ||
+                        "Piste " + (index + 1)
+                    )}
+                </span>
+
+            </h3>
+
+            <div class="track-controls">
+
+                <button
+                    class="play-button"
+                    onclick="playPreparedTrack(${index})">
+
+                    ▶️
+
+                </button>
+
+                <button
+                    class="pause-button"
+                    onclick="pausePreparedTrack(${index})">
+
+                    ⏸️
+
+                </button>
+
+                <div class="volume-container">
+
+                    <span class="volume-icon">
+                        🔊
+                    </span>
+
+                    <input
+                        class="volume"
+                        type="range"
+                        min="0"
+                        max="100"
+                        value="100"
+                        oninput="changePreparedVolume(${index}, this.value)">
+
+                </div>
+
+            </div>
+
+            <div
+                id="next-player-${index}"
+                class="player hidden-player">
+            </div>
+
+        `;
+
+        container.appendChild(div);
+
+        const player =
+            new YT.Player(
+                "next-player-" + index,
+                {
+
+                    videoId: videoId,
+
+                    playerVars: {
+
+                        autoplay: 0,
+                        controls: 1,
+                        rel: 0,
+                        playsinline: 1
+
+                    },
+
+                    events: {
+
+                        onReady: function(event) {
+
+                            event.target.setVolume(100);
+
+                        }
+
+                    }
+
+                }
+            );
+
+        preparedPlayers.push(
+            player
+        );
+
+    });
+
+    warmUpPlayers(
+        preparedPlayers,
+        function() {
+
+            console.log(
+                "Préparation de la manche suivante terminée :",
+                nextRound.name
+            );
+
+        }
+    );
+
+    window.nextRoundPreparedPlayers =
+        preparedPlayers;
+
+    window.nextRoundPreparedId =
+        nextRound.id;
+
+}
+           
+  function warmUpPlayers(playerList, onComplete) {
+
+    if (
+        !playerList ||
+        playerList.length === 0
+    ) {
+
+        if (onComplete) {
+            onComplete();
+        }
+
+        return;
+
+    }
+
+    let attempts = 0;
+
+    const checkPlayers =
+        setInterval(function() {
+
+            attempts++;
+
+            if (attempts > 100) {
+
+                clearInterval(
+                    checkPlayers
+                );
+
+                console.log(
+                    "Préparation de la manche suivante interrompue."
+                );
+
+                if (onComplete) {
+                    onComplete();
+                }
+
+                return;
+
+            }
+
+            if (
+                playerList.some(function(player) {
+
+                    return !player ||
+                           typeof player.playVideo !== "function" ||
+                           typeof player.pauseVideo !== "function";
+
+                })
+            ) {
+
+                return;
+
+            }
+
+            clearInterval(
+                checkPlayers
+            );
+
+            playerList.forEach(function(player) {
+
+                player.mute();
+                player.playVideo();
+
+            });
+
+            let playingCheck =
+                setInterval(function() {
+
+                    const allPlaying =
+                        playerList.every(function(player) {
+
+                            return (
+                                typeof player.getPlayerState ===
+                                "function" &&
+                                player.getPlayerState() ===
+                                YT.PlayerState.PLAYING
+                            );
+
+                        });
+
+                    if (allPlaying) {
+
+                        clearInterval(
+                            playingCheck
+                        );
+
+                        playerList.forEach(function(player) {
+
+                            player.pauseVideo();
+                            player.unMute();
+                            player.setVolume(100);
+
+                        });
+
+                        if (onComplete) {
+                            onComplete();
+                        }
+
+                    }
+
+                }, 100);
+
+        }, 100);
+
+}         
+
+
+
+function activatePreparedNextRound() {
+
+    const preparedPlayers =
+        window.nextRoundPreparedPlayers;
+
+    const preparedId =
+        window.nextRoundPreparedId;
+
+    if (
+        !preparedPlayers ||
+        !preparedId ||
+        preparedPlayers.length === 0
+    ) {
+
+        return false;
+
+    }
+
+    const currentContainer =
+        document.getElementById("playTracks");
+
+    const preparedContainer =
+        document.getElementById("nextRoundTracks");
+
+    if (
+        !currentContainer ||
+        !preparedContainer
+    ) {
+
+        return false;
+
+    }
+
+    /*
+     * Échange les deux zones.
+     * Les lecteurs YouTube restent exactement
+     * dans leurs iframes.
+     */
+
+    currentContainer.id =
+        "nextRoundTracks";
+
+    preparedContainer.id =
+        "playTracks";
+
+
+    /*
+     * Remet les identifiants utilisés par
+     * les fonctions normales de lecture.
+     */
+
+    const cards =
+        preparedContainer.querySelectorAll(".track");
+
+    cards.forEach(function(card, index) {
+
+        card.id =
+            "track-card-" + index;
+
+        const statusIcon =
+            card.querySelector(".track-status-icon");
+
+        if (statusIcon) {
+
+            statusIcon.id =
+                "track-status-" + index;
+
+            statusIcon.textContent =
+                "🔇";
+
+        }
+
+        const playerElement =
+            card.querySelector(".player");
+
+        if (playerElement) {
+
+            playerElement.id =
+                "player-" + index;
+
+        }
+
+    });
+
+
+    /*
+     * Les lecteurs préparés deviennent
+     * les lecteurs actifs.
+     */
+
+    players =
+        preparedPlayers;
+
+    playersVisible =
+        false;
+
+
+    /*
+     * Les anciennes références préparées
+     * ne sont plus nécessaires.
+     */
+
+    window.nextRoundPreparedPlayers =
+        null;
+
+    window.nextRoundPreparedId =
+        null;
+
+
+    return true;
+
+}
+
    
 
 function getNextRoundPreparationContainer() {
@@ -18510,12 +18932,16 @@ function resumeAfterPauseAll() {
 
 function nextRound() {
 
-    const game = getCurrentGame();
+    const game =
+        getCurrentGame();
 
     const currentIndex =
         game.rounds.findIndex(function(round) {
+
             return round.id === currentRoundId;
+
         });
+
 
     if (
         currentIndex >= game.rounds.length - 1
@@ -18523,21 +18949,49 @@ function nextRound() {
 
         pauseAll();
 
-history.back();
+        history.back();
 
         return;
 
     }
 
+
     pauseAll();
 
+
+    const nextRound =
+        game.rounds[currentIndex + 1];
+
+
     currentRoundId =
-        game.rounds[currentIndex + 1].id;
+        nextRound.id;
+
+
+    /*
+     * Si la manche suivante a déjà été préparée,
+     * on utilise directement ses lecteurs.
+     */
+
+    const preparedUsed =
+        activatePreparedNextRound();
+
+
+    if (preparedUsed) {
+
+        loadRoundForPlaying();
+
+        return;
+
+    }
+
+
+    /*
+     * Sinon, fonctionnement habituel.
+     */
 
     loadRoundForPlaying();
 
 }
-
 
 function previousRound() {
 
