@@ -3148,10 +3148,11 @@ textarea:focus {
 }
 
 .play-navigation {
-    display: flex;
-    align-items: stretch;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
     gap: 10px;
-    margin-top: 10px;
+    margin-top: 14px;
 }
 
 .play-round-section {
@@ -3214,21 +3215,39 @@ body.dark-mode .play-round-empty {
     color: #aaa;
 }
 
-.navigation-left {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+.play-navigation .previous-round,
+.play-navigation .quit-game,
+.play-navigation .next-round,
+.play-navigation .finish-game {
+    margin: 0;
+    min-height: 42px;
+    font-size: 14px;
+    padding: 9px 14px;
 }
 
-.navigation-left button {
-    margin: 0;
+.play-navigation .previous-round {
+    justify-self: stretch;
+    background: #e1e1e1;
+    color: #555;
+}
+
+.play-navigation .quit-game {
+    justify-self: center;
+    width: auto;
+    background: transparent;
+    color: #777;
+    border: 1px solid #d0d0d0;
 }
 
 .play-navigation .next-round,
 .play-navigation .finish-game {
-    flex: 1;
-    font-size: 16px;
-    padding: 12px;
+    justify-self: stretch;
+}
+
+.play-navigation .next-round,
+.play-navigation .finish-game {
+    background: #720038;
+    color: white;
 }
 
     #createGameScreen .back-arrow-button {
@@ -3355,7 +3374,19 @@ body.dark-mode .play-round-empty {
     }
 
     .play-navigation {
-        align-items: stretch;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .play-navigation .previous-round,
+    .play-navigation .quit-game,
+    .play-navigation .next-round,
+    .play-navigation .finish-game {
+        width: auto;
+        min-width: 0;
+        font-size: 13px;
+        padding: 9px 8px;
     }
 
     .play-round-section {
@@ -18665,7 +18696,7 @@ function updateNavigationButton() {
         );
 
         button.textContent =
-            "➡️ Manche suivante";
+            "Suivante →";
 
     }
 
