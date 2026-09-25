@@ -3965,6 +3965,8 @@ background: #ffffff;
 
 
    
+/* PIXELS PROTOTYPE */
+.pixels-game-type-options{display:flex;gap:10px;margin:8px 0 16px}.pixels-game-type-option{flex:1;padding:14px 10px;border:2px solid #ddd;border-radius:10px;background:#fff;cursor:pointer;text-align:center}.pixels-game-type-option.selected{border-color:#720038;background:rgba(114,0,56,.07)}.pixels-game-type-option input{display:none}.pixels-image-preview{width:100%;max-height:260px;object-fit:contain;border-radius:8px;background:#eee;margin:8px 0 12px}.pixels-play-card{text-align:center;padding:16px}.pixels-play-canvas{display:block;width:100%;max-width:760px;height:auto;margin:12px auto;border-radius:10px;background:#ddd}.pixels-phase-label{font-weight:bold;margin:8px 0}.pixels-answer{margin-top:12px;padding:10px 14px;border-radius:8px;background:#f0f0f0;display:none}.pixels-answer.visible{display:block}.pixels-phase-buttons{display:flex;flex-wrap:wrap;justify-content:center;gap:4px}body.dark-mode .pixels-game-type-option{background:#363636;border-color:#555}body.dark-mode .pixels-game-type-option.selected{background:rgba(114,0,56,.22)}body.dark-mode .pixels-answer{background:#363636}
 </style>
 <script>
 window.addEventListener("error", function(event) {
@@ -4378,7 +4380,7 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
     class="participant-bank creator-person-bank">
 </div>
 
-    <label>Groupe (facultatif)</label>
+    <label>Type de jeu</label><div class="pixels-game-type-options"><label class="pixels-game-type-option selected" id="gameTypeBlindtestOption"><input type="radio" name="gameType" value="blindtest" checked onchange="selectGameType('blindtest')">🎵<br><strong>Blindtest Mix</strong></label><label class="pixels-game-type-option" id="gameTypePixelsOption"><input type="radio" name="gameType" value="pixels" onchange="selectGameType('pixels')">🧩<br><strong>Pixels</strong></label></div><label>Groupe (facultatif)</label>
 
     <select id="gameGroup">
 
@@ -4921,15 +4923,10 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
 <div class="card">
 
-    <h2>🎶 Nouvelle manche</h2>
-
+    <h2 id="createRoundTitle">🎶 Nouvelle manche</h2>
     <label>Nom de la manche</label>
-
-    <input
-        id="roundName"
-        type="text"
-        placeholder="Ex : Années 2000">
-
+    <input id="roundName" type="text" placeholder="Ex : Années 2000">
+    <div id="pixelsCreateFields" style="display:none;"><label>Image à faire deviner</label><input id="pixelsImageFile" type="file" accept="image/*" onchange="previewPixelsImage(this)"><img id="pixelsCreatePreview" class="pixels-image-preview" style="display:none;"><label>Réponse</label><input id="pixelsAnswer" type="text" placeholder="Ex : Le Roi Lion"></div>
     <button class="primary" onclick="createRound()">
         💾 Créer la manche
     </button>
@@ -4957,19 +4954,7 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
 <div class="card">
 
-    <h2 id="editRoundTitle"></h2>
-
-    <label>Nom de la manche</label>
-
-    <input
-        id="editRoundName"
-        type="text">
-
-    <p>
-        Ajoute jusqu'à 7 liens YouTube.
-    </p>
-
-    <div id="editTracks"></div>
+    <h2 id="editRoundTitle"></h2><label>Nom de la manche</label><input id="editRoundName" type="text"><div id="pixelsEditFields" style="display:none;"><label>Image à faire deviner</label><input id="pixelsEditImageFile" type="file" accept="image/*" onchange="previewPixelsImage(this, 'pixelsEditPreview')"><img id="pixelsEditPreview" class="pixels-image-preview" style="display:none;"><label>Réponse</label><input id="pixelsEditAnswer" type="text" placeholder="Ex : Le Roi Lion"></div><div id="blindtestEditFields"><p>Ajoute jusqu'à 7 liens YouTube.</p><div id="editTracks"></div></div>
 
     <div class="add-track-container">
 
@@ -10206,6 +10191,9 @@ if (password && (!recoveryQuestion || !recoveryAnswer)) {
         groupId:
             groupId,
 
+        gameType:
+            document.querySelector('input[name="gameType"]:checked')?.value || "blindtest",
+
 has_password:
     !!password,
 
@@ -11124,6 +11112,7 @@ function showCreateGameForCurrentGroup() {
 
 function showCreateGame() {
 
+    selectGameType("blindtest");
     document.getElementById("gameName").value = "";
     document.getElementById("gameCreator").value = "";
     document.getElementById("gamePassword").value = "";
@@ -14821,13 +14810,10 @@ function startSpecificRound(roundId) {
    CRÉER UNE MANCHE
    ======================================================== */
 
-function showCreateRound() {
-
-    document.getElementById("roundName").value = "";
-
-    showScreen("createRoundScreen");
-
-}
+function selectGameType(type) { const a=document.getElementById("gameTypeBlindtestOption"), b=document.getElementById("gameTypePixelsOption"); if(a)a.classList.toggle("selected",type==="blindtest"); if(b)b.classList.toggle("selected",type==="pixels"); const r=document.querySelector('input[name="gameType"][value="'+type+'"]'); if(r)r.checked=true; }
+function showCreateRound() { const game=getCurrentGame(); document.getElementById("roundName").value=""; document.getElementById("pixelsImageFile").value=""; document.getElementById("pixelsAnswer").value=""; document.getElementById("pixelsCreatePreview").style.display="none"; const p=game&&game.gameType==="pixels"; document.getElementById("createRoundTitle").textContent=p?"🧩 Nouvelle manche Pixels":"🎶 Nouvelle manche"; document.getElementById("pixelsCreateFields").style.display=p?"block":"none"; showScreen("createRoundScreen"); }
+function previewPixelsImage(input,previewId="pixelsCreatePreview"){const file=input.files&&input.files[0],preview=document.getElementById(previewId);if(!file||!preview)return;const reader=new FileReader();reader.onload=e=>{preview.src=e.target.result;preview.style.display="block"};reader.readAsDataURL(file)}
+function fileToDataURL(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=e=>resolve(e.target.result);reader.onerror=reject;reader.readAsDataURL(file)})}
 
 
 async function createRound() {
@@ -14844,7 +14830,8 @@ async function createRound() {
     }
 
     const game = getCurrentGame();
-
+    if (!game) return;
+    if (game.gameType === "pixels") { const fileInput=document.getElementById("pixelsImageFile"), answer=document.getElementById("pixelsAnswer").value.trim(), file=fileInput.files&&fileInput.files[0]; if(!file){alert("Choisis une image à faire deviner.");return} if(!answer){alert("Donne la réponse de la manche.");return} const imageData=await fileToDataURL(file); const round={id:Date.now().toString(),name:name,tracks:[],imageData:imageData,answer:answer,gameType:"pixels"}; game.rounds.push(round); saveData(); try{await fetch("https://blindtestmix.amelinebrt.workers.dev/rounds",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:round.id,partie_id:game.id,nom:round.name,ordre:game.rounds.length})})}catch(error){console.error(error)} editRound(round.id); return; }
     const round = {
 
         id: Date.now().toString(),
@@ -14953,15 +14940,7 @@ function editRound(roundId) {
         return;
     }
 
-    document.getElementById("editRoundTitle").textContent =
-        "🎶 Modifier la manche";
-
-    document.getElementById("editRoundName").value =
-        round.name;
-
-    renderEditTracks(round);
-
-    showScreen("editRoundScreen");
+    const isPixels=game.gameType==="pixels"||round.gameType==="pixels"; document.getElementById("editRoundTitle").textContent=isPixels?"🧩 Modifier la manche Pixels":"🎶 Modifier la manche"; document.getElementById("editRoundName").value=round.name; document.getElementById("pixelsEditFields").style.display=isPixels?"block":"none"; document.getElementById("blindtestEditFields").style.display=isPixels?"none":"block"; if(isPixels){document.getElementById("pixelsEditAnswer").value=round.answer||"";const p=document.getElementById("pixelsEditPreview");if(round.imageData){p.src=round.imageData;p.style.display="block"}else p.style.display="none"}else renderEditTracks(round); showScreen("editRoundScreen");
 
 }
 
@@ -15271,7 +15250,7 @@ async function saveRound() {
     }
 
 
-    await saveTracksFromInputs(round);
+    if(game.gameType==="pixels"||round.gameType==="pixels"){const fileInput=document.getElementById("pixelsEditImageFile"),file=fileInput.files&&fileInput.files[0];if(file)round.imageData=await fileToDataURL(file);round.answer=document.getElementById("pixelsEditAnswer").value.trim();round.gameType="pixels";if(!round.imageData){alert("Choisis une image pour cette manche.");return}if(!round.answer){alert("Donne la réponse de la manche.");return}}else{await saveTracksFromInputs(round)}
 
     saveData();
 
@@ -16801,8 +16780,7 @@ function updatePlayHeader(game, round) {
             return item.id === round.id;
         });
 
-    document.getElementById("playGameTitle").textContent =
-        "🎶 " + game.name;
+    document.getElementById("playGameTitle").textContent = (game.gameType === "pixels" ? "🧩 " : "🎶 ") + game.name;
 
     document.getElementById("playRoundNumber").textContent =
         "Manche " +
@@ -17312,15 +17290,12 @@ function scrollToPlayRound(roundId, smooth) {
 }
 
 
+function renderPixelsPlay(game){const c=document.getElementById("playRoundsContainer");if(!c)return;c.innerHTML="";playRoundStates={};players=[];const phases=[["90%",40],["70%",28],["50%",18],["25%",10],["10%",4],["0%",1]];game.rounds.forEach(function(round){const section=document.createElement("section");section.className="play-round-section";section.dataset.roundId=round.id;const card=document.createElement("div");card.className="card pixels-play-card";const canvas=document.createElement("canvas");canvas.className="pixels-play-canvas";const label=document.createElement("div");label.className="pixels-phase-label";const buttons=document.createElement("div");buttons.className="pixels-phase-buttons";const answer=document.createElement("div");answer.className="pixels-answer";answer.textContent="💡 Réponse : "+(round.answer||"—");let image=new Image(),phase=0;function draw(i){phase=i;label.textContent="Pixelisation : "+phases[i][0];const ctx=canvas.getContext("2d");if(!ctx||!image.complete)return;const ratio=image.naturalWidth/image.naturalHeight||1,w=Math.min(760,image.naturalWidth||760),h=w/ratio;canvas.width=Math.round(w);canvas.height=Math.round(h);if(phases[i][1]===1){ctx.imageSmoothingEnabled=true;ctx.drawImage(image,0,0,canvas.width,canvas.height);return}const sw=Math.max(1,Math.round(canvas.width/phases[i][1])),sh=Math.max(1,Math.round(canvas.height/phases[i][1])),t=document.createElement("canvas");t.width=sw;t.height=sh;const tc=t.getContext("2d");tc.drawImage(image,0,0,sw,sh);ctx.imageSmoothingEnabled=false;ctx.drawImage(t,0,0,sw,sh,0,0,canvas.width,canvas.height)}phases.forEach((p,i)=>{const b=document.createElement("button");b.className=i===0?"primary":"light";b.textContent=p[0];b.onclick=()=>draw(i);buttons.appendChild(b)});const ab=document.createElement("button");ab.className="secondary";ab.textContent="💡 Voir la réponse";ab.onclick=()=>{answer.classList.toggle("visible");ab.textContent=answer.classList.contains("visible")?"🙈 Masquer la réponse":"💡 Voir la réponse"};card.append(canvas,label,buttons,ab,answer);section.appendChild(card);c.appendChild(section);if(round.imageData){image.onload=()=>draw(phase);image.src=round.imageData}});document.querySelector(".play-main-controls").style.display="none";document.querySelector(".play-global-controls").style.display="none";updatePlayRoundVisibility()}
 function loadRoundForPlaying() {
 
-    const game =
-        getCurrentGame();
-
-    if (!game) {
-        return;
-    }
-
+    const game=getCurrentGame();
+    if(!game)return;
+    if(game.gameType==="pixels"){const round=game.rounds.find(item=>item.id===currentRoundId);if(!round)return;renderPixelsPlay(game);playRenderedGameId=game.id;const i=game.rounds.findIndex(item=>item.id===currentRoundId);document.getElementById("playGameTitle").textContent="🧩 "+game.name;document.getElementById("playRoundNumber").textContent="Manche "+(i+1)+" / "+game.rounds.length;document.getElementById("playRoundTitle").textContent=round.name||"Manche "+(i+1);document.getElementById("playTrackCount").textContent="Jeu Pixels";showScreen("playScreen",document.getElementById("playScreen").classList.contains("active"));setTimeout(()=>scrollToPlayRound(currentRoundId,true),30);return}
     const round =
         game.rounds.find(function(item) {
             return item.id === currentRoundId;
