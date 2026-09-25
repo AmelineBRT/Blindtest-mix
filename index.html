@@ -16653,31 +16653,52 @@ function loadRoundForPlaying() {
         return;
     }
 
-    const preparedForThisRound =
-        preparedNextRound &&
-        preparedNextRound.roundId === currentRoundId &&
-        preparedNextRound.ready;
 
-    players.forEach(function(player) {
+    const usingPreparedRound =
+        window.preparedRoundActivated === true;
 
-        if (
-            player &&
-            typeof player.destroy === "function"
-        ) {
 
-            player.destroy();
+    /*
+     * Si la manche n'a pas été préparée,
+     * on fonctionne exactement comme avant.
+     */
 
-        }
+    if (!usingPreparedRound) {
 
-    });
+        players.forEach(function(player) {
 
-    if (!preparedForThisRound) {
+            if (
+                player &&
+                typeof player.destroy === "function"
+            ) {
+
+                player.destroy();
+
+            }
+
+        });
 
         players = [];
 
+        playersVisible = false;
+
+        renderPlayTracks(
+            round
+        );
+
+        warmUpCurrentRound();
+
+    } else {
+
+        /*
+         * Les lecteurs préparés sont déjà présents
+         * dans le DOM : surtout, on ne les recrée pas.
+         */
+
+        playersVisible = false;
+
     }
 
-    playersVisible = false;
 
     const roundIndex =
         game.rounds.findIndex(function(r) {
@@ -16686,8 +16707,10 @@ function loadRoundForPlaying() {
 
         });
 
+
     document.getElementById("playGameTitle").textContent =
         "🎶 " + game.name;
+
 
     document.getElementById("playRoundNumber").textContent =
         "Manche " +
@@ -16695,31 +16718,30 @@ function loadRoundForPlaying() {
         " / " +
         game.rounds.length;
 
+
     document.getElementById("playRoundTitle").textContent =
         round.name;
 
-    renderPlayTracks(
-        round
-    );
-
-    if (!preparedForThisRound) {
-
-        warmUpCurrentRound();
-
-    }
 
     updatePlayingCount();
 
     updateNavigationButton();
+
 
     showScreen(
         "playScreen",
         document.getElementById("playScreen").classList.contains("active")
     );
 
+
+    /*
+     * Le basculement est terminé.
+     */
+
+    window.preparedRoundActivated =
+        false;
+
 }
-
-
 /* ========================================================
    AFFICHER LES PISTES EN JEU
    ======================================================== */
@@ -17323,6 +17345,8 @@ function activatePreparedNextRound() {
     window.nextRoundPreparedId =
         null;
 
+       window.preparedRoundActivated =
+        true;
 
     return true;
 
