@@ -17090,15 +17090,54 @@ function prepareNextRound() {
 
                     },
 
-                    events: {
+                   events: {
 
-                        onReady: function(event) {
+    onReady: function(event) {
 
-                            event.target.setVolume(100);
+        event.target.setVolume(70);
 
-                        }
+    },
 
-                    }
+    onStateChange: function(event) {
+
+        const card =
+            document.getElementById(
+                "next-track-card-" + index
+            );
+
+        if (!card) {
+            return;
+        }
+
+        const statusIcon =
+            card.querySelector(
+                ".track-status-icon"
+            );
+
+        if (
+            event.data ===
+            YT.PlayerState.PLAYING
+        ) {
+
+            card.classList.add("playing");
+
+            if (statusIcon) {
+                statusIcon.textContent = "🎵";
+            }
+
+        } else {
+
+            card.classList.remove("playing");
+
+            if (statusIcon) {
+                statusIcon.textContent = "🔇";
+            }
+
+        }
+
+    }
+
+}
 
                 }
             );
@@ -17260,11 +17299,13 @@ function activatePreparedNextRound() {
 
     }
 
+
     const currentContainer =
         document.getElementById("playTracks");
 
     const preparedContainer =
         document.getElementById("nextRoundTracks");
+
 
     if (
         !currentContainer ||
@@ -17275,10 +17316,50 @@ function activatePreparedNextRound() {
 
     }
 
+
+    /*
+     * L'ancienne manche reste dans le DOM,
+     * mais on lui retire les IDs utilisés
+     * par la manche active.
+     */
+
+    const oldCards =
+        currentContainer.querySelectorAll(".track");
+
+    oldCards.forEach(function(card, index) {
+
+        card.id =
+            "old-track-card-" + index;
+
+
+        const statusIcon =
+            card.querySelector(".track-status-icon");
+
+        if (statusIcon) {
+
+            statusIcon.id =
+                "old-track-status-" + index;
+
+        }
+
+
+        const playerElement =
+            card.querySelector(".player");
+
+        if (playerElement) {
+
+            playerElement.id =
+                "old-player-" + index;
+
+        }
+
+    });
+
+
     /*
      * Échange les deux zones.
-     * Les lecteurs YouTube restent exactement
-     * dans leurs iframes.
+     * Les lecteurs YouTube restent dans
+     * leurs iframes respectives.
      */
 
     currentContainer.id =
@@ -17289,8 +17370,8 @@ function activatePreparedNextRound() {
 
 
     /*
-     * Remet les identifiants utilisés par
-     * les fonctions normales de lecture.
+     * Les lecteurs préparés deviennent
+     * les lecteurs actifs.
      */
 
     const cards =
@@ -17300,6 +17381,7 @@ function activatePreparedNextRound() {
 
         card.id =
             "track-card-" + index;
+
 
         const statusIcon =
             card.querySelector(".track-status-icon");
@@ -17314,6 +17396,7 @@ function activatePreparedNextRound() {
 
         }
 
+
         const playerElement =
             card.querySelector(".player");
 
@@ -17326,11 +17409,6 @@ function activatePreparedNextRound() {
 
     });
 
-
-    /*
-     * Les lecteurs préparés deviennent
-     * les lecteurs actifs.
-     */
 
     players =
         preparedPlayers;
@@ -17350,13 +17428,16 @@ function activatePreparedNextRound() {
     window.nextRoundPreparedId =
         null;
 
-       window.preparedRoundActivated =
+
+    window.preparedRoundActivated =
         true;
+
 
     return true;
 
 }
 
+   
    
 
 function getNextRoundPreparationContainer() {
