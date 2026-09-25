@@ -16822,6 +16822,33 @@ function scrollToPlayRound(roundId, smooth) {
 }
 
 
+/* ========================================================
+   EXTRAIRE ID YOUTUBE
+   ======================================================== */
+
+function getVideoId(url) {
+
+    try {
+
+        const urlObject = new URL(url);
+
+        if (urlObject.hostname.includes("youtube.com")) {
+            return urlObject.searchParams.get("v");
+        }
+
+        if (urlObject.hostname.includes("youtu.be")) {
+            return urlObject.pathname.substring(1);
+        }
+
+    } catch (error) {
+        return null;
+    }
+
+    return null;
+
+}
+
+
 function renderPlayRounds(game) {
 
     const container =
