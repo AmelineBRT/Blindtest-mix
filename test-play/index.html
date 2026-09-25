@@ -3133,6 +3133,12 @@ textarea:focus {
     background: #75a39d;
 }
 
+.play-main-controls {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
 .play-all {
     width: 100%;
     font-size: 16px;
@@ -5372,7 +5378,7 @@ onclick="history.back()"
 
 </div>
 
-<div class="card">
+<div class="card play-main-controls">
 
     <button
         class="play-all"
@@ -17354,8 +17360,6 @@ function loadRoundForPlaying() {
         "playScreen",
         document.getElementById("playScreen").classList.contains("active")
     );
-
-    setupPlayScrollLock();
 
     setTimeout(function() {
 
