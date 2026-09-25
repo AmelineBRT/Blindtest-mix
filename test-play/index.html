@@ -16889,6 +16889,13 @@ function updatePlayAllButton() {
         return;
     }
 
+    /*
+     * Chaque manche repart avec son bouton
+     * "LANCER LE MIX" en mauve foncé
+     * tant qu'il n'a pas encore été lancé.
+     */
+    button.classList.remove("has-started");
+
     const state =
         playRoundStates[currentRoundId];
 
