@@ -16629,33 +16629,51 @@ renderRounds();
 
 function loadRoundForPlaying() {
 
-    const game = getCurrentGame();
+    const game =
+        getCurrentGame();
 
     const round =
         game.rounds.find(function(r) {
+
             return r.id === currentRoundId;
+
         });
 
     if (!round) {
         return;
     }
 
-const hasPreparedPlayers =
-    preparedNextRound &&
-    preparedNextRound.roundId === currentRoundId &&
-    preparedNextRound.ready;
+    const preparedForThisRound =
+        preparedNextRound &&
+        preparedNextRound.roundId === currentRoundId &&
+        preparedNextRound.ready;
 
-if (!hasPreparedPlayers) {
+    players.forEach(function(player) {
 
-    players = [];
+        if (
+            player &&
+            typeof player.destroy === "function"
+        ) {
 
-}
+            player.destroy();
 
-playersVisible = false;
+        }
+
+    });
+
+    if (!preparedForThisRound) {
+
+        players = [];
+
+    }
+
+    playersVisible = false;
 
     const roundIndex =
         game.rounds.findIndex(function(r) {
+
             return r.id === currentRoundId;
+
         });
 
     document.getElementById("playGameTitle").textContent =
@@ -16670,18 +16688,25 @@ playersVisible = false;
     document.getElementById("playRoundTitle").textContent =
         round.name;
 
-   renderPlayTracks(round);
+    renderPlayTracks(
+        round
+    );
 
-warmUpCurrentRound();
+    if (!preparedForThisRound) {
 
-updatePlayingCount();
+        warmUpCurrentRound();
+
+    }
+
+    updatePlayingCount();
 
     updateNavigationButton();
 
-   showScreen(
-    "playScreen",
-    document.getElementById("playScreen").classList.contains("active")
-);
+    showScreen(
+        "playScreen",
+        document.getElementById("playScreen").classList.contains("active")
+    );
+
 }
 
 
@@ -16695,6 +16720,18 @@ function renderPlayTracks(round) {
         document.getElementById("playTracks");
 
     container.innerHTML = "";
+
+    const preparedForThisRound =
+        preparedNextRound &&
+        preparedNextRound.roundId === round.id &&
+        preparedNextRound.ready;
+
+    if (preparedForThisRound) {
+
+        players =
+            preparedNextRound.players;
+
+    }
 
     const tracksWithVideo =
         round.tracks.filter(function(track) {
@@ -16798,12 +16835,52 @@ function renderPlayTracks(round) {
 
         container.appendChild(div);
 
-        createPlayer(
-            index,
-            videoId
-        );
+        if (preparedForThisRound) {
+
+            const preparedPlayer =
+                preparedNextRound.players[index];
+
+            const iframe =
+                preparedPlayer &&
+                typeof preparedPlayer.getIframe === "function"
+                    ? preparedPlayer.getIframe()
+                    : null;
+
+            const playerContainer =
+                document.getElementById(
+                    "player-" + index
+                );
+
+            if (
+                iframe &&
+                playerContainer
+            ) {
+
+                playerContainer.appendChild(
+                    iframe
+                );
+
+            }
+
+        } else {
+
+            createPlayer(
+                index,
+                videoId
+            );
+
+        }
 
     });
+
+    if (preparedForThisRound) {
+
+        preparedNextRound.container.remove();
+
+        preparedNextRound =
+            null;
+
+    }
 
     const toggleButton =
         document.querySelector(".players-toggle");
@@ -16829,6 +16906,7 @@ function renderPlayTracks(round) {
 
 }
 
+   
 
 function getNextRoundPreparationContainer() {
 
@@ -17014,6 +17092,114 @@ function getNextRoundPreparationContainer() {
     );
 
 }
+
+
+function warmUpPlayers(playerList, onComplete) {
+
+    if (
+        !playerList ||
+        playerList.length === 0
+    ) {
+
+        if (onComplete) {
+            onComplete();
+        }
+
+        return;
+
+    }
+
+    let attempts = 0;
+
+    const checkPlayers =
+        setInterval(function() {
+
+            attempts++;
+
+            if (attempts > 100) {
+
+                clearInterval(
+                    checkPlayers
+                );
+
+                console.log(
+                    "Préparation annulée : lecteurs non prêts."
+                );
+
+                if (onComplete) {
+                    onComplete();
+                }
+
+                return;
+
+            }
+
+            if (
+                playerList.some(function(player) {
+
+                    return !player ||
+                           typeof player.playVideo !== "function" ||
+                           typeof player.pauseVideo !== "function";
+
+                })
+            ) {
+
+                return;
+
+            }
+
+            clearInterval(
+                checkPlayers
+            );
+
+            playerList.forEach(function(player) {
+
+                player.mute();
+                player.playVideo();
+
+            });
+
+            let playingCheck =
+                setInterval(function() {
+
+                    const allPlaying =
+                        playerList.every(function(player) {
+
+                            return (
+                                typeof player.getPlayerState ===
+                                "function" &&
+                                player.getPlayerState() ===
+                                YT.PlayerState.PLAYING
+                            );
+
+                        });
+
+                    if (allPlaying) {
+
+                        clearInterval(
+                            playingCheck
+                        );
+
+                        playerList.forEach(function(player) {
+
+                            player.pauseVideo();
+                            player.unMute();
+                            player.setVolume(100);
+
+                        });
+
+                        if (onComplete) {
+                            onComplete();
+                        }
+
+                    }
+
+                }, 100);
+
+        }, 100);
+
+}
+
    
 
 function toggleSinglePlayer(index, button) {
@@ -17266,7 +17452,9 @@ function createPlayer(index, videoId) {
 
 }
 
-   function warmUpCurrentRound() {
+   
+
+function warmUpCurrentRound() {
 
     if (currentRoundWarmingUp) {
         return;
@@ -17280,12 +17468,12 @@ function createPlayer(index, videoId) {
 
             currentRoundWarmingUp = false;
 
-            prepareNextRound();
-
         }
     );
 
 }
+
+   
 
    
 function prepareNextRound() {
@@ -18240,6 +18428,8 @@ function changeVolume(index, volume) {
 let tracksPlayingBeforePauseAll = [];
 
 
+
+   
 function playAll() {
 
     players.forEach(function(player) {
@@ -18255,8 +18445,15 @@ function playAll() {
 
     });
 
+    setTimeout(function() {
+
+        prepareNextRound();
+
+    }, 500);
+
 }
 
+   
 
 function pauseAll() {
 
