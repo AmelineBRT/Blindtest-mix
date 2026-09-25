@@ -316,8 +316,8 @@ button:disabled {
 
     position: absolute;
 
-    top: -20px;
-    left: -10px;
+    top: 0;
+    left: 0;
 
     margin: 0;
     padding: 4px 6px;
@@ -444,50 +444,8 @@ button:disabled {
     pointer-events: auto;
 }
 
-   #editRoundScreen .back-arrow-button {
-    top: 0px;
-    left: 0px;
-}
-
-   #editGameScreen .back-arrow-button {
-    top: 0px;
-    left: 0px;
-}
-
-
-#createPersonScreen .back-arrow-button {
-    top: 0px;
-    left: 0px;
-}
-   
-   #gameMainCard .back-arrow-button {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    z-index: 10;
-    pointer-events: auto;
-}
-
-   #groupMainCard .back-arrow-button {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    z-index: 10;
-    pointer-events: auto;
-}
-
-   #duplicateRoundScreen .back-arrow-button {
-    position: static;
-    width: 42px;
-    height: 30px;
-    margin: 0;
-    padding: 4px 6px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-}
-   
-.game-icon-button {
+      
+         .game-icon-button {
     width: auto;
     margin: 5 0 0 0px;
     padding: 5px 3px 5px 5px;
@@ -3286,11 +3244,6 @@ body.dark-mode .play-round-empty {
     line-height: 1.2;
 }
 
-    #createGameScreen .back-arrow-button {
-    top: 0px;
-    left: 0px;
-}
-
 /* =========================================================
    MOBILE
    ========================================================= */
@@ -3920,15 +3873,6 @@ background: #ffffff;
     font-weight: normal;
 }
 
-#forgotPasswordScreen .card {
-    position: relative;
-}
-
-#forgotPasswordScreen .back-arrow-button {
-    top: 0;
-    left: 0;
-}
-
 /* ========================================================
    MOT DE PASSE OUBLIÉ
    ======================================================== */
@@ -3948,10 +3892,6 @@ background: #ffffff;
     margin-top: 0;
 }
    
-#editGroupScreen .back-arrow-button {
-    top: 0px;
-    left: 0px;
-}   
    
 
    
@@ -3965,8 +3905,135 @@ background: #ffffff;
 
 
    
-/* PIXELS PROTOTYPE */
-.pixels-game-type-options{display:flex;gap:10px;margin:8px 0 16px}.pixels-game-type-option{flex:1;padding:14px 10px;border:2px solid #ddd;border-radius:10px;background:#fff;cursor:pointer;text-align:center}.pixels-game-type-option.selected{border-color:#720038;background:rgba(114,0,56,.07)}.pixels-game-type-option input{display:none}.pixels-image-preview{width:100%;max-height:260px;object-fit:contain;border-radius:8px;background:#eee;margin:8px 0 12px}.pixels-play-card{text-align:center;padding:16px}.pixels-play-canvas{display:block;width:100%;max-width:760px;height:auto;margin:12px auto;border-radius:10px;background:#ddd}.pixels-phase-label{font-weight:bold;margin:8px 0}.pixels-answer{margin-top:12px;padding:10px 14px;border-radius:8px;background:#f0f0f0;display:none}.pixels-answer.visible{display:block}.pixels-phase-buttons{display:flex;flex-wrap:wrap;justify-content:center;gap:4px}body.dark-mode .pixels-game-type-option{background:#363636;border-color:#555}body.dark-mode .pixels-game-type-option.selected{background:rgba(114,0,56,.22)}body.dark-mode .pixels-answer{background:#363636}
+/* ========================================================
+   PIXELS
+   ======================================================== */
+
+.pixels-game-type-options {
+    display: flex;
+    gap: 10px;
+    margin: 8px 0 16px;
+}
+
+.pixels-game-type-option {
+    flex: 1;
+    padding: 14px 10px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    text-align: center;
+}
+
+.pixels-game-type-option.selected {
+    border-color: #720038;
+    background: rgba(114,0,56,0.07);
+}
+
+.pixels-game-type-option input {
+    display: none;
+}
+
+.pixels-image-preview {
+    width: 100%;
+    max-height: 260px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: #eee;
+    margin: 8px 0 12px;
+}
+
+.pixels-play-card {
+    text-align: center;
+    padding: 16px;
+}
+
+.pixels-play-canvas {
+    display: block;
+    width: 100%;
+    max-width: 760px;
+    height: auto;
+    margin: 12px auto;
+    border-radius: 10px;
+    background: #ddd;
+}
+
+.pixels-phase-label {
+    font-weight: bold;
+    margin: 8px 0;
+}
+
+.pixels-phase-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+}
+
+.pixels-phase-button {
+    width: auto;
+    margin: 0;
+}
+
+.pixels-answer-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.pixels-answer-button {
+    flex: 0 0 auto;
+    width: auto;
+    margin: 0;
+}
+
+.pixels-answer {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: #f0f0f0;
+    text-align: left;
+    display: none;
+}
+
+.pixels-answer.visible {
+    display: block;
+}
+
+body.dark-mode .pixels-game-type-option {
+    background: #363636;
+    border-color: #555;
+}
+
+body.dark-mode .pixels-game-type-option.selected {
+    background: rgba(114,0,56,0.22);
+}
+
+body.dark-mode .pixels-answer {
+    background: #363636;
+}
+
+body.dark-mode .pixels-answer-button {
+    background: #75a39d;
+}
+
+@media (max-width: 600px) {
+
+    .pixels-answer-row {
+        align-items: stretch;
+    }
+
+    .pixels-answer-button {
+        width: auto;
+        min-width: 0;
+        flex: 0 0 auto;
+    }
+
+}
 </style>
 <script>
 window.addEventListener("error", function(event) {
@@ -4380,7 +4447,7 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
     class="participant-bank creator-person-bank">
 </div>
 
-    <label>Type de jeu</label><div class="pixels-game-type-options"><label class="pixels-game-type-option selected" id="gameTypeBlindtestOption"><input type="radio" name="gameType" value="blindtest" checked onchange="selectGameType('blindtest')">🎵<br><strong>Blindtest Mix</strong></label><label class="pixels-game-type-option" id="gameTypePixelsOption"><input type="radio" name="gameType" value="pixels" onchange="selectGameType('pixels')">🧩<br><strong>Pixels</strong></label></div><label>Groupe (facultatif)</label>
+    <label>Type de jeu</label><div class="pixels-game-type-options"><label class="pixels-game-type-option selected" id="gameTypeBlindtestOption"><input type="radio" name="gameType" value="blindtest" checked onchange="selectGameType('blindtest')">🎧<br><strong>Blindtest Mix</strong></label><label class="pixels-game-type-option" id="gameTypePixelsOption"><input type="radio" name="gameType" value="pixels" onchange="selectGameType('pixels')">🖼️<br><strong>Pixels</strong></label></div><label>Groupe (facultatif)</label>
 
     <select id="gameGroup">
 
@@ -14818,7 +14885,7 @@ function startSpecificRound(roundId) {
    ======================================================== */
 
 function selectGameType(type) { const a=document.getElementById("gameTypeBlindtestOption"), b=document.getElementById("gameTypePixelsOption"); if(a)a.classList.toggle("selected",type==="blindtest"); if(b)b.classList.toggle("selected",type==="pixels"); const r=document.querySelector('input[name="gameType"][value="'+type+'"]'); if(r)r.checked=true; }
-function showCreateRound() { const game=getCurrentGame(); document.getElementById("roundName").value=""; document.getElementById("pixelsImageFile").value=""; document.getElementById("pixelsAnswer").value=""; document.getElementById("pixelsCreatePreview").style.display="none"; const p=game&&game.gameType==="pixels"; document.getElementById("createRoundTitle").textContent=p?"🧩 Nouvelle manche Pixels":"🎶 Nouvelle manche"; document.getElementById("pixelsCreateFields").style.display=p?"block":"none"; showScreen("createRoundScreen"); }
+function showCreateRound() { const game=getCurrentGame(); document.getElementById("roundName").value=""; document.getElementById("pixelsImageFile").value=""; document.getElementById("pixelsAnswer").value=""; document.getElementById("pixelsCreatePreview").style.display="none"; const p=game&&game.gameType==="pixels"; document.getElementById("createRoundTitle").textContent=p?"🖼️ Nouvelle manche Pixels":"🎶 Nouvelle manche"; document.getElementById("pixelsCreateFields").style.display=p?"block":"none"; showScreen("createRoundScreen"); }
 function previewPixelsImage(input,previewId="pixelsCreatePreview"){const file=input.files&&input.files[0],preview=document.getElementById(previewId);if(!file||!preview)return;const reader=new FileReader();reader.onload=e=>{preview.src=e.target.result;preview.style.display="block"};reader.readAsDataURL(file)}
 function fileToDataURL(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=e=>resolve(e.target.result);reader.onerror=reject;reader.readAsDataURL(file)})}
 
@@ -14947,7 +15014,7 @@ function editRound(roundId) {
         return;
     }
 
-    const isPixels=game.gameType==="pixels"||round.gameType==="pixels"; document.getElementById("editRoundTitle").textContent=isPixels?"🧩 Modifier la manche Pixels":"🎶 Modifier la manche"; document.getElementById("editRoundName").value=round.name; document.getElementById("pixelsEditFields").style.display=isPixels?"block":"none"; document.getElementById("blindtestEditFields").style.display=isPixels?"none":"block"; if(isPixels){document.getElementById("pixelsEditAnswer").value=round.answer||"";const p=document.getElementById("pixelsEditPreview");if(round.imageData){p.src=round.imageData;p.style.display="block"}else p.style.display="none"}else renderEditTracks(round); showScreen("editRoundScreen");
+    const isPixels=game.gameType==="pixels"||round.gameType==="pixels"; document.getElementById("editRoundTitle").textContent=isPixels?"🖼️ Modifier la manche Pixels":"🎶 Modifier la manche"; document.getElementById("editRoundName").value=round.name; document.getElementById("pixelsEditFields").style.display=isPixels?"block":"none"; document.getElementById("blindtestEditFields").style.display=isPixels?"none":"block"; if(isPixels){document.getElementById("pixelsEditAnswer").value=round.answer||"";const p=document.getElementById("pixelsEditPreview");if(round.imageData){p.src=round.imageData;p.style.display="block"}else p.style.display="none"}else renderEditTracks(round); showScreen("editRoundScreen");
 
 }
 
@@ -17297,12 +17364,373 @@ function scrollToPlayRound(roundId, smooth) {
 }
 
 
-function renderPixelsPlay(game){const c=document.getElementById("playRoundsContainer");if(!c)return;c.innerHTML="";playRoundStates={};players=[];const phases=[["90%",40],["70%",28],["50%",18],["25%",10],["10%",4],["0%",1]];game.rounds.forEach(function(round){const section=document.createElement("section");section.className="play-round-section";section.dataset.roundId=round.id;const card=document.createElement("div");card.className="card pixels-play-card";const canvas=document.createElement("canvas");canvas.className="pixels-play-canvas";const label=document.createElement("div");label.className="pixels-phase-label";const buttons=document.createElement("div");buttons.className="pixels-phase-buttons";const answer=document.createElement("div");answer.className="pixels-answer";answer.textContent="💡 Réponse : "+(round.answer||"—");let image=new Image(),phase=0;function draw(i){phase=i;label.textContent="Pixelisation : "+phases[i][0];const ctx=canvas.getContext("2d");if(!ctx||!image.complete)return;const ratio=image.naturalWidth/image.naturalHeight||1,w=Math.min(760,image.naturalWidth||760),h=w/ratio;canvas.width=Math.round(w);canvas.height=Math.round(h);if(phases[i][1]===1){ctx.imageSmoothingEnabled=true;ctx.drawImage(image,0,0,canvas.width,canvas.height);return}const sw=Math.max(1,Math.round(canvas.width/phases[i][1])),sh=Math.max(1,Math.round(canvas.height/phases[i][1])),t=document.createElement("canvas");t.width=sw;t.height=sh;const tc=t.getContext("2d");tc.drawImage(image,0,0,sw,sh);ctx.imageSmoothingEnabled=false;ctx.drawImage(t,0,0,sw,sh,0,0,canvas.width,canvas.height)}phases.forEach((p,i)=>{const b=document.createElement("button");b.className=i===0?"primary":"light";b.textContent=p[0];b.onclick=()=>draw(i);buttons.appendChild(b)});const ab=document.createElement("button");ab.className="secondary";ab.textContent="💡 Voir la réponse";ab.onclick=()=>{answer.classList.toggle("visible");ab.textContent=answer.classList.contains("visible")?"🙈 Masquer la réponse":"💡 Voir la réponse"};card.append(canvas,label,buttons,ab,answer);section.appendChild(card);c.appendChild(section);if(round.imageData){image.onload=()=>draw(phase);image.src=round.imageData}});document.querySelector(".play-main-controls").style.display="none";document.querySelector(".play-global-controls").style.display="none";updatePlayRoundVisibility()}
+function renderPixelsPlay(game) {
+
+    const container =
+        document.getElementById("playRoundsContainer");
+
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = "";
+    playRoundStates = {};
+    players = [];
+
+    const phases = [
+        ["90%", 40],
+        ["70%", 28],
+        ["50%", 18],
+        ["25%", 10],
+        ["10%", 4],
+        ["0%", 1]
+    ];
+
+    game.rounds.forEach(function(round) {
+
+        const section =
+            document.createElement("section");
+
+        section.className =
+            "play-round-section";
+
+        section.dataset.roundId =
+            round.id;
+
+        const card =
+            document.createElement("div");
+
+        card.className =
+            "card pixels-play-card";
+
+        const canvas =
+            document.createElement("canvas");
+
+        canvas.className =
+            "pixels-play-canvas";
+
+        const label =
+            document.createElement("div");
+
+        label.className =
+            "pixels-phase-label";
+
+        const buttons =
+            document.createElement("div");
+
+        buttons.className =
+            "pixels-phase-buttons";
+
+        const answerRow =
+            document.createElement("div");
+
+        answerRow.className =
+            "pixels-answer-row";
+
+        const answerButton =
+            document.createElement("button");
+
+        answerButton.className =
+            "pause-button pixels-answer-button";
+
+        answerButton.textContent =
+            "💡 Voir la réponse";
+
+        const answer =
+            document.createElement("div");
+
+        answer.className =
+            "pixels-answer";
+
+        answer.textContent =
+            "💡 Réponse : " +
+            (round.answer || "—");
+
+        let image =
+            new Image();
+
+        let phase = 0;
+
+        function updatePhaseButtons() {
+
+            buttons
+                .querySelectorAll(".pixels-phase-button")
+                .forEach(function(button, index) {
+
+                    button.classList.toggle(
+                        "primary",
+                        index === phase
+                    );
+
+                    button.classList.toggle(
+                        "light",
+                        index !== phase
+                    );
+
+                });
+
+        }
+
+        function draw(index) {
+
+            phase = index;
+
+            label.textContent =
+                "Pixelisation : " +
+                phases[index][0];
+
+            updatePhaseButtons();
+
+            const ctx =
+                canvas.getContext("2d");
+
+            if (!ctx || !image.complete) {
+                return;
+            }
+
+            const ratio =
+                image.naturalWidth /
+                image.naturalHeight ||
+                1;
+
+            const width =
+                Math.min(
+                    760,
+                    image.naturalWidth || 760
+                );
+
+            const height =
+                width / ratio;
+
+            canvas.width =
+                Math.round(width);
+
+            canvas.height =
+                Math.round(height);
+
+            if (phases[index][1] === 1) {
+
+                ctx.imageSmoothingEnabled =
+                    true;
+
+                ctx.drawImage(
+                    image,
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height
+                );
+
+                return;
+            }
+
+            const smallWidth =
+                Math.max(
+                    1,
+                    Math.round(
+                        canvas.width /
+                        phases[index][1]
+                    )
+                );
+
+            const smallHeight =
+                Math.max(
+                    1,
+                    Math.round(
+                        canvas.height /
+                        phases[index][1]
+                    )
+                );
+
+            const temporaryCanvas =
+                document.createElement("canvas");
+
+            temporaryCanvas.width =
+                smallWidth;
+
+            temporaryCanvas.height =
+                smallHeight;
+
+            const temporaryContext =
+                temporaryCanvas.getContext("2d");
+
+            temporaryContext.drawImage(
+                image,
+                0,
+                0,
+                smallWidth,
+                smallHeight
+            );
+
+            ctx.imageSmoothingEnabled =
+                false;
+
+            ctx.drawImage(
+                temporaryCanvas,
+                0,
+                0,
+                smallWidth,
+                smallHeight,
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
+
+        }
+
+        phases.forEach(function(phaseData, index) {
+
+            const button =
+                document.createElement("button");
+
+            button.className =
+                "pixels-phase-button " +
+                (index === 0
+                    ? "primary"
+                    : "light");
+
+            button.textContent =
+                phaseData[0];
+
+            button.onclick =
+                function() {
+                    draw(index);
+                };
+
+            buttons.appendChild(
+                button
+            );
+
+        });
+
+        answerButton.onclick =
+            function() {
+
+                const visible =
+                    answer.classList.toggle(
+                        "visible"
+                    );
+
+                answerButton.textContent =
+                    visible
+                        ? "🙈 Masquer la réponse"
+                        : "💡 Voir la réponse";
+
+            };
+
+        answerRow.append(
+            answerButton,
+            answer
+        );
+
+        card.append(
+            canvas,
+            label,
+            buttons,
+            answerRow
+        );
+
+        section.appendChild(
+            card
+        );
+
+        container.appendChild(
+            section
+        );
+
+        if (round.imageData) {
+
+            image.onload =
+                function() {
+                    draw(phase);
+                };
+
+            image.src =
+                round.imageData;
+
+        }
+
+    });
+
+    document.querySelector(
+        ".play-main-controls"
+    ).style.display = "none";
+
+    document.querySelector(
+        ".play-global-controls"
+    ).style.display = "none";
+
+    updatePlayRoundVisibility();
+}
 function loadRoundForPlaying() {
 
     const game=getCurrentGame();
     if(!game)return;
-    if(game.gameType==="pixels"){const round=game.rounds.find(item=>item.id===currentRoundId);if(!round)return;renderPixelsPlay(game);playRenderedGameId=game.id;const i=game.rounds.findIndex(item=>item.id===currentRoundId);document.getElementById("playGameTitle").textContent="🧩 "+game.name;document.getElementById("playRoundNumber").textContent="Manche "+(i+1)+" / "+game.rounds.length;document.getElementById("playRoundTitle").textContent=round.name||"Manche "+(i+1);document.getElementById("playTrackCount").textContent="Jeu Pixels";showScreen("playScreen",document.getElementById("playScreen").classList.contains("active"));setTimeout(()=>scrollToPlayRound(currentRoundId,true),30);return}
+    if (game.gameType === "pixels") {
+
+        const round =
+            game.rounds.find(function(item) {
+                return item.id === currentRoundId;
+            });
+
+        if (!round) {
+            return;
+        }
+
+        renderPixelsPlay(game);
+
+        playRenderedGameId =
+            game.id;
+
+        const roundIndex =
+            game.rounds.findIndex(function(item) {
+                return item.id === currentRoundId;
+            });
+
+        document.getElementById(
+            "playGameTitle"
+        ).textContent =
+            "🖼️ " + game.name;
+
+        document.getElementById(
+            "playRoundNumber"
+        ).textContent =
+            "Manche " +
+            (roundIndex + 1) +
+            " / " +
+            game.rounds.length;
+
+        document.getElementById(
+            "playRoundTitle"
+        ).textContent =
+            round.name ||
+            "Manche " +
+            (roundIndex + 1);
+
+        document.getElementById(
+            "playTrackCount"
+        ).textContent =
+            "Jeu Pixels";
+
+        updateNavigationButton();
+
+        showScreen(
+            "playScreen",
+            document.getElementById("playScreen").classList.contains("active")
+        );
+
+        setTimeout(function() {
+
+            scrollToPlayRound(
+                currentRoundId,
+                true
+            );
+
+        }, 30);
+
+        return;
+    }
     const round =
         game.rounds.find(function(item) {
             return item.id === currentRoundId;
@@ -18746,8 +19174,8 @@ function updateNavigationButton() {
             "finish-game"
         );
 
-        button.innerHTML =
-            "🏁 Fin de la partie<br>retour au menu";
+        button.textContent =
+            "🏁 Fin de partie";
 
         if (quitButton) {
             quitButton.style.display = "none";
