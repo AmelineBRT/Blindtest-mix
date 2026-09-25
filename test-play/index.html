@@ -17311,14 +17311,14 @@ function ensureRoundPlayers(roundId) {
 
 function scrollToPlayRound(roundId, smooth) {
 
-    const section =
-        getPlayRoundElement(roundId);
+    const controls =
+        document.querySelector(".play-main-controls");
 
-    if (!section) {
+    if (!controls) {
         return;
     }
 
-    section.scrollIntoView({
+    controls.scrollIntoView({
         behavior: smooth ? "smooth" : "instant",
         block: "start",
         inline: "nearest"
