@@ -17309,6 +17309,24 @@ function ensureRoundPlayers(roundId) {
 }
 
 
+function scrollToPlayRound(roundId, smooth) {
+
+    const section =
+        getPlayRoundElement(roundId);
+
+    if (!section) {
+        return;
+    }
+
+    section.scrollIntoView({
+        behavior: smooth ? "smooth" : "instant",
+        block: "start",
+        inline: "nearest"
+    });
+
+}
+
+
 function loadRoundForPlaying() {
 
     const game =
