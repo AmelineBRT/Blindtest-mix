@@ -3265,9 +3265,9 @@ body.dark-mode .play-round-empty {
 }
 
 .play-navigation .next-round {
-    background: #720038;
+    background: #b48a9f;
     color: white;
-    border: 1px solid #720038;
+    border: 1px solid #b48a9f;
     border-left: none;
     border-radius: 0 7px 7px 0;
     min-width: 160px;
@@ -18656,6 +18656,52 @@ function resumeAfterPauseAll() {
    NAVIGATION MANCHES
    ======================================================== */
 
+function releasePlayScreenPlayers() {
+
+    Object.keys(playRoundStates).forEach(function(roundId) {
+
+        const state = playRoundStates[roundId];
+
+        if (!state || !Array.isArray(state.players)) {
+            return;
+        }
+
+        state.players.forEach(function(player) {
+
+            if (
+                player &&
+                typeof player.destroy === "function"
+            ) {
+                try {
+                    player.stopVideo();
+                } catch (error) {
+                    /* Lecteur déjà arrêté ou indisponible. */
+                }
+
+                try {
+                    player.destroy();
+                } catch (error) {
+                    /* Lecteur déjà détruit. */
+                }
+            }
+
+        });
+
+        state.players = [];
+        state.initialized = false;
+        state.ready = false;
+        state.readyCount = 0;
+        state.warmedUpCount = 0;
+
+    });
+
+    playRoundStates = {};
+    players = [];
+    tracksPlayingBeforePauseAll = [];
+
+}
+
+
 function nextRound() {
 
     const game =
@@ -18676,6 +18722,7 @@ function nextRound() {
     ) {
 
         pauseAll();
+        releasePlayScreenPlayers();
         history.back();
         return;
 
@@ -18728,6 +18775,7 @@ function previousRound() {
 function quitGame() {
 
     pauseAll();
+    releasePlayScreenPlayers();
     history.back();
 
 }
