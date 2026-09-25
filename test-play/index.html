@@ -16911,58 +16911,6 @@ function updatePlayRoundVisibility() {
 
 }
 
-function limitPlayScreenScroll() {
-
-    if (!document.getElementById("playScreen")?.classList.contains("active")) {
-        return;
-    }
-
-    const currentSection =
-        getPlayRoundElement(currentRoundId);
-
-    if (!currentSection) {
-        return;
-    }
-
-    const viewportHeight =
-        window.innerHeight;
-
-    const maxScroll =
-        Math.max(
-            0,
-            currentSection.offsetTop +
-            currentSection.offsetHeight -
-            viewportHeight +
-            24
-        );
-
-    if (window.scrollY > maxScroll) {
-        window.scrollTo({
-            top: maxScroll,
-            behavior: "instant"
-        });
-    }
-
-}
-
-
-function scrollToPlayRound(roundId, smooth) {
-
-    const section =
-        getPlayRoundElement(roundId);
-
-    if (!section) {
-        return;
-    }
-
-    section.scrollIntoView({
-        behavior: smooth ? "smooth" : "instant",
-        block: "start",
-        inline: "nearest"
-    });
-
-}
-
 
 /* ========================================================
    EXTRAIRE ID YOUTUBE
@@ -17507,16 +17455,6 @@ function isPlayScreenActive() {
 
 }
 
-
-function handlePlayScreenScrollBoundary() {
-    limitPlayScreenScroll();
-}
-
-window.addEventListener(
-    "scroll",
-    handlePlayScreenScrollBoundary,
-    { passive: true }
-);
 
 function blockPlayScreenScroll(event) {
 
