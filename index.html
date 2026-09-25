@@ -17109,17 +17109,22 @@ function prepareNextRound() {
 
     });
 
-    warmUpPlayers(
-        preparedPlayers,
-        function() {
+   warmUpPlayers(
+    preparedPlayers,
+    function() {
 
-            console.log(
-                "Préparation de la manche suivante terminée :",
-                nextRound.name
-            );
+        console.log(
+            "✅ PRÉPARATION TERMINÉE :",
+            nextRound.name
+        );
 
-        }
-    );
+    }
+);
+
+console.log(
+    "🚀 PRÉPARATION LANCÉE POUR :",
+    nextRound.name
+);
 
     window.nextRoundPreparedPlayers =
         preparedPlayers;
