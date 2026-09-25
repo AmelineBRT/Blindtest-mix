@@ -5021,22 +5021,30 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
 
 <div class="card">
 
-    <h2 id="editRoundTitle"></h2><label>Nom de la manche</label><input id="editRoundName" type="text"><div id="pixelsEditFields" style="display:none;"><label>Image à faire deviner</label><input id="pixelsEditImageFile" type="file" accept="image/*" onchange="previewPixelsImage(this, 'pixelsEditPreview')"><img id="pixelsEditPreview" class="pixels-image-preview" style="display:none;"><label>Réponse</label><input id="pixelsEditAnswer" type="text" placeholder="Ex : Le Roi Lion"></div><div id="blindtestEditFields"><p>Ajoute jusqu'à 7 liens YouTube.</p><div id="editTracks"></div></div>
+    <h2 id="editRoundTitle"></h2><label>Nom de la manche</label><input id="editRoundName" type="text"><div id="pixelsEditFields" style="display:none;"><label>Image à faire deviner</label><input id="pixelsEditImageFile" type="file" accept="image/*" onchange="previewPixelsImage(this, 'pixelsEditPreview')"><img id="pixelsEditPreview" class="pixels-image-preview" style="display:none;"><label>Réponse</label><input id="pixelsEditAnswer" type="text" placeholder="Ex : Le Roi Lion"></div><div id="blindtestEditFields">
 
-    <div class="add-track-container">
+        <p>
+            Ajoute jusqu'à 7 liens YouTube.
+        </p>
 
-        <button
-            id="addTrackButton"
-            class="add-track-button"
-            onclick="addTrack()">
+        <div id="editTracks"></div>
 
-            ＋ Ajouter une piste
+        <div class="add-track-container">
 
-        </button>
+            <button
+                id="addTrackButton"
+                class="add-track-button"
+                onclick="addTrack()">
+
+                ＋ Ajouter une piste
+
+            </button>
+
+        </div>
 
     </div>
 
-<button class="primary" onclick="saveRound()">
+    <button class="primary" onclick="saveRound()">
     💾 Enregistrer la manche
 </button>
 
@@ -11383,7 +11391,8 @@ function createGameCard(game, group = null) {
         <div class="game-card-content">
 
             <h3>
-                🎶 ${escapeHTML(game.name)}
+                ${game.gameType === "pixels" ? "🖼️" : "🎶"}
+                ${escapeHTML(game.name)}
                 ${passwordIcon}
             </h3>
 
@@ -11833,7 +11842,8 @@ function showForgotPassword(gameId) {
 ).innerHTML = `
 
     <h3>
-        🎶 ${escapeHTML(game.name)}
+        ${game.gameType === "pixels" ? "🖼️" : "🎶"}
+        ${escapeHTML(game.name)}
     </h3>
 
     <div class="game-info creator-info">
@@ -12217,7 +12227,8 @@ groupHeader.style.display =
     document.getElementById("gameTitle");
 
 gameTitleElement.textContent =
-    "🎶 " + game.name;
+    (game.gameType === "pixels" ? "🖼️ " : "🎶 ") +
+    game.name;
 
 gameTitleElement.style.color =
     "#222222";
@@ -16445,7 +16456,7 @@ function renderDuplicateGames() {
                         <div
                             class="duplicate-game-name">
 
-                            🎶
+                            ${game.gameType === "pixels" ? "🖼️" : "🎶"}
                             ${escapeHTML(game.name)}
 
                         </div>
@@ -16854,7 +16865,9 @@ function updatePlayHeader(game, round) {
             return item.id === round.id;
         });
 
-    document.getElementById("playGameTitle").textContent = (game.gameType === "pixels" ? "🧩 " : "🎶 ") + game.name;
+    document.getElementById("playGameTitle").textContent =
+        (game.gameType === "pixels" ? "🖼️ " : "🎶 ") +
+        game.name;
 
     document.getElementById("playRoundNumber").textContent =
         "Manche " +
