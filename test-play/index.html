@@ -3171,8 +3171,9 @@ textarea:focus {
 
 .play-navigation {
     display: flex;
-    align-items: stretch;
-    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    gap: 0;
     margin-top: 10px;
 }
 
@@ -3220,34 +3221,36 @@ body.dark-mode .play-round-empty {
     margin: 0;
     min-height: 34px;
     font-size: 13px;
-    padding: 6px 11px;
+    padding: 5px 10px;
     border-radius: 0;
-}
-
-.play-navigation .previous-round,
-.play-navigation .next-round {
-    background: #e1e1e1;
-    color: #555;
-}
-
-.play-navigation .quit-game {
     width: auto;
-    background: transparent;
-    color: #777;
-    border-top: 1px solid #d0d0d0;
-    border-bottom: 1px solid #d0d0d0;
+    flex: 0 0 auto;
 }
 
 .play-navigation .previous-round {
-    border: 1px solid #d0d0d0;
+    background: #ead8c7;
+    color: #6d5139;
+    border: 1px solid #d2c0ad;
     border-right: none;
     border-radius: 7px 0 0 7px;
 }
 
+.play-navigation .quit-game {
+    background: #ddd;
+    color: #333;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    border-left: none;
+    border-right: none;
+}
+
 .play-navigation .next-round {
-    border: 1px solid #d0d0d0;
+    background: #b8e6c1;
+    color: #174d25;
+    border: 1px solid #9fceb0;
     border-left: none;
     border-radius: 0 7px 7px 0;
+    min-width: 120px;
 }
 
 .play-navigation .finish-game {
@@ -3390,12 +3393,19 @@ body.dark-mode .play-round-empty {
 
     .play-navigation {
         gap: 0;
+        width: 100%;
     }
 
     .play-navigation button {
         min-width: 0;
+        width: auto;
+        flex: 0 0 auto;
         font-size: 12px;
-        padding: 6px 9px;
+        padding: 5px 9px;
+    }
+
+    .play-navigation .next-round {
+        min-width: 110px;
     }
 
     .play-round-section {
@@ -18646,8 +18656,23 @@ function updateNavigationButton() {
             "nextRoundButton"
         );
 
+    const previousButton =
+        document.querySelector(
+            ".play-navigation .previous-round"
+        );
+
+    const quitButton =
+        document.querySelector(
+            ".play-navigation .quit-game"
+        );
+
     if (!button) {
         return;
+    }
+
+    if (previousButton) {
+        previousButton.style.display =
+            currentIndex <= 0 ? "none" : "";
     }
 
     if (
@@ -18663,8 +18688,12 @@ function updateNavigationButton() {
             "finish-game"
         );
 
-        button.textContent =
-            "🏁 Fin de la partie, retour au menu";
+        button.innerHTML =
+            "Fin de la partie<br>retour au menu";
+
+        if (quitButton) {
+            quitButton.style.display = "none";
+        }
 
     } else {
 
@@ -18678,6 +18707,10 @@ function updateNavigationButton() {
 
         button.textContent =
             "Suivant →";
+
+        if (quitButton) {
+            quitButton.style.display = "";
+        }
 
     }
 
