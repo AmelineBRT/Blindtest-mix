@@ -3134,9 +3134,8 @@ textarea:focus {
 }
 
 .play-main-controls {
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    position: relative;
+    z-index: 1;
 }
 
 .play-all {
@@ -3163,18 +3162,16 @@ textarea:focus {
 .play-preparation-round {
     visibility: hidden;
     pointer-events: none;
+    height: 0;
+    overflow: hidden;
+    margin: 0 !important;
 }
 
 .play-navigation {
-    position: fixed;
-    left: 12px;
-    right: 12px;
-    bottom: 10px;
-    z-index: 110;
-    padding: 8px;
-    background: rgba(255, 255, 255, 0.96);
-    border-radius: 12px;
-    box-shadow: 0 3px 14px rgba(0,0,0,0.18);
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    margin-top: 10px;
 }
 
 .play-round-section:first-child {
@@ -16791,6 +16788,7 @@ function getPlayRoundState(roundId) {
             readyCount: 0,
             ready: false,
             initialized: false,
+            warmedUpCount: 0,
             error: false
         };
     }
@@ -17033,26 +17031,6 @@ function renderPlayRounds(game) {
 
             });
 
-        const heading =
-            document.createElement("div");
-
-        heading.className =
-            "play-round-heading";
-
-        heading.innerHTML =
-            '<div class="play-round-heading-number">' +
-            'Manche ' + (roundIndex + 1) +
-            ' / ' + game.rounds.length +
-            '</div>' +
-            '<h2>' +
-            escapeHTML(
-                round.name ||
-                "Manche " + (roundIndex + 1)
-            ) +
-            '</h2>';
-
-        roundSection.appendChild(heading);
-
         const tracksContainer =
             document.createElement("div");
 
@@ -17241,6 +17219,7 @@ function ensureRoundPlayers(roundId) {
         tracksWithVideo.length
     );
     state.readyCount = 0;
+    state.warmedUpCount = 0;
     state.ready = false;
     state.error = false;
 
@@ -17272,16 +17251,16 @@ function ensureRoundPlayers(roundId) {
 
                         onReady: function(event) {
 
+                            event.target.mute();
                             event.target.setVolume(100);
 
-                            state.readyCount++;
-
-                            if (
-                                state.readyCount >=
-                                state.total
-                            ) {
-                                state.ready = true;
-                            }
+                            setTimeout(function() {
+                                try {
+                                    event.target.playVideo();
+                                } catch (error) {
+                                    state.error = true;
+                                }
+                            }, 50);
 
                             if (
                                 roundId ===
@@ -17303,6 +17282,46 @@ function ensureRoundPlayers(roundId) {
                                 index,
                                 event.data
                             );
+
+                            if (
+                                event.data ===
+                                YT.PlayerState.PLAYING &&
+                                !state.players[index]?._blindtestWarmedUp
+                            ) {
+
+                                state.players[index]._blindtestWarmedUp =
+                                    true;
+
+                                try {
+                                    event.target.pauseVideo();
+                                    event.target.unMute();
+                                    event.target.setVolume(100);
+                                } catch (error) {
+                                    state.error = true;
+                                }
+
+                                state.warmedUpCount++;
+                                state.readyCount++;
+
+                                if (
+                                    state.readyCount >=
+                                    state.total
+                                ) {
+                                    state.ready = true;
+                                }
+
+                                if (
+                                    roundId ===
+                                    currentRoundId
+                                ) {
+                                    players =
+                                        state.players;
+
+                                    updatePlayAllButton();
+                                    updatePlayingCount();
+                                }
+
+                            }
 
                         },
 
