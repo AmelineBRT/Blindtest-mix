@@ -3126,6 +3126,12 @@ textarea:focus {
     background: #b48a9f;
 }
 
+/* Quand REPRENDRE est indisponible, il reste visuellement identique aux PLAY individuels. */
+.resume-all:disabled {
+    background: #b48a9f !important;
+    opacity: 1 !important;
+}
+
 .resume-all.is-playing {
     background: #720038;
 }
@@ -3265,7 +3271,7 @@ body.dark-mode .play-round-empty {
 }
 
 .play-navigation .next-round {
-    background: #b48a9f;
+    background: #b48a9f !important;
     color: white;
     border: 1px solid #b48a9f;
     border-left: none;
