@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixels — Blindtest Mix</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f3f3;color:#222;transition:.25s}
+body.dark{background:#181818;color:#eee}
+header{background:#222;color:#fff;text-align:center;padding:10px 20px;position:relative}
+header h1{margin:0;font-size:28px}
+.container{max-width:900px;margin:auto;padding:20px}
+.card{background:#fff;border-radius:12px;padding:18px;margin-bottom:15px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.dark .card{background:#282828;color:#eee;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+button{border:0;border-radius:8px;padding:10px 16px;font-size:15px;cursor:pointer;margin:3px}
+.primary{background:#35a853;color:#fff}.secondary{background:#555;color:#fff}.blue{background:#4285f4;color:#fff}
+input{width:100%;padding:11px;border:1px solid #ccc;border-radius:7px;font-size:15px;margin:6px 0 12px}
+.dark input{background:#363636;color:#eee;border-color:#555}
+.image-box{width:100%;max-width:760px;margin:20px auto;aspect-ratio:16/10;background:#111;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+canvas{width:100%;height:100%;display:block}
+.phase{text-align:center;font-size:18px;font-weight:bold;margin:12px 0}
+.progress{height:8px;background:#ddd;border-radius:99px;overflow:hidden;margin:12px 0 18px}
+.progress span{display:block;height:100%;width:0;background:#4285f4;transition:width .25s}
+.controls{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.phase-list{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:15px}
+.phase-list button{font-size:13px;padding:8px 4px;background:#eee;color:#222}
+.dark .phase-list button{background:#555;color:#eee}
+.phase-list button.active{background:#4285f4;color:#fff}
+.answer{display:none;margin-top:15px;padding:12px;border-radius:8px;background:#eee;text-align:center;font-weight:bold}
+.dark .answer{background:#363636}
+.note{color:#777;font-size:14px;text-align:center}
+@media(max-width:600px){.container{padding:12px}.phase-list{grid-template-columns:repeat(3,1fr)}header h1{font-size:24px}}
+</style>
+</head>
+<body>
+<header>
+<h1>🧩 Pixels</h1>
+</header>
+<div class="container">
+<div class="card">
+<button class="secondary" onclick="history.back()">← Retour</button>
+<h2 id="roundTitle">🧩 Exemple de manche</h2>
+<p class="note">Prototype : une seule image, progressivement dé-pixelisée.</p>
+
+<div class="image-box"><canvas id="canvas"></canvas></div>
+
+<div class="phase" id="phaseLabel">Phase 1 — très pixelisée</div>
+<div class="progress"><span id="progress"></span></div>
+
+<div class="controls">
+<button class="secondary" onclick="previousPhase()">← Précédente</button>
+<button class="primary" onclick="nextPhase()">Suivante →</button>
+<button class="blue" onclick="showAnswer()">💡 Réponse</button>
+</div>
+
+<div class="phase-list" id="phaseList"></div>
+<div class="answer" id="answer">Réponse de démonstration</div>
+</div>
+
+<div class="card">
+<h3>Tester avec ta propre image</h3>
+<input id="fileInput" type="file" accept="image/*">
+<p class="note">Cette partie est uniquement pour le prototype. Plus tard, l'image viendra de R2 et les informations de la manche de D1.</p>
+</div>
+</div>
+
+<script>
+const phases=[
+ {label:"90 %",scale:10},
+ {label:"70 %",scale:18},
+ {label:"50 %",scale:30},
+ {label:"25 %",scale:55},
+ {label:"10 %",scale:95},
+ {label:"0 %",scale:9999}
+];
+
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+const phaseLabel=document.getElementById("phaseLabel");
+const progress=document.getElementById("progress");
+const phaseList=document.getElementById("phaseList");
+const answer=document.getElementById("answer");
+
+let currentPhase=0;
+let image=new Image();
+
+const demoSvg=
+'<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="750">'+
+'<rect width="1200" height="750" fill="#6b7280"/>'+
+'<rect x="90" y="100" width="1020" height="550" rx="45" fill="#dbeafe"/>'+
+'<circle cx="600" cy="330" r="190" fill="#f59e0b"/>'+
+'<circle cx="530" cy="300" r="24" fill="#222"/><circle cx="670" cy="300" r="24" fill="#222"/>'+
+'<path d="M500 405 Q600 490 700 405" fill="none" stroke="#222" stroke-width="18" stroke-linecap="round"/>'+
+'<text x="600" y="585" text-anchor="middle" font-family="Arial" font-size="64" font-weight="bold" fill="#222">IMAGE TEST</text>'+
+'</svg>';
+
+function setImage(src){
+ image=new Image();
+ image.onload=()=>render();
+ image.src=src;
+}
+
+function render(){
+ if(!image.width)return;
+ const w=canvas.clientWidth||760;
+ const h=canvas.clientHeight||475;
+ const dpr=window.devicePixelRatio||1;
+ canvas.width=w*dpr;canvas.height=h*dpr;
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+ ctx.fillStyle="#111";ctx.fillRect(0,0,w,h);
+
+ const ratio=Math.min(w/image.width,h/image.height);
+ const dw=image.width*ratio,dh=image.height*ratio;
+ const x=(w-dw)/2,y=(h-dh)/2;
+ const p=phases[currentPhase];
+
+ if(currentPhase===phases.length-1){
+   ctx.imageSmoothingEnabled=true;
+   ctx.drawImage(image,x,y,dw,dh);
+ }else{
+   const blocks=Math.max(6,Math.round(p.scale));
+   const sw=Math.max(1,Math.round(image.width/blocks));
+   const sh=Math.max(1,Math.round(image.height/blocks*0.75));
+   const temp=document.createElement("canvas");
+   temp.width=sw;temp.height=sh;
+   const t=temp.getContext("2d");
+   t.imageSmoothingEnabled=true;
+   t.drawImage(image,0,0,sw,sh);
+   ctx.imageSmoothingEnabled=false;
+   ctx.drawImage(temp,x,y,dw,dh);
+ }
+
+ phaseLabel.textContent="Phase "+(currentPhase+1)+" — "+p.label;
+ progress.style.width=((currentPhase/(phases.length-1))*100)+"%";
+ [...phaseList.children].forEach((b,i)=>b.classList.toggle("active",i===currentPhase));
+}
+
+function goToPhase(n){
+ currentPhase=Math.max(0,Math.min(phases.length-1,n));
+ answer.style.display="none";
+ render();
+}
+function nextPhase(){goToPhase(currentPhase+1)}
+function previousPhase(){goToPhase(currentPhase-1)}
+function showAnswer(){answer.style.display="block"}
+
+phases.forEach((p,i)=>{
+ const b=document.createElement("button");
+ b.textContent=p.label;
+ b.onclick=()=>goToPhase(i);
+ phaseList.appendChild(b);
+});
+
+document.getElementById("fileInput").addEventListener("change",e=>{
+ const file=e.target.files[0];
+ if(!file)return;
+ const reader=new FileReader();
+ reader.onload=()=>setImage(reader.result);
+ reader.readAsDataURL(file);
+});
+
+window.addEventListener("resize",render);
+setImage("data:image/svg+xml;charset=utf-8,"+encodeURIComponent(demoSvg));
+</script>
+</body>
+</html>
