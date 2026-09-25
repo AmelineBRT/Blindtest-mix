@@ -16643,25 +16643,25 @@ function loadRoundForPlaying() {
         return;
     }
 
-    const usedPreparedRound =
-        usePreparedNextRound(
-            round
-        );
+    const preparedForThisRound =
+        preparedNextRound &&
+        preparedNextRound.roundId === currentRoundId &&
+        preparedNextRound.ready;
 
-    if (!usedPreparedRound) {
+    players.forEach(function(player) {
 
-        players.forEach(function(player) {
+        if (
+            player &&
+            typeof player.destroy === "function"
+        ) {
 
-            if (
-                player &&
-                typeof player.destroy === "function"
-            ) {
+            player.destroy();
 
-                player.destroy();
+        }
 
-            }
+    });
 
-        });
+    if (!preparedForThisRound) {
 
         players = [];
 
@@ -16688,11 +16688,11 @@ function loadRoundForPlaying() {
     document.getElementById("playRoundTitle").textContent =
         round.name;
 
-    if (!usedPreparedRound) {
+    renderPlayTracks(
+        round
+    );
 
-        renderPlayTracks(
-            round
-        );
+    if (!preparedForThisRound) {
 
         warmUpCurrentRound();
 
@@ -16708,6 +16708,7 @@ function loadRoundForPlaying() {
     );
 
 }
+
 
 /* ========================================================
    AFFICHER LES PISTES EN JEU
@@ -17009,8 +17010,6 @@ function getNextRoundPreparationContainer() {
 
         players: [],
 
-        cards: [],
-
         ready: false
 
     };
@@ -17023,103 +17022,18 @@ function getNextRoundPreparationContainer() {
         const videoId =
             getVideoId(track.url);
 
-        const card =
-            document.createElement("div");
-
-        card.className =
-            "track";
-
-        card.id =
-            "prepared-track-card-" +
-            nextRound.id +
-            "-" +
-            index;
-
-        card.style.setProperty(
-            "--track-thumbnail",
-            `url("https://img.youtube.com/vi/${videoId}/hqdefault.jpg")`
-        );
-
-        card.innerHTML = `
-
-            <h3>
-
-                <span
-                    class="track-status-icon">
-
-                    🔇
-
-                </span>
-
-                <span>
-                    ${escapeHTML(
-                        track.title ||
-                        "Piste " + (index + 1)
-                    )}
-                </span>
-
-            </h3>
-
-            <div class="track-controls">
-
-                <button
-                    class="play-button"
-                    onclick="playTrack(${index})">
-
-                    ▶️
-
-                </button>
-
-                <button
-                    class="pause-button"
-                    onclick="pauseTrack(${index})">
-
-                    ⏸️
-
-                </button>
-
-                <div class="volume-container">
-
-                    <span class="volume-icon">
-                        🔊
-                    </span>
-
-                    <input
-                        class="volume"
-                        type="range"
-                        min="0"
-                        max="100"
-                        value="100"
-                        oninput="changeVolume(${index}, this.value)">
-
-                </div>
-
-                <button
-                    class="light"
-                    onclick="toggleSinglePlayer(${index}, this)">
-
-                    👁️
-
-                </button>
-
-            </div>
-
-            <div
-                class="player hidden-player">
-            </div>
-
-        `;
-
-        container.appendChild(card);
-
         const playerContainer =
-            card.querySelector(".player");
+            document.createElement("div");
 
         playerContainer.id =
             "prepared-player-" +
             nextRound.id +
             "-" +
             index;
+
+        container.appendChild(
+            playerContainer
+        );
 
         const player =
             new YT.Player(
@@ -17131,7 +17045,7 @@ function getNextRoundPreparationContainer() {
                     playerVars: {
 
                         autoplay: 0,
-                        controls: 1,
+                        controls: 0,
                         rel: 0,
                         playsinline: 1
 
@@ -17152,10 +17066,6 @@ function getNextRoundPreparationContainer() {
 
         preparation.players.push(
             player
-        );
-
-        preparation.cards.push(
-            card
         );
 
     });
@@ -17182,7 +17092,6 @@ function getNextRoundPreparationContainer() {
     );
 
 }
-   
 
 
 function warmUpPlayers(playerList, onComplete) {
@@ -17734,107 +17643,6 @@ function prepareNextRound() {
     );
 
 }
-
-
-
-function usePreparedNextRound(round) {
-
-    if (
-        !preparedNextRound ||
-        preparedNextRound.roundId !== round.id ||
-        !preparedNextRound.ready
-    ) {
-
-        return false;
-
-    }
-
-    const container =
-        document.getElementById("playTracks");
-
-    container.innerHTML = "";
-
-    preparedNextRound.cards.forEach(
-        function(card, index) {
-
-            card.id =
-                "track-card-" + index;
-
-            const statusIcon =
-                card.querySelector(
-                    ".track-status-icon"
-                );
-
-            if (statusIcon) {
-
-                statusIcon.id =
-                    "track-status-" + index;
-
-            }
-
-            const playerContainer =
-                card.querySelector(".player");
-
-            if (playerContainer) {
-
-                playerContainer.id =
-                    "player-" + index;
-
-            }
-
-            container.appendChild(
-                card
-            );
-
-        }
-    );
-
-    players =
-        preparedNextRound.players;
-
-    preparedNextRound =
-        null;
-
-    const preparationContainer =
-        document.getElementById(
-            "nextRoundPreparation"
-        );
-
-    if (preparationContainer) {
-
-        preparationContainer.innerHTML = "";
-
-    }
-
-    const toggleButton =
-        document.querySelector(
-            ".players-toggle"
-        );
-
-    if (toggleButton) {
-
-        if (players.length <= 1) {
-
-            toggleButton.style.display =
-                "none";
-
-        } else {
-
-            toggleButton.style.display =
-                "inline-block";
-
-            toggleButton.textContent =
-                "👁️ Afficher tous les lecteurs";
-
-        }
-
-    }
-
-    return true;
-
-}
-   
-   
 
 function onYouTubeIframeAPIReady() {
 
