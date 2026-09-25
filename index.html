@@ -3149,6 +3149,51 @@ textarea:focus {
     margin-top: 10px;
 }
 
+.play-round-section {
+    scroll-margin-top: 150px;
+    margin-top: 18px;
+}
+
+.play-round-section:first-child {
+    margin-top: 10px;
+}
+
+.play-round-heading {
+    background: white;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    text-align: center;
+}
+
+.play-round-heading-number {
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 3px;
+}
+
+.play-round-heading h2 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.play-round-empty {
+    text-align: center;
+    color: #777;
+    padding: 15px;
+}
+
+body.dark-mode .play-round-heading {
+    background: #282828;
+    color: #e8e8e8;
+}
+
+body.dark-mode .play-round-heading-number,
+body.dark-mode .play-round-empty {
+    color: #aaa;
+}
+
 .navigation-left {
     display: flex;
     flex-direction: column;
@@ -3291,6 +3336,14 @@ textarea:focus {
 
     .play-navigation {
         align-items: stretch;
+    }
+
+    .play-round-section {
+        scroll-margin-top: 130px;
+    }
+
+    .play-round-heading h2 {
+        font-size: 20px;
     }
 
     .multi-filter-row {
@@ -5318,7 +5371,7 @@ onclick="history.back()"
 
 </div>
 
-<div id="playTracks"></div>
+<div id="playRoundsContainer"></div>
 
 <div class="play-navigation">
 
@@ -5386,10 +5439,10 @@ let isAppNavigation = false;
    
 let players = [];
 let playersVisible = false;
-
- let currentRoundWarmingUp = false;  
-
-   let preparedNextRound = null;
+let playRoundStates = {};
+let playRenderedGameId = null;
+let youtubeApiReady = false;
+let playScrollLockInstalled = false;
 
 let gamesView = "games";
 
@@ -16627,35 +16680,47 @@ renderRounds();
    CHARGER UNE MANCHE POUR LE JEU
    ======================================================== */
 
-function loadRoundForPlaying() {
+function getPlayRoundState(roundId) {
 
-    const game = getCurrentGame();
-
-    const round =
-        game.rounds.find(function(r) {
-            return r.id === currentRoundId;
-        });
-
-    if (!round) {
-        return;
+    if (!playRoundStates[roundId]) {
+        playRoundStates[roundId] = {
+            players: [],
+            total: 0,
+            readyCount: 0,
+            ready: false,
+            initialized: false,
+            error: false
+        };
     }
 
-const hasPreparedPlayers =
-    preparedNextRound &&
-    preparedNextRound.roundId === currentRoundId &&
-    preparedNextRound.ready;
+    return playRoundStates[roundId];
+}
 
-if (!hasPreparedPlayers) {
 
-    players = [];
+function getPlayRoundKey(roundId) {
+
+    return String(roundId)
+        .replace(/[^a-zA-Z0-9_-]/g, "_");
 
 }
 
-playersVisible = false;
+
+function getPlayRoundElement(roundId) {
+
+    return document.querySelector(
+        '.play-round-section[data-round-id="' +
+        escapeAttribute(roundId) +
+        '"]'
+    );
+
+}
+
+
+function updatePlayHeader(game, round) {
 
     const roundIndex =
-        game.rounds.findIndex(function(r) {
-            return r.id === currentRoundId;
+        game.rounds.findIndex(function(item) {
+            return item.id === round.id;
         });
 
     document.getElementById("playGameTitle").textContent =
@@ -16668,246 +16733,313 @@ playersVisible = false;
         game.rounds.length;
 
     document.getElementById("playRoundTitle").textContent =
-        round.name;
+        round.name || "Manche " + (roundIndex + 1);
 
-   renderPlayTracks(round);
-
-warmUpCurrentRound();
-
-updatePlayingCount();
-
-    updateNavigationButton();
-
-   showScreen(
-    "playScreen",
-    document.getElementById("playScreen").classList.contains("active")
-);
 }
 
 
-/* ========================================================
-   AFFICHER LES PISTES EN JEU
-   ======================================================== */
+function updatePlayAllButton() {
 
-function renderPlayTracks(round) {
+    const button =
+        document.querySelector(".play-all");
 
-    const container =
-        document.getElementById("playTracks");
+    if (!button) {
+        return;
+    }
 
-    container.innerHTML = "";
+    const state =
+        playRoundStates[currentRoundId];
 
-    const tracksWithVideo =
-        round.tracks.filter(function(track) {
+    if (!state) {
+        button.disabled = true;
+        button.textContent =
+            "⏳ PRÉPARATION DES PISTES…";
+        return;
+    }
 
-            return track.url &&
-                   track.url.trim() !== "" &&
-                   getVideoId(track.url);
+    if (state.error) {
+        button.disabled = true;
+        button.textContent =
+            "⚠️ PISTE NON DISPONIBLE";
+        return;
+    }
+
+    if (state.total === 0) {
+        button.disabled = true;
+        button.textContent =
+            "Aucune piste YouTube";
+        return;
+    }
+
+    if (
+        state.ready &&
+        state.readyCount === state.total
+    ) {
+        button.disabled = false;
+        button.textContent =
+            "▶️ LANCER LE MIX";
+    } else {
+        button.disabled = true;
+        button.textContent =
+            "⏳ PRÉPARATION DES PISTES…";
+    }
+
+}
+
+
+function updatePlayRoundVisibility() {
+
+    document
+        .querySelectorAll(".play-round-section")
+        .forEach(function(section) {
+
+            section.classList.toggle(
+                "current-play-round",
+                section.dataset.roundId ===
+                String(currentRoundId)
+            );
 
         });
 
-    tracksWithVideo.forEach(function(track, index) {
+}
 
-        const videoId =
-            getVideoId(track.url);
 
-        const div =
-            document.createElement("div");
+function scrollToPlayRound(roundId, smooth) {
 
-        div.className =
-            "track";
+    const section =
+        getPlayRoundElement(roundId);
 
-        div.id =
-            "track-card-" + index;
+    if (!section) {
+        return;
+    }
 
-        div.style.setProperty(
-            "--track-thumbnail",
-            `url("https://img.youtube.com/vi/${videoId}/hqdefault.jpg")`
-        );
-
-        div.innerHTML = `
-
-            <h3>
-
-                <span
-                    id="track-status-${index}"
-                    class="track-status-icon">
-
-                    🔇
-
-                </span>
-
-                <span>
-                    ${escapeHTML(
-                        track.title ||
-                        "Piste " + (index + 1)
-                    )}
-                </span>
-
-            </h3>
-
-            <div class="track-controls">
-
-                <button
-                    class="play-button"
-                    onclick="playTrack(${index})">
-
-                    ▶️
-
-                </button>
-
-                <button
-                    class="pause-button"
-                    onclick="pauseTrack(${index})">
-
-                    ⏸️
-
-                </button>
-
-                <div class="volume-container">
-
-                    <span class="volume-icon">
-                        🔊
-                    </span>
-
-                    <input
-                        class="volume"
-                        type="range"
-                        min="0"
-                        max="100"
-                        value="100"
-                        oninput="changeVolume(${index}, this.value)">
-
-                </div>
-
-                <button
-                    class="light"
-                    onclick="toggleSinglePlayer(${index}, this)">
-
-                    👁️
-
-                </button>
-
-            </div>
-
-            <div
-                id="player-${index}"
-                class="player hidden-player">
-            </div>
-
-        `;
-
-        container.appendChild(div);
-
-        createPlayer(
-            index,
-            videoId
-        );
-
+    section.scrollIntoView({
+        behavior: smooth ? "smooth" : "instant",
+        block: "start",
+        inline: "nearest"
     });
 
-    const toggleButton =
-        document.querySelector(".players-toggle");
+}
 
-    if (toggleButton) {
 
-        if (tracksWithVideo.length <= 1) {
+function renderPlayRounds(game) {
 
-            toggleButton.style.display =
-                "none";
+    const container =
+        document.getElementById(
+            "playRoundsContainer"
+        );
 
-        } else {
+    if (!container) {
+        return;
+    }
 
-            toggleButton.style.display =
-                "inline-block";
+    container.innerHTML = "";
 
-            toggleButton.textContent =
-                "👁️ Afficher tous les lecteurs";
+    playRoundStates = {};
+    players = [];
+    playersVisible = false;
+
+    game.rounds.forEach(function(round, roundIndex) {
+
+        const roundSection =
+            document.createElement("section");
+
+        roundSection.className =
+            "play-round-section";
+
+        roundSection.dataset.roundId =
+            round.id;
+
+        const roundKey =
+            getPlayRoundKey(round.id);
+
+        const tracksWithVideo =
+            (round.tracks || []).filter(function(track) {
+
+                return track.url &&
+                       track.url.trim() !== "" &&
+                       getVideoId(track.url);
+
+            });
+
+        const heading =
+            document.createElement("div");
+
+        heading.className =
+            "play-round-heading";
+
+        heading.innerHTML =
+            '<div class="play-round-heading-number">' +
+            'Manche ' + (roundIndex + 1) +
+            ' / ' + game.rounds.length +
+            '</div>' +
+            '<h2>' +
+            escapeHTML(
+                round.name ||
+                "Manche " + (roundIndex + 1)
+            ) +
+            '</h2>';
+
+        roundSection.appendChild(heading);
+
+        const tracksContainer =
+            document.createElement("div");
+
+        tracksContainer.className =
+            "play-round-tracks";
+
+        tracksWithVideo.forEach(function(track, index) {
+
+            const videoId =
+                getVideoId(track.url);
+
+            const trackCard =
+                document.createElement("div");
+
+            trackCard.className =
+                "track";
+
+            trackCard.id =
+                "track-card-" +
+                roundKey +
+                "-" +
+                index;
+
+            trackCard.dataset.roundId =
+                round.id;
+
+            trackCard.dataset.trackIndex =
+                index;
+
+            trackCard.style.setProperty(
+                "--track-thumbnail",
+                'url("https://img.youtube.com/vi/' +
+                videoId +
+                '/hqdefault.jpg")'
+            );
+
+            trackCard.innerHTML =
+                '<h3>' +
+                    '<span id="track-status-' +
+                    roundKey + '-' + index +
+                    '" class="track-status-icon">🔇</span>' +
+                    '<span>' +
+                        escapeHTML(
+                            track.title ||
+                            "Piste " + (index + 1)
+                        ) +
+                    '</span>' +
+                '</h3>' +
+
+                '<div class="track-controls">' +
+
+                    '<button class="play-button" ' +
+                        'onclick="playTrack(\'' +
+                        escapeAttribute(round.id) +
+                        '\', ' + index + ')">' +
+                        '▶️' +
+                    '</button>' +
+
+                    '<button class="pause-button" ' +
+                        'onclick="pauseTrack(\'' +
+                        escapeAttribute(round.id) +
+                        '\', ' + index + ')">' +
+                        '⏸️' +
+                    '</button>' +
+
+                    '<div class="volume-container">' +
+
+                        '<span class="volume-icon">🔊</span>' +
+
+                        '<input class="volume" type="range" ' +
+                            'min="0" max="100" value="100" ' +
+                            'oninput="changeVolume(\'' +
+                            escapeAttribute(round.id) +
+                            '\', ' + index + ', this.value)">' +
+
+                    '</div>' +
+
+                    '<button class="light" ' +
+                        'onclick="toggleSinglePlayer(\'' +
+                        escapeAttribute(round.id) +
+                        '\', ' + index + ', this)">' +
+                        '👁️' +
+                    '</button>' +
+
+                '</div>' +
+
+                '<div id="player-' +
+                    roundKey + '-' + index +
+                    '" class="player hidden-player"></div>';
+
+            tracksContainer.appendChild(trackCard);
+
+        });
+
+        if (tracksWithVideo.length === 0) {
+
+            const empty =
+                document.createElement("p");
+
+            empty.className =
+                "play-round-empty";
+
+            empty.textContent =
+                "Aucune piste YouTube dans cette manche.";
+
+            tracksContainer.appendChild(empty);
 
         }
 
-    }
-
-}
-
-
-function getNextRoundPreparationContainer() {
-
-    let container =
-        document.getElementById("nextRoundPreparation");
-
-    if (!container) {
-
-        container =
-            document.createElement("div");
-
-        container.id =
-            "nextRoundPreparation";
-
-        container.style.position =
-            "fixed";
-
-        container.style.left =
-            "-10000px";
-
-        container.style.top =
-            "0";
-
-        container.style.width =
-            "1px";
-
-        container.style.height =
-            "1px";
-
-        container.style.overflow =
-            "hidden";
-
-        document.body.appendChild(
-            container
+        roundSection.appendChild(
+            tracksContainer
         );
 
-    }
+        container.appendChild(
+            roundSection
+        );
 
-    return container;
+        const state =
+            getPlayRoundState(round.id);
+
+        state.total =
+            tracksWithVideo.length;
+
+        state.ready =
+            tracksWithVideo.length === 0;
+
+    });
 
 }
 
 
-
-   function prepareNextRound() {
+function ensureRoundPlayers(roundId) {
 
     const game =
         getCurrentGame();
 
-    if (!game) {
+    if (!game || !youtubeApiReady) {
         return;
     }
 
-    const currentIndex =
-        game.rounds.findIndex(function(round) {
-
-            return round.id === currentRoundId;
-
+    const round =
+        game.rounds.find(function(item) {
+            return item.id === roundId;
         });
 
-    if (
-        currentIndex < 0 ||
-        currentIndex >= game.rounds.length - 1
-    ) {
+    if (!round) {
         return;
     }
 
-    const nextRound =
-        game.rounds[currentIndex + 1];
+    const state =
+        getPlayRoundState(roundId);
 
-    if (
-        preparedNextRound &&
-        preparedNextRound.roundId === nextRound.id
-    ) {
+    if (state.initialized) {
         return;
     }
 
     const tracksWithVideo =
-        nextRound.tracks.filter(function(track) {
+        (round.tracks || []).filter(function(track) {
 
             return track.url &&
                    track.url.trim() !== "" &&
@@ -16915,62 +17047,54 @@ function getNextRoundPreparationContainer() {
 
         });
 
+    state.total =
+        tracksWithVideo.length;
+
     if (tracksWithVideo.length === 0) {
+
+        state.initialized = true;
+        state.ready = true;
+
+        if (roundId === currentRoundId) {
+            players = state.players;
+            updatePlayAllButton();
+            updatePlayingCount();
+        }
+
         return;
+
     }
 
-    const container =
-        getNextRoundPreparationContainer();
-
-    container.innerHTML = "";
-
-    const preparation = {
-
-        gameId: game.id,
-
-        roundId: nextRound.id,
-
-        players: [],
-
-        ready: false
-
-    };
-
-    preparedNextRound =
-        preparation;
+    state.initialized = true;
+    state.players = new Array(
+        tracksWithVideo.length
+    );
+    state.readyCount = 0;
+    state.ready = false;
+    state.error = false;
 
     tracksWithVideo.forEach(function(track, index) {
 
         const videoId =
             getVideoId(track.url);
 
-        const playerContainer =
-            document.createElement("div");
-
-        playerContainer.id =
-            "prepared-player-" +
-            nextRound.id +
+        const playerId =
+            "player-" +
+            getPlayRoundKey(roundId) +
             "-" +
             index;
 
-        container.appendChild(
-            playerContainer
-        );
-
         const player =
             new YT.Player(
-                playerContainer.id,
+                playerId,
                 {
-
                     videoId: videoId,
 
                     playerVars: {
-
                         autoplay: 0,
-                        controls: 0,
+                        controls: 1,
                         rel: 0,
                         playsinline: 1
-
                     },
 
                     events: {
@@ -16979,6 +17103,49 @@ function getNextRoundPreparationContainer() {
 
                             event.target.setVolume(100);
 
+                            state.readyCount++;
+
+                            if (
+                                state.readyCount >=
+                                state.total
+                            ) {
+                                state.ready = true;
+                            }
+
+                            if (
+                                roundId ===
+                                currentRoundId
+                            ) {
+                                players =
+                                    state.players;
+
+                                updatePlayAllButton();
+                                updatePlayingCount();
+                            }
+
+                        },
+
+                        onStateChange: function(event) {
+
+                            updateTrackPlayingState(
+                                roundId,
+                                index,
+                                event.data
+                            );
+
+                        },
+
+                        onError: function() {
+
+                            state.error = true;
+
+                            if (
+                                roundId ===
+                                currentRoundId
+                            ) {
+                                updatePlayAllButton();
+                            }
+
                         }
 
                     }
@@ -16986,41 +17153,251 @@ function getNextRoundPreparationContainer() {
                 }
             );
 
-        preparation.players.push(
-            player
-        );
+        state.players[index] =
+            player;
 
     });
 
-    warmUpPlayers(
-        preparation.players,
-        function() {
+    if (roundId === currentRoundId) {
+
+        players =
+            state.players;
+
+        updatePlayAllButton();
+        updatePlayingCount();
+
+    }
+
+}
+
+
+function loadRoundForPlaying() {
+
+    const game =
+        getCurrentGame();
+
+    if (!game) {
+        return;
+    }
+
+    const round =
+        game.rounds.find(function(item) {
+            return item.id === currentRoundId;
+        });
+
+    if (!round) {
+        return;
+    }
+
+    const container =
+        document.getElementById(
+            "playRoundsContainer"
+        );
+
+    const needsRender =
+        playRenderedGameId !== game.id ||
+        !container ||
+        container.children.length === 0;
+
+    if (needsRender) {
+
+        renderPlayRounds(game);
+
+        playRenderedGameId =
+            game.id;
+
+    }
+
+    ensureRoundPlayers(
+        currentRoundId
+    );
+
+    const currentIndex =
+        game.rounds.findIndex(function(item) {
+            return item.id === currentRoundId;
+        });
+
+    if (
+        currentIndex >= 0 &&
+        currentIndex < game.rounds.length - 1
+    ) {
+
+        ensureRoundPlayers(
+            game.rounds[currentIndex + 1].id
+        );
+
+    }
+
+    players =
+        getPlayRoundState(
+            currentRoundId
+        ).players;
+
+    playersVisible = false;
+
+    updatePlayRoundVisibility();
+    updatePlayHeader(
+        game,
+        round
+    );
+    updatePlayAllButton();
+    updatePlayingCount();
+    updateNavigationButton();
+
+    showScreen(
+        "playScreen",
+        document.getElementById("playScreen").classList.contains("active")
+    );
+
+    setupPlayScrollLock();
+
+    setTimeout(function() {
+
+        scrollToPlayRound(
+            currentRoundId,
+            true
+        );
+
+    }, 30);
+
+}
+
+
+function onYouTubeIframeAPIReady() {
+
+    youtubeApiReady = true;
+
+    console.log(
+        "API YouTube prête"
+    );
+
+    if (currentRoundId) {
+
+        ensureRoundPlayers(
+            currentRoundId
+        );
+
+        const game =
+            getCurrentGame();
+
+        if (game) {
+
+            const currentIndex =
+                game.rounds.findIndex(function(round) {
+                    return round.id === currentRoundId;
+                });
 
             if (
-                preparedNextRound === preparation
+                currentIndex >= 0 &&
+                currentIndex < game.rounds.length - 1
             ) {
 
-                preparation.ready =
-                    true;
-
-                console.log(
-                    "Manche suivante prête :",
-                    nextRound.name
+                ensureRoundPlayers(
+                    game.rounds[currentIndex + 1].id
                 );
 
             }
 
         }
+
+    }
+
+}
+
+
+function isPlayScreenActive() {
+
+    const screen =
+        document.getElementById(
+            "playScreen"
+        );
+
+    return !!(
+        screen &&
+        screen.classList.contains("active")
     );
 
 }
-   
 
-function toggleSinglePlayer(index, button) {
+
+function blockPlayScreenScroll(event) {
+
+    if (!isPlayScreenActive()) {
+        return;
+    }
+
+    event.preventDefault();
+
+}
+
+
+function blockPlayScreenKeyboardScroll(event) {
+
+    if (!isPlayScreenActive()) {
+        return;
+    }
+
+    const scrollKeys = [
+        "ArrowUp",
+        "ArrowDown",
+        "PageUp",
+        "PageDown",
+        "Home",
+        "End",
+        " "
+    ];
+
+    if (
+        scrollKeys.includes(
+            event.key
+        )
+    ) {
+        event.preventDefault();
+    }
+
+}
+
+
+function setupPlayScrollLock() {
+
+    if (playScrollLockInstalled) {
+        return;
+    }
+
+    playScrollLockInstalled = true;
+
+    document.addEventListener(
+        "wheel",
+        blockPlayScreenScroll,
+        { passive: false }
+    );
+
+    document.addEventListener(
+        "touchmove",
+        blockPlayScreenScroll,
+        { passive: false }
+    );
+
+    document.addEventListener(
+        "keydown",
+        blockPlayScreenKeyboardScroll
+    );
+
+}
+
+
+function toggleSinglePlayer(
+    roundId,
+    index,
+    button
+) {
 
     const playerElement =
         document.getElementById(
-            "player-" + index
+            "player-" +
+            getPlayRoundKey(roundId) +
+            "-" +
+            index
         );
 
     if (!playerElement) {
@@ -17037,7 +17414,8 @@ function toggleSinglePlayer(index, button) {
             "hidden-player"
         );
 
-        button.textContent = "🙈";
+        button.textContent =
+            "🙈";
 
     } else {
 
@@ -17045,7 +17423,8 @@ function toggleSinglePlayer(index, button) {
             "hidden-player"
         );
 
-        button.textContent = "👁️";
+        button.textContent =
+            "👁️";
 
     }
 
@@ -17054,8 +17433,19 @@ function toggleSinglePlayer(index, button) {
 
 function togglePlayers(button) {
 
+    const currentSection =
+        getPlayRoundElement(
+            currentRoundId
+        );
+
+    if (!currentSection) {
+        return;
+    }
+
     const playerElements =
-        document.querySelectorAll(".player");
+        currentSection.querySelectorAll(
+            ".player"
+        );
 
     playersVisible =
         !playersVisible;
@@ -17063,17 +17453,13 @@ function togglePlayers(button) {
     playerElements.forEach(function(player) {
 
         if (playersVisible) {
-
             player.classList.remove(
                 "hidden-player"
             );
-
         } else {
-
             player.classList.add(
                 "hidden-player"
             );
-
         }
 
     });
@@ -17086,428 +17472,70 @@ function togglePlayers(button) {
 }
 
 
-/* ========================================================
-   EXTRAIRE ID YOUTUBE
-   ======================================================== */
-
-function getVideoId(url) {
-
-    try {
-
-        const urlObject =
-            new URL(url);
-
-        if (
-            urlObject.hostname.includes(
-                "youtube.com"
-            )
-        ) {
-
-            return urlObject.searchParams.get("v");
-
-        }
-
-        if (
-            urlObject.hostname.includes(
-                "youtu.be"
-            )
-        ) {
-
-            return urlObject.pathname.substring(1);
-
-        }
-
-    } catch (error) {
-
-        return null;
-
-    }
-
-    return null;
-
-}
-
-
-/* ========================================================
-   CRÉER LECTEUR YOUTUBE
-   ======================================================== */
-
-function createPlayer(index, videoId) {
-
-    players[index] =
-        new YT.Player(
-            "player-" + index,
-            {
-
-                videoId: videoId,
-
-                playerVars: {
-
-                    autoplay: 0,
-                    controls: 1,
-                    rel: 0,
-                    playsinline: 1
-
-                },
-
-                events: {
-
-                    onReady: function(event) {
-
-                        event.target.setVolume(100);
-
-                    },
-
-                    onStateChange: function(event) {
-
-                        updateTrackPlayingState(
-                            index,
-                            event.data
-                        );
-
-                    }
-
-                }
-
-            }
-        );
-
-}
-
-   function warmUpPlayers(playerList, onComplete) {
-
-    if (!playerList || playerList.length === 0) {
-        if (onComplete) {
-            onComplete();
-        }
-        return;
-    }
-
-    let attempts = 0;
-
-    const checkReady = setInterval(function() {
-
-        attempts++;
-
-        if (attempts > 100) {
-
-            clearInterval(checkReady);
-
-            console.log(
-                "Préparation annulée : lecteurs non prêts."
-            );
-
-            return;
-
-        }
-
-        if (
-            playerList.some(function(player) {
-
-                return !player ||
-                       typeof player.playVideo !== "function" ||
-                       typeof player.pauseVideo !== "function" ||
-                       typeof player.getPlayerState !== "function";
-
-            })
-        ) {
-
-            return;
-
-        }
-
-        clearInterval(checkReady);
-
-        playerList.forEach(function(player) {
-
-            player.mute();
-            player.playVideo();
-
-        });
-
-        let playingCheck =
-            setInterval(function() {
-
-                const allPlaying =
-                    playerList.every(function(player) {
-
-                        return (
-                            player.getPlayerState() ===
-                            YT.PlayerState.PLAYING
-                        );
-
-                    });
-
-                if (allPlaying) {
-
-                    clearInterval(playingCheck);
-
-                    playerList.forEach(function(player) {
-
-                        player.pauseVideo();
-                        player.unMute();
-                        player.setVolume(100);
-
-                    });
-
-                    console.log(
-                        "Toutes les pistes ont été préparées."
-                    );
-
-                    if (onComplete) {
-                        onComplete();
-                    }
-
-                }
-
-            }, 100);
-
-    }, 100);
-
-}
-
-   function warmUpCurrentRound() {
-
-    if (currentRoundWarmingUp) {
-        return;
-    }
-
-    currentRoundWarmingUp = true;
-
-    warmUpPlayers(
-        players,
-        function() {
-
-            currentRoundWarmingUp = false;
-
-            prepareNextRound();
-
-        }
-    );
-
-}
-
-   
-function prepareNextRound() {
-
-    const game =
-        getCurrentGame();
-
-    if (!game) {
-        return;
-    }
-
-    const currentIndex =
-        game.rounds.findIndex(function(round) {
-
-            return round.id === currentRoundId;
-
-        });
-
-    if (
-        currentIndex < 0 ||
-        currentIndex >= game.rounds.length - 1
-    ) {
-
-        return;
-
-    }
-
-    const nextRound =
-        game.rounds[currentIndex + 1];
-
-    if (
-        preparedNextRound &&
-        preparedNextRound.roundId === nextRound.id
-    ) {
-
-        return;
-
-    }
-
-    const tracksWithVideo =
-        nextRound.tracks.filter(function(track) {
-
-            return track.url &&
-                   track.url.trim() !== "" &&
-                   getVideoId(track.url);
-
-        });
-
-    if (tracksWithVideo.length === 0) {
-
-        return;
-
-    }
-
-    const preparationContainer =
-        document.createElement("div");
-
-    preparationContainer.style.position =
-        "fixed";
-
-    preparationContainer.style.left =
-        "-10000px";
-
-    preparationContainer.style.top =
-        "0";
-
-    preparationContainer.style.width =
-        "1px";
-
-    preparationContainer.style.height =
-        "1px";
-
-    document.body.appendChild(
-        preparationContainer
-    );
-
-    const preparation = {
-
-        roundId: nextRound.id,
-        players: [],
-        container: preparationContainer,
-        ready: false
-
-    };
-
-    preparedNextRound =
-        preparation;
-
-    tracksWithVideo.forEach(function(track, index) {
-
-        const videoId =
-            getVideoId(track.url);
-
-        const playerContainer =
-            document.createElement("div");
-
-        playerContainer.id =
-            "prepared-player-" +
-            nextRound.id +
-            "-" +
-            index;
-
-        playerContainer.style.width =
-            "1px";
-
-        playerContainer.style.height =
-            "1px";
-
-        preparationContainer.appendChild(
-            playerContainer
-        );
-
-        const player =
-            new YT.Player(
-                playerContainer.id,
-                {
-
-                    videoId: videoId,
-
-                    playerVars: {
-
-                        autoplay: 0,
-                        controls: 0,
-                        rel: 0,
-                        playsinline: 1
-
-                    },
-
-                    events: {
-
-                        onReady: function(event) {
-
-                            event.target.setVolume(100);
-
-                        }
-
-                    }
-
-                }
-            );
-
-        preparation.players.push(
-            player
-        );
-
-    });
-
-    warmUpPlayers(
-        preparation.players,
-        function() {
-
-            if (
-                preparedNextRound === preparation
-            ) {
-
-                preparation.ready =
-                    true;
-
-                console.log(
-                    "Manche suivante prête :",
-                    nextRound.name
-                );
-
-            }
-
-        }
-    );
-
-}
-
-function onYouTubeIframeAPIReady() {
-
-    console.log(
-        "API YouTube prête"
-    );
-
-}
-
-
-/* ========================================================
-   ÉTAT VISUEL DES PISTES
-   ======================================================== */
-
-function updateTrackPlayingState(index, state) {
+function updateTrackPlayingState(
+    roundId,
+    index,
+    state
+) {
+
+    const roundKey =
+        getPlayRoundKey(roundId);
 
     const card =
         document.getElementById(
-            "track-card-" + index
+            "track-card-" +
+            roundKey +
+            "-" +
+            index
         );
 
     const statusIcon =
         document.getElementById(
-            "track-status-" + index
+            "track-status-" +
+            roundKey +
+            "-" +
+            index
         );
 
     if (!card) {
         return;
     }
 
-    if (state === YT.PlayerState.PLAYING) {
+    if (
+        state ===
+        YT.PlayerState.PLAYING
+    ) {
 
-        card.classList.add("playing");
+        card.classList.add(
+            "playing"
+        );
 
         if (statusIcon) {
-            statusIcon.textContent = "🎵";
+            statusIcon.textContent =
+                "🎵";
         }
 
     } else {
 
-        card.classList.remove("playing");
+        card.classList.remove(
+            "playing"
+        );
 
         if (statusIcon) {
-            statusIcon.textContent = "🔇";
+            statusIcon.textContent =
+                "🔇";
         }
 
     }
 
-    updatePlayingCount();
+    if (roundId === currentRoundId) {
+        updatePlayingCount();
+    }
 
 }
 
-   /* =========================================================
+
+/* =========================================================
    DÉPLACEMENT DES MANCHES PAR APPUI LONG
    ========================================================= */
 
@@ -18157,100 +18185,130 @@ renderRounds();
 
 function updatePlayingCount() {
 
-    let playing = 0;
+    const state =
+        playRoundStates[currentRoundId];
 
-    players.forEach(function(player) {
+    const count =
+        document.getElementById(
+            "playTrackCount"
+        );
+
+    if (!count) {
+        return;
+    }
+
+    if (!state) {
+        count.textContent =
+            "0 / 0 à trouver";
+        return;
+    }
+
+    let playing =
+        0;
+
+    state.players.forEach(function(player) {
 
         if (
             player &&
-            typeof player.getPlayerState === "function"
+            typeof player.getPlayerState ===
+            "function" &&
+            player.getPlayerState() ===
+            YT.PlayerState.PLAYING
         ) {
-
-            if (
-                player.getPlayerState() ===
-                YT.PlayerState.PLAYING
-            ) {
-
-                playing++;
-
-            }
-
+            playing++;
         }
 
     });
 
-    document.getElementById(
-        "playTrackCount"
-    ).textContent =
+    count.textContent =
         playing +
         " / " +
-        players.length +
+        state.total +
         " à trouver";
 
 }
 
 
-/* ========================================================
-   CONTRÔLES LECTURE
-   ======================================================== */
+function playTrack(roundId, index) {
 
-function playTrack(index) {
+    const state =
+        playRoundStates[roundId];
 
     if (
-        players[index] &&
-        typeof players[index].playVideo === "function"
+        state &&
+        state.players[index] &&
+        typeof state.players[index].playVideo ===
+        "function"
     ) {
-
-        players[index].playVideo();
-
+        state.players[index].playVideo();
     }
 
 }
 
 
-function pauseTrack(index) {
+function pauseTrack(roundId, index) {
+
+    const state =
+        playRoundStates[roundId];
 
     if (
-        players[index] &&
-        typeof players[index].pauseVideo === "function"
+        state &&
+        state.players[index] &&
+        typeof state.players[index].pauseVideo ===
+        "function"
     ) {
-
-        players[index].pauseVideo();
-
+        state.players[index].pauseVideo();
     }
 
 }
 
 
-function changeVolume(index, volume) {
+function changeVolume(roundId, index, volume) {
+
+    const state =
+        playRoundStates[roundId];
 
     if (
-        players[index] &&
-        typeof players[index].setVolume === "function"
+        state &&
+        state.players[index] &&
+        typeof state.players[index].setVolume ===
+        "function"
     ) {
-
-        players[index].setVolume(
+        state.players[index].setVolume(
             Number(volume)
         );
-
     }
 
 }
+
 
 let tracksPlayingBeforePauseAll = [];
 
 
 function playAll() {
 
+    const state =
+        playRoundStates[currentRoundId];
+
+    if (
+        !state ||
+        !state.ready ||
+        state.readyCount !== state.total
+    ) {
+        return;
+    }
+
+    players =
+        state.players;
+
     players.forEach(function(player) {
 
         if (
             player &&
-            typeof player.playVideo === "function"
+            typeof player.playVideo ===
+            "function"
         ) {
-
             player.playVideo();
-
         }
 
     });
@@ -18262,20 +18320,33 @@ function pauseAll() {
 
     tracksPlayingBeforePauseAll = [];
 
+    const state =
+        playRoundStates[currentRoundId];
+
+    if (!state) {
+        return;
+    }
+
+    players =
+        state.players;
+
     players.forEach(function(player, index) {
 
         if (
             player &&
-            typeof player.getPlayerState === "function" &&
-            typeof player.pauseVideo === "function"
+            typeof player.getPlayerState ===
+            "function" &&
+            typeof player.pauseVideo ===
+            "function"
         ) {
 
             if (
-                player.getPlayerState() === YT.PlayerState.PLAYING
+                player.getPlayerState() ===
+                YT.PlayerState.PLAYING
             ) {
-
-                tracksPlayingBeforePauseAll.push(index);
-
+                tracksPlayingBeforePauseAll.push(
+                    index
+                );
             }
 
             player.pauseVideo();
@@ -18289,31 +18360,42 @@ function pauseAll() {
 
 function resumeAfterPauseAll() {
 
-    tracksPlayingBeforePauseAll.forEach(function(index) {
+    const state =
+        playRoundStates[currentRoundId];
 
-        const player =
-            players[index];
+    if (!state) {
+        return;
+    }
+
+    state.players.forEach(function(player, index) {
 
         if (
+            tracksPlayingBeforePauseAll.includes(
+                index
+            ) &&
             player &&
-            typeof player.playVideo === "function"
+            typeof player.playVideo ===
+            "function"
         ) {
-
             player.playVideo();
-
         }
 
     });
 
 }
-   
+
 /* ========================================================
    NAVIGATION MANCHES
    ======================================================== */
 
 function nextRound() {
 
-    const game = getCurrentGame();
+    const game =
+        getCurrentGame();
+
+    if (!game) {
+        return;
+    }
 
     const currentIndex =
         game.rounds.findIndex(function(round) {
@@ -18321,13 +18403,12 @@ function nextRound() {
         });
 
     if (
-        currentIndex >= game.rounds.length - 1
+        currentIndex >=
+        game.rounds.length - 1
     ) {
 
         pauseAll();
-
-history.back();
-
+        history.back();
         return;
 
     }
@@ -18344,7 +18425,12 @@ history.back();
 
 function previousRound() {
 
-    const game = getCurrentGame();
+    const game =
+        getCurrentGame();
+
+    if (!game) {
+        return;
+    }
 
     const currentIndex =
         game.rounds.findIndex(function(round) {
@@ -18374,14 +18460,15 @@ function previousRound() {
 function quitGame() {
 
     pauseAll();
-
     history.back();
 
 }
 
+
 function updateNavigationButton() {
 
-    const game = getCurrentGame();
+    const game =
+        getCurrentGame();
 
     const currentIndex =
         game.rounds.findIndex(function(round) {
@@ -18392,6 +18479,10 @@ function updateNavigationButton() {
         document.getElementById(
             "nextRoundButton"
         );
+
+    if (!button) {
+        return;
+    }
 
     if (
         currentIndex ===
