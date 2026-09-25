@@ -3160,6 +3160,23 @@ textarea:focus {
     margin-top: 18px;
 }
 
+.play-preparation-round {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.play-navigation {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: 10px;
+    z-index: 110;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 12px;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.18);
+}
+
 .play-round-section:first-child {
     margin-top: 10px;
 }
@@ -16878,13 +16895,55 @@ function updatePlayRoundVisibility() {
         .querySelectorAll(".play-round-section")
         .forEach(function(section) {
 
+            const isCurrent =
+                section.dataset.roundId ===
+                String(currentRoundId);
+
             section.classList.toggle(
                 "current-play-round",
-                section.dataset.roundId ===
-                String(currentRoundId)
+                isCurrent
+            );
+
+            section.classList.toggle(
+                "play-preparation-round",
+                !isCurrent
             );
 
         });
+
+}
+
+function limitPlayScreenScroll() {
+
+    if (!document.getElementById("playScreen")?.classList.contains("active")) {
+        return;
+    }
+
+    const currentSection =
+        getPlayRoundElement(currentRoundId);
+
+    if (!currentSection) {
+        return;
+    }
+
+    const viewportHeight =
+        window.innerHeight;
+
+    const maxScroll =
+        Math.max(
+            0,
+            currentSection.offsetTop +
+            currentSection.offsetHeight -
+            viewportHeight +
+            24
+        );
+
+    if (window.scrollY > maxScroll) {
+        window.scrollTo({
+            top: maxScroll,
+            behavior: "instant"
+        });
+    }
 
 }
 
@@ -17429,6 +17488,16 @@ function isPlayScreenActive() {
 
 }
 
+
+function handlePlayScreenScrollBoundary() {
+    limitPlayScreenScroll();
+}
+
+window.addEventListener(
+    "scroll",
+    handlePlayScreenScrollBoundary,
+    { passive: true }
+);
 
 function blockPlayScreenScroll(event) {
 
