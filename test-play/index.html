@@ -268,9 +268,6 @@ button:disabled {
 
 /* Boutons actifs pendant lecture */
 
-.track.playing .play-button {
-    background: #720038;
-}
 
 .track.playing .pause-button {
     background: #09463E;
@@ -280,8 +277,8 @@ button:disabled {
 /* Manche suivante */
 
 .next-round {
-    background: #b8e6c1;
-    color: #174d25;
+    background: #b48a9f;
+    color: white;
 }
 
 
@@ -3141,14 +3138,18 @@ textarea:focus {
     background: #09463E;
 }
 
-.play-all:disabled,
-.play-all:not(:disabled) {
+.play-all:disabled {
     background: #b48a9f;
     color: white;
 }
 
-.play-all.is-playing {
+.play-all:not(:disabled) {
     background: #720038;
+    color: white;
+}
+
+.play-all.has-started {
+    background: #b48a9f;
     color: white;
 }
 
@@ -18465,23 +18466,13 @@ function updateGlobalPlayControls() {
 
     resumeButton.classList.toggle(
         "is-playing",
-        somethingPlaying
+        canResume
     );
 
     pauseButton.classList.toggle(
         "is-playing",
         somethingPlaying
     );
-
-    const playAllButton =
-        document.querySelector(".play-all");
-
-    if (playAllButton) {
-        playAllButton.classList.toggle(
-            "is-playing",
-            somethingPlaying
-        );
-    }
 }
 
 
@@ -18556,6 +18547,13 @@ function playAll() {
 
     players =
         state.players;
+
+    const playAllButton =
+        document.querySelector(".play-all");
+
+    if (playAllButton) {
+        playAllButton.classList.add("has-started");
+    }
 
     players.forEach(function(player) {
 
@@ -18776,7 +18774,7 @@ function updateNavigationButton() {
         );
 
         button.innerHTML =
-            "Fin de la partie<br>retour au menu";
+            "🏁 Fin de la partie<br>retour au menu";
 
         if (quitButton) {
             quitButton.style.display = "none";
