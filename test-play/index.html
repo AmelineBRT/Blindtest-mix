@@ -526,9 +526,7 @@ button:disabled {
     padding: 7px;
 }
 
-.participant-current-list .participant-item {
-    background: rgba(255, 255, 255, 0.85);
-}
+
 
 .participant-current-list .participant-item {
     background: rgba(255, 255, 255, 0.85);
@@ -1368,9 +1366,7 @@ max-height: calc(100vh - 90px);
     line-height: 1;
 }
 
-.person-edit-button.visible {
-    display: block;
-}
+
 .person-edit-button.visible {
     display: block;
 }
@@ -3820,9 +3816,7 @@ background: #ffffff;
     font-weight: normal;
 }
 
-.recovery-change-label input {
-    margin: 0;
-}
+
 
 /* Même apparence que les autres labels */
 
@@ -3943,9 +3937,7 @@ background: #ffffff;
     margin: 8px 0 18px 0;
 }
 
-.forgot-password-game-card-content h3 {
-    margin-top: 0;
-}
+
    
    .forgot-password-game-card-content {
     padding: 0;
@@ -12212,68 +12204,6 @@ async function toggleParticipants(type) {
     renderParticipants(type);
 
     panel.classList.add("visible");
-}
-
-
-function getParticipantIconHTML(name) {
-
-    const person =
-        people.find(function(person) {
-            return person.nom.toLowerCase() ===
-                   name.toLowerCase();
-        });
-
-    if (!person) {
-        return "";
-    }
-
-    let backgroundHTML = "";
-
-    if (person.fond_couleur) {
-
-        let size = 26;
-
-        if (person.fond_taille === "small") {
-            size = 22;
-        } else if (person.fond_taille === "large") {
-            size = 32;
-        }
-
-        let shapeStyle =
-            "border-radius: 50%;";
-
-        if (person.fond_forme === "rectangle") {
-
-            shapeStyle =
-                "border-radius: 8px;";
-
-        } else if (person.fond_forme === "triangle") {
-
-            shapeStyle =
-                "clip-path: polygon(50% 0%, 100% 100%, 0% 100%);";
-        }
-
-        backgroundHTML = `
-            <span
-                class="participant-person-background"
-                style="
-                    width:${size}px;
-                    height:${size}px;
-                    background:${person.fond_couleur};
-                    ${shapeStyle}
-                ">
-            </span>
-        `;
-    }
-
-    return `
-        <span class="participant-person-icon">
-            ${backgroundHTML}
-            <span class="participant-person-emoji">
-                ${person.emoji ? escapeHTML(person.emoji) : "👤"}
-            </span>
-        </span>
-    `;
 }
 
 
