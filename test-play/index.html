@@ -3126,6 +3126,10 @@ textarea:focus {
 }
 
 .resume-all {
+    background: #b48a9f;
+}
+
+.resume-all.is-playing {
     background: #720038;
 }
 
@@ -3133,18 +3137,17 @@ textarea:focus {
     background: #75a39d;
 }
 
-.resume-all:disabled,
-.pause-all:disabled {
-    background: #bdbdbd;
-    color: #f5f5f5;
+.pause-all.is-playing {
+    background: #09463E;
 }
 
-.play-all:disabled {
-    background: #bdbdbd;
-    color: #f5f5f5;
-}
-
+.play-all:disabled,
 .play-all:not(:disabled) {
+    background: #b48a9f;
+    color: white;
+}
+
+.play-all.is-playing {
     background: #720038;
     color: white;
 }
@@ -18459,6 +18462,26 @@ function updateGlobalPlayControls() {
 
     pauseButton.disabled = !somethingPlaying;
     resumeButton.disabled = !canResume;
+
+    resumeButton.classList.toggle(
+        "is-playing",
+        somethingPlaying
+    );
+
+    pauseButton.classList.toggle(
+        "is-playing",
+        somethingPlaying
+    );
+
+    const playAllButton =
+        document.querySelector(".play-all");
+
+    if (playAllButton) {
+        playAllButton.classList.toggle(
+            "is-playing",
+            somethingPlaying
+        );
+    }
 }
 
 
