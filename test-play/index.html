@@ -6023,8 +6023,15 @@ participants:
                ========================= */
 
             /*
-             * D1 devient la source de vérité.
+             * D1 devient la source de vérité pour Blindtest Mix.
+             * Pour le prototype Pixels, les images restent
+             * temporairement stockées localement.
              */
+
+            const localPixelRounds =
+                localGame.gameType === "pixels"
+                    ? localGame.rounds
+                    : null;
 
             localGame.name =
                 detail.nom;
@@ -6046,7 +6053,7 @@ localGame.email =
                 participants;
 
             localGame.rounds =
-                rounds;
+                localPixelRounds || rounds;
 
         }
 
