@@ -15916,7 +15916,10 @@ async function saveRound() {
             if (file) {
 
                 round.imageData =
-                    await compressImageFileToWebP(file);
+                    await getPreparedPixelsImage(
+                        fileInput,
+                        "pixelsEditPreview"
+                    );
 
                 pixelsImageChanged = true;
 
