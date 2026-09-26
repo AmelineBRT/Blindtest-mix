@@ -2235,6 +2235,10 @@ textarea:focus {
    VUE PARTIES / GROUPES
    ========================================================= */
 
+#gamesScreen.initializing {
+    visibility: hidden;
+}
+
 .games-header {
     display: flex;
     align-items: center;
@@ -4234,14 +4238,14 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
      ÉCRAN : LISTE DES PARTIES
      ================================================== -->
 
-<section id="gamesScreen" class="screen active">
+<section id="gamesScreen" class="screen active initializing">
 
 <div class="card">
 
   <div class="games-header">
 
     <h2 id="gamesViewTitle">
-        🎶 Mes parties
+        🎶 Parties
     </h2>
 
     <div class="games-header-actions">
@@ -6551,6 +6555,10 @@ history.pushState(
 isBrowserBack = true;
 await showGames();
 isBrowserBack = false;
+
+document.getElementById(
+    "gamesScreen"
+).classList.remove("initializing");
 
 }
 
