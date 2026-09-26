@@ -3958,21 +3958,22 @@ background: #ffffff;
     background: #ddd;
 }
 
-.pixels-phase-label {
-    font-weight: bold;
-    margin: 8px 0;
-}
-
 .pixels-phase-buttons {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: center;
     gap: 4px;
+    width: 100%;
 }
 
 .pixels-phase-button {
+    flex: 1 1 0;
+    min-width: 0;
     width: auto;
     margin: 0;
+    padding-left: 4px;
+    padding-right: 4px;
+    white-space: nowrap;
 }
 
 .pixels-answer-row {
@@ -3994,6 +3995,11 @@ background: #ffffff;
     align-items: center;
     justify-content: center;
     font-size: 20px;
+    background: #75a39d;
+}
+
+.pixels-answer-button.visible {
+    background: #09463E;
 }
 
 .pixels-answer {
@@ -4002,13 +4008,18 @@ background: #ffffff;
     margin: 0;
     padding: 10px 14px;
     border-radius: 8px;
-    background: #f0f0f0;
-    text-align: left;
+    background: #75a39d;
+    color: white;
+    text-align: center;
     display: none;
+    font-weight: bold;
 }
 
 .pixels-answer.visible {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 22px;
 }
 
 body.dark-mode .pixels-game-type-option {
@@ -17627,12 +17638,6 @@ function renderPixelsPlay(game) {
         canvas.className =
             "pixels-play-canvas";
 
-        const label =
-            document.createElement("div");
-
-        label.className =
-            "pixels-phase-label";
-
         const buttons =
             document.createElement("div");
 
@@ -17651,8 +17656,7 @@ function renderPixelsPlay(game) {
         answerButton.className =
             "pause-button pixels-answer-button";
 
-        answerButton.textContent =
-            "💡 Voir la réponse";
+        answerButton.textContent = "💡";
 
         const answer =
             document.createElement("div");
@@ -17660,9 +17664,7 @@ function renderPixelsPlay(game) {
         answer.className =
             "pixels-answer";
 
-        answer.textContent =
-            "💡 Réponse : " +
-            (round.answer || "—");
+        answer.textContent = round.answer || "—";
 
         let image =
             new Image();
@@ -17692,10 +17694,6 @@ function renderPixelsPlay(game) {
         function draw(index) {
 
             phase = index;
-
-            label.textContent =
-                "Pixelisation : " +
-                phases[index][0];
 
             updatePhaseButtons();
 
@@ -17830,10 +17828,9 @@ function renderPixelsPlay(game) {
                         "visible"
                     );
 
-                answerButton.textContent =
-                    visible
-                        ? "🙈 Masquer la réponse"
-                        : "💡 Voir la réponse";
+                answerButton.textContent = visible ? "🙈" : "💡";
+
+                answerButton.classList.toggle("visible", visible);
 
             };
 
@@ -17844,7 +17841,6 @@ function renderPixelsPlay(game) {
 
         card.append(
             canvas,
-            label,
             buttons,
             answerRow
         );
