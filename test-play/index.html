@@ -4084,6 +4084,8 @@ window.addEventListener("unhandledrejection", function(event) {
 });
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+
 </head>
 
 <body>
@@ -15124,15 +15126,67 @@ async function compressImageFileToWebP(file){
         );
     }
 
+    let imageBlob = file;
+
+    const fileName =
+        String(file.name || "").toLowerCase();
+
+    const isHeic =
+        file.type === "image/heic" ||
+        file.type === "image/heif" ||
+        fileName.endsWith(".heic") ||
+        fileName.endsWith(".heif");
+
+    if (isHeic) {
+
+        if (typeof heic2any !== "function") {
+            throw new Error(
+                "Cette photo est au format HEIC/HEIF et le convertisseur d'image n'a pas pu être chargé. Vérifie ta connexion Internet puis réessaie."
+            );
+        }
+
+        try {
+
+            const converted =
+                await heic2any({
+                    blob: file,
+                    toType: "image/jpeg",
+                    quality: 0.92
+                });
+
+            imageBlob =
+                Array.isArray(converted)
+                    ? converted[0]
+                    : converted;
+
+        } catch (error) {
+
+            console.error(
+                "Erreur conversion HEIC/HEIF :",
+                error
+            );
+
+            throw new Error(
+                "Cette photo HEIC/HEIF n'a pas pu être convertie sur cet appareil."
+            );
+
+        }
+
+    }
+
     const objectUrl =
-        URL.createObjectURL(file);
+        URL.createObjectURL(imageBlob);
 
     try {
+
         return await compressImageToWebP(
             objectUrl
         );
+
     } finally {
+
         URL.revokeObjectURL(objectUrl);
+
     }
 }
 
