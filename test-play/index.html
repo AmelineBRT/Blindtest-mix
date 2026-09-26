@@ -14815,6 +14815,36 @@ div.dataset.roundId = round.id;
                 : ""
             }
 
+
+            ${
+                game.gameType === "pixels" && round.answer
+                ? `
+                    <button
+                        class="show-tracks-button"
+                        onclick="toggleRoundAnswer('${round.id}', this)">
+
+                        ▶️ Voir la réponse
+
+                    </button>
+
+                    <div
+                        id="round-answer-${round.id}"
+                        class="track-list">
+
+                        <div class="track-count">
+                            Réponse
+                        </div>
+
+                        <div class="track-name">
+                            ${escapeHTML(round.answer)}
+                        </div>
+
+                    </div>
+
+                `
+                : ""
+            }
+
 <div class="round-edit-line">
 
     <button
@@ -14843,6 +14873,36 @@ div.dataset.roundId = round.id;
     });
 
           setupRoundDrag();
+
+}
+
+
+function toggleRoundAnswer(roundId, button) {
+
+    const answer =
+        document.getElementById(
+            "round-answer-" + roundId
+        );
+
+    if (!answer) {
+        return;
+    }
+
+    if (answer.classList.contains("visible")) {
+
+        answer.classList.remove("visible");
+
+        button.textContent =
+            "▶️ Voir la réponse";
+
+    } else {
+
+        answer.classList.add("visible");
+
+        button.textContent =
+            "▼ Masquer la réponse";
+
+    }
 
 }
 
