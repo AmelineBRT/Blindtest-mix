@@ -3138,7 +3138,7 @@ textarea:focus {
 
 .play-round-section {
     scroll-margin-top: 150px;
-    margin-top: 18px;
+    margin-top: 10px;
 }
 
 .play-preparation-round {
@@ -15025,22 +15025,39 @@ function previewPixelsImage(input,previewId="pixelsCreatePreview"){
     preview.style.display = "block";
 }
 
-function compressImageToWebP(source,maxSize=1280,quality=0.82){
+async function compressImageToWebP(source,maxSize=1280,quality=0.82){
     return new Promise(function(resolve,reject){
 
-        const image = new Image();
+        const image =
+            new Image();
 
-        image.onload = function(){
+        function drawDecodedImage(decodedImage){
 
             try {
+
+                const naturalWidth =
+                    decodedImage.naturalWidth ||
+                    decodedImage.width ||
+                    0;
+
+                const naturalHeight =
+                    decodedImage.naturalHeight ||
+                    decodedImage.height ||
+                    0;
+
+                if (!naturalWidth || !naturalHeight) {
+                    throw new Error(
+                        "L'image n'a pas pu être décodée."
+                    );
+                }
 
                 const scale =
                     Math.min(
                         1,
                         maxSize /
                         Math.max(
-                            image.naturalWidth,
-                            image.naturalHeight
+                            naturalWidth,
+                            naturalHeight
                         )
                     );
 
@@ -15051,7 +15068,7 @@ function compressImageToWebP(source,maxSize=1280,quality=0.82){
                     Math.max(
                         1,
                         Math.round(
-                            image.naturalWidth * scale
+                            naturalWidth * scale
                         )
                     );
 
@@ -15059,7 +15076,7 @@ function compressImageToWebP(source,maxSize=1280,quality=0.82){
                     Math.max(
                         1,
                         Math.round(
-                            image.naturalHeight * scale
+                            naturalHeight * scale
                         )
                     );
 
@@ -15073,12 +15090,19 @@ function compressImageToWebP(source,maxSize=1280,quality=0.82){
                 }
 
                 context.drawImage(
-                    image,
+                    decodedImage,
                     0,
                     0,
                     canvas.width,
                     canvas.height
                 );
+
+                if (
+                    typeof decodedImage.close ===
+                    "function"
+                ) {
+                    decodedImage.close();
+                }
 
                 const result =
                     canvas.toDataURL(
@@ -15104,15 +15128,51 @@ function compressImageToWebP(source,maxSize=1280,quality=0.82){
 
             }
 
-        };
+        }
 
-        image.onerror = function(){
-            reject(
-                new Error(
-                    "Impossible de lire cette image sur cet appareil."
-                )
-            );
-        };
+        image.onload =
+            function(){
+                drawDecodedImage(image);
+            };
+
+        image.onerror =
+            async function(){
+
+                try {
+
+                    if (
+                        typeof createImageBitmap !==
+                        "function"
+                    ) {
+                        throw new Error();
+                    }
+
+                    const response =
+                        await fetch(source);
+
+                    if (!response.ok) {
+                        throw new Error();
+                    }
+
+                    const blob =
+                        await response.blob();
+
+                    const bitmap =
+                        await createImageBitmap(blob);
+
+                    drawDecodedImage(bitmap);
+
+                } catch (error) {
+
+                    reject(
+                        new Error(
+                            "Impossible de lire cette image sur cet appareil."
+                        )
+                    );
+
+                }
+
+            };
 
         image.src = source;
 
