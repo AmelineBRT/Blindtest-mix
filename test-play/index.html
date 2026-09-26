@@ -15682,6 +15682,8 @@ async function saveRound() {
         game.gameType === "pixels" ||
         round.gameType === "pixels";
 
+    let pixelsImageChanged = false;
+
     if (isPixels) {
 
         const fileInput =
@@ -15697,15 +15699,7 @@ async function saveRound() {
                 round.imageData =
                     await compressImageFileToWebP(file);
 
-            } else if (
-                round.imageData &&
-                !round.imageData.startsWith("data:")
-            ) {
-
-                round.imageData =
-                    await imageSourceToWebP(
-                        round.imageData
-                    );
+                pixelsImageChanged = true;
 
             }
 
@@ -15775,8 +15769,18 @@ async function saveRound() {
         if (isPixels) {
 
             payload.game_type = "pixels";
-            payload.image_data = round.imageData;
             payload.answer = round.answer;
+
+            /*
+             * On ne renvoie l'image que si l'utilisateur
+             * vient réellement d'en sélectionner une nouvelle.
+             * Cela évite de demander au Worker de remplacer
+             * inutilement le fichier GitHub existant.
+             */
+
+            if (pixelsImageChanged) {
+                payload.image_data = round.imageData;
+            }
 
         }
 
