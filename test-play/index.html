@@ -2825,6 +2825,57 @@ textarea:focus {
 
 
 /* =========================================================
+   RÉPONSE PIXELS DANS LA LISTE DES MANCHES
+   ========================================================= */
+
+.round-answer-inline {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    margin-left: auto;
+    margin-right: 92px;
+}
+
+.round-answer-toggle {
+    width: 26px;
+    height: 26px;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    color: #777;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 26px;
+}
+
+.round-answer-text {
+    display: none;
+    min-width: 0;
+    max-width: 150px;
+    font-size: 13px;
+    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.round-answer-text.visible {
+    display: block;
+}
+
+body.dark-mode .round-answer-toggle {
+    color: #aaa;
+}
+
+body.dark-mode .round-answer-text {
+    color: #ddd;
+}
+
+
+/* =========================================================
    PISTES
    ========================================================= */
 
@@ -14817,26 +14868,26 @@ div.dataset.roundId = round.id;
 
 
             ${
-                game.gameType === "pixels" && round.answer
+                (game.gameType === "pixels" || round.gameType === "pixels") && round.answer
                 ? `
-                    <button
-                        class="show-tracks-button"
-                        onclick="toggleRoundAnswer('${round.id}', this)">
+                    <div class="round-answer-inline">
 
-                        ▶️ Voir la réponse
+                        <button
+                            type="button"
+                            class="round-answer-toggle"
+                            onclick="toggleRoundAnswer('${round.id}', this)"
+                            title="Afficher la réponse">
 
-                    </button>
+                            ▶
 
-                    <div
-                        id="round-answer-${round.id}"
-                        class="track-list">
+                        </button>
 
-                        <div class="track-count">
-                            Réponse
-                        </div>
+                        <div
+                            id="round-answer-text-${round.id}"
+                            class="round-answer-text">
 
-                        <div class="track-name">
                             ${escapeHTML(round.answer)}
+
                         </div>
 
                     </div>
@@ -14881,7 +14932,7 @@ function toggleRoundAnswer(roundId, button) {
 
     const answer =
         document.getElementById(
-            "round-answer-" + roundId
+            "round-answer-text-" + roundId
         );
 
     if (!answer) {
@@ -14893,14 +14944,20 @@ function toggleRoundAnswer(roundId, button) {
         answer.classList.remove("visible");
 
         button.textContent =
-            "▶️ Voir la réponse";
+            "▶";
+
+        button.title =
+            "Afficher la réponse";
 
     } else {
 
         answer.classList.add("visible");
 
         button.textContent =
-            "▼ Masquer la réponse";
+            "▼";
+
+        button.title =
+            "Masquer la réponse";
 
     }
 
@@ -18275,7 +18332,7 @@ function renderPixelsPlay(game) {
         answerButton.className =
             "pause-button pixels-answer-button";
 
-        answerButton.textContent = "▸";
+        answerButton.textContent = "💡";
 
         const answer =
             document.createElement("div");
@@ -18456,7 +18513,7 @@ function renderPixelsPlay(game) {
                 }
 
                 answerButton.textContent =
-                    visible ? "▾" : "▸";
+                    visible ? "🙈" : "💡";
 
                 answerButton.classList.toggle(
                     "visible",
