@@ -3949,7 +3949,11 @@ background: #ffffff;
 .pixels-play-card {
     text-align: center;
     padding: 10px 10px 16px;
-    margin-top: -13px;
+    margin-top: -8px;
+}
+
+.pixels-play-round-section {
+    margin-top: 0;
 }
 
 .pixels-play-canvas {
@@ -18176,7 +18180,7 @@ function renderPixelsPlay(game) {
             document.createElement("section");
 
         section.className =
-            "play-round-section";
+            "play-round-section pixels-play-round-section";
 
         section.dataset.roundId =
             round.id;
@@ -18211,7 +18215,7 @@ function renderPixelsPlay(game) {
         answerButton.className =
             "pause-button pixels-answer-button";
 
-        answerButton.textContent = "💡";
+        answerButton.textContent = "▸";
 
         const answer =
             document.createElement("div");
@@ -18392,7 +18396,7 @@ function renderPixelsPlay(game) {
                 }
 
                 answerButton.textContent =
-                    visible ? "🙈" : "💡";
+                    visible ? "▾" : "▸";
 
                 answerButton.classList.toggle(
                     "visible",
