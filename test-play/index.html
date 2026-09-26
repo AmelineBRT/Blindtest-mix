@@ -15659,6 +15659,12 @@ async function saveRound() {
 
     }
 
+    const oldRoundName =
+        round.name;
+
+    const nameChanged =
+        newName !== oldRoundName;
+
     round.name = newName;
 
     const isPixels =
@@ -15666,6 +15672,7 @@ async function saveRound() {
         round.gameType === "pixels";
 
     let pixelsImageChanged = false;
+    let answerChanged = false;
 
     if (isPixels) {
 
@@ -15702,11 +15709,17 @@ async function saveRound() {
             return;
         }
 
-        round.answer =
+        const newAnswer =
             document
                 .getElementById("pixelsEditAnswer")
                 .value
                 .trim();
+
+        answerChanged =
+            newAnswer !== (round.answer || "");
+
+        round.answer =
+            newAnswer;
 
         round.gameType = "pixels";
 
@@ -15729,7 +15742,30 @@ async function saveRound() {
 
     /*
      * Sauvegarde de la manche dans Cloudflare D1
+     *
+     * Pour une manche musicale, cette requête n'est nécessaire
+     * que si le nom de la manche a réellement changé.
+     * Les pistes sont enregistrées séparément dans /tracks.
      */
+
+    const roundDataChanged =
+        nameChanged ||
+        (
+            isPixels &&
+            (
+                pixelsImageChanged ||
+                answerChanged
+            )
+        );
+
+    if (!roundDataChanged) {
+
+        saveData();
+        alert("Manche enregistrée !");
+        showGame();
+        return;
+
+    }
 
     try {
 
