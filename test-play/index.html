@@ -3945,7 +3945,7 @@ background: #ffffff;
 
 .pixels-play-card {
     text-align: center;
-    padding: 10px 10px 16px;
+    padding: 0 10px 16px;
     margin-top: -13px;
 }
 
@@ -17612,14 +17612,12 @@ function renderPixelsPlay(game) {
     players = [];
 
     const phases = [
-        ["120%", 75],
+        ["125%", 80],
         ["100%", 60],
-        ["90%", 40],
-        ["70%", 28],
+        ["75%", 30],
         ["50%", 18],
         ["25%", 10],
-        ["10%", 4],
-        ["0%", 1]
+        ["15%", 5]
     ];
 
     game.rounds.forEach(function(round) {
@@ -17677,6 +17675,7 @@ function renderPixelsPlay(game) {
             new Image();
 
         let phase = 0;
+        let phaseBeforeAnswer = 0;
 
         function updatePhaseButtons() {
 
@@ -17835,9 +17834,20 @@ function renderPixelsPlay(game) {
                         "visible"
                     );
 
-                answerButton.textContent = visible ? "🙈" : "💡";
+                if (visible) {
+                    phaseBeforeAnswer = phase;
+                    draw(phases.length - 1);
+                } else {
+                    draw(phaseBeforeAnswer);
+                }
 
-                answerButton.classList.toggle("visible", visible);
+                answerButton.textContent =
+                    visible ? "🙈" : "💡";
+
+                answerButton.classList.toggle(
+                    "visible",
+                    visible
+                );
 
             };
 
