@@ -3945,7 +3945,7 @@ background: #ffffff;
 
 .pixels-play-card {
     text-align: center;
-    padding: 0 10px 16px;
+    padding: 10px 10px 16px;
     margin-top: -13px;
 }
 
@@ -17730,7 +17730,7 @@ function renderPixelsPlay(game) {
             canvas.height =
                 Math.round(height);
 
-            if (phases[index][1] === 1) {
+            if (index === phases.length) {
 
                 ctx.imageSmoothingEnabled =
                     true;
@@ -17836,7 +17836,7 @@ function renderPixelsPlay(game) {
 
                 if (visible) {
                     phaseBeforeAnswer = phase;
-                    draw(phases.length - 1);
+                    draw(phases.length);
                 } else {
                     draw(phaseBeforeAnswer);
                 }
