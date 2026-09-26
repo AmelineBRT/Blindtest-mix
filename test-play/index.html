@@ -2235,10 +2235,6 @@ textarea:focus {
    VUE PARTIES / GROUPES
    ========================================================= */
 
-#gamesScreen.initializing {
-    visibility: hidden;
-}
-
 .games-header {
     display: flex;
     align-items: center;
@@ -4238,7 +4234,7 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
      ÉCRAN : LISTE DES PARTIES
      ================================================== -->
 
-<section id="gamesScreen" class="screen active initializing">
+<section id="gamesScreen" class="screen active">
 
 <div class="card">
 
@@ -6530,7 +6526,11 @@ async function initializeApp() {
     loadTheme();
     loadData();
 
-    await loadGamesFromCloud();
+    /*
+     * Affiche immédiatement les données locales.
+     * La synchronisation Cloudflare se fait ensuite
+     * en arrière-plan, comme avant.
+     */
 
     history.replaceState(
     {
@@ -6553,14 +6553,41 @@ history.pushState(
 );
 
 isBrowserBack = true;
-await showGames();
-isBrowserBack = false;
+
+gamesView = "games";
+currentGroupId = null;
 
 document.getElementById(
-    "gamesScreen"
-).classList.remove("initializing");
+    "gamesViewTitle"
+).textContent =
+    "🎶 Parties";
+
+document.getElementById(
+    "gamesViewToggle"
+).textContent =
+    "🎉 Voir les groupes";
+
+showScreen("gamesScreen");
+
+renderFilters();
+renderGames();
+
+isBrowserBack = false;
+
+/*
+ * Mise à jour depuis Cloudflare en arrière-plan.
+ */
+
+await loadGamesFromCloud();
+
+await loadPeopleFromCloud();
+
+renderFilters();
+renderGames();
 
 }
+
+initializeApp();
 
 initializeApp();
 
