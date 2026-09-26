@@ -3935,8 +3935,11 @@ background: #ffffff;
 }
 
 .pixels-image-preview {
+    display: block;
     width: 100%;
-    max-height: 260px;
+    max-width: 100%;
+    height: auto;
+    max-height: min(260px, calc(100vh - 260px));
     object-fit: contain;
     border-radius: 8px;
     background: #eee;
@@ -3951,9 +3954,10 @@ background: #ffffff;
 
 .pixels-play-canvas {
     display: block;
-    width: 100%;
-    max-width: 760px;
+    width: auto;
+    max-width: 100%;
     height: auto;
+    max-height: calc(100vh - 260px);
     margin: 10px auto 12px;
     border-radius: 10px;
     background: #ddd;
@@ -6462,11 +6466,14 @@ function quitApp() {
    ÉCRAN DES PARTIES
    ======================================================== */
 
-loadTheme();
-loadData();
-loadGamesFromCloud();
+async function initializeApp() {
 
-history.replaceState(
+    loadTheme();
+    loadData();
+
+    await loadGamesFromCloud();
+
+    history.replaceState(
     {
         exitSentinel: true
     },
@@ -6487,8 +6494,12 @@ history.pushState(
 );
 
 isBrowserBack = true;
-showGames();
+await showGames();
 isBrowserBack = false;
+
+}
+
+initializeApp();
 
 
 
@@ -15004,11 +15015,14 @@ function showCreateRound() {
 
     showScreen("createRoundScreen");
 }
+const pixelsImagePreparationPromises = {};
+const pixelsPreparedImages = {};
+
 function previewPixelsImage(input,previewId="pixelsCreatePreview"){
     const file = input.files && input.files[0];
     const preview = document.getElementById(previewId);
 
-    if (!file || !preview) {
+    if (!preview) {
         return;
     }
 
@@ -15016,13 +15030,98 @@ function previewPixelsImage(input,previewId="pixelsCreatePreview"){
 
     if (oldUrl) {
         URL.revokeObjectURL(oldUrl);
+        delete preview.dataset.objectUrl;
     }
 
-    const objectUrl = URL.createObjectURL(file);
+    delete pixelsPreparedImages[previewId];
 
-    preview.dataset.objectUrl = objectUrl;
-    preview.src = objectUrl;
-    preview.style.display = "block";
+    if (!file) {
+        preview.removeAttribute("src");
+        preview.style.display = "none";
+        delete pixelsImagePreparationPromises[previewId];
+        return;
+    }
+
+    const preparation =
+        compressImageFileToWebP(file)
+            .then(function(imageData) {
+
+                if (
+                    input.files &&
+                    input.files[0] === file
+                ) {
+                    pixelsPreparedImages[previewId] =
+                        imageData;
+
+                    preview.src =
+                        imageData;
+
+                    preview.style.display =
+                        "block";
+                }
+
+                return imageData;
+            })
+            .catch(function(error) {
+
+                if (
+                    input.files &&
+                    input.files[0] === file
+                ) {
+                    preview.removeAttribute("src");
+                    preview.style.display = "none";
+                }
+
+                console.error(
+                    "Erreur préparation image Pixels :",
+                    error
+                );
+
+                throw error;
+            });
+
+    pixelsImagePreparationPromises[previewId] =
+        preparation;
+
+    preparation.catch(function(error) {
+        if (
+            input.files &&
+            input.files[0] === file
+        ) {
+            alert(
+                error && error.message
+                    ? error.message
+                    : "Impossible de préparer l'image Pixels."
+            );
+        }
+    });
+}
+
+async function getPreparedPixelsImage(input,previewId){
+    const file =
+        input &&
+        input.files &&
+        input.files[0];
+
+    if (!file) {
+        return "";
+    }
+
+    if (pixelsPreparedImages[previewId]) {
+        return pixelsPreparedImages[previewId];
+    }
+
+    if (pixelsImagePreparationPromises[previewId]) {
+        return await pixelsImagePreparationPromises[previewId];
+    }
+
+    const imageData =
+        await compressImageFileToWebP(file);
+
+    pixelsPreparedImages[previewId] =
+        imageData;
+
+    return imageData;
 }
 
 async function compressImageToWebP(source,maxSize=1280,quality=0.82){
@@ -15110,10 +15209,28 @@ async function compressImageToWebP(source,maxSize=1280,quality=0.82){
                         quality
                     );
 
-                resolve(
+                if (
                     result.startsWith("data:image/webp")
-                        ? result
-                        : source
+                ) {
+                    resolve(result);
+                    return;
+                }
+
+                const jpegResult =
+                    canvas.toDataURL(
+                        "image/jpeg",
+                        quality
+                    );
+
+                if (
+                    jpegResult.startsWith("data:image/jpeg")
+                ) {
+                    resolve(jpegResult);
+                    return;
+                }
+
+                throw new Error(
+                    "Le navigateur ne peut pas convertir cette image."
                 );
 
             } catch (error) {
@@ -15571,7 +15688,18 @@ async function addTrack() {
         return;
     }
 
-    await saveTracksFromInputs(round);
+    try {
+        await saveTracksFromInputs(round);
+    } catch (error) {
+        console.error(
+            "Erreur sauvegarde pistes D1 :",
+            error
+        );
+        alert(
+            "Les pistes ont été enregistrées sur cet appareil, mais elles n'ont pas pu être enregistrées en ligne."
+        );
+        return;
+    }
 
     if (round.tracks.length >= 7) {
 
@@ -15597,9 +15725,7 @@ const trackSaveQueues = {};
 
 async function saveTracksSnapshot(roundId, tracksSnapshot) {
 
-    try {
-
-        for (
+    for (
             let index = 0;
             index < tracksSnapshot.length;
             index++
@@ -15666,17 +15792,6 @@ async function saveTracksSnapshot(roundId, tracksSnapshot) {
             );
 
         }
-
-    } catch (error) {
-
-        console.error(
-            "Erreur sauvegarde pistes D1 :",
-            error
-        );
-
-        alert(
-            "Les pistes ont été enregistrées sur cet appareil, mais elles n'ont pas pu être enregistrées en ligne."
-        );
 
     }
 
@@ -15849,7 +15964,20 @@ async function saveRound() {
 
     } else {
 
-        await saveTracksFromInputs(round);
+        try {
+            await saveTracksFromInputs(round);
+        } catch (error) {
+            console.error(
+                "Erreur sauvegarde pistes D1 :",
+                error
+            );
+
+            alert(
+                "Les pistes ont été enregistrées sur cet appareil, mais elles n'ont pas pu être enregistrées en ligne."
+            );
+
+            return;
+        }
 
     }
 
