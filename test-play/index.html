@@ -3946,6 +3946,7 @@ background: #ffffff;
 .pixels-play-card {
     text-align: center;
     padding: 16px;
+    margin-top: -8px;
 }
 
 .pixels-play-canvas {
@@ -17928,8 +17929,10 @@ function loadRoundForPlaying() {
 
         document.getElementById(
             "playTrackCount"
-        ).textContent =
-            "Jeu Pixels";
+        ).textContent = "";
+        document.getElementById(
+            "playTrackCount"
+        ).style.display = "none";
 
         updateNavigationButton();
 
