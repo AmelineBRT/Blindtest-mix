@@ -2825,6 +2825,57 @@ textarea:focus {
 
 
 /* =========================================================
+   RÉPONSE PIXELS DANS LA LISTE DES MANCHES
+   ========================================================= */
+
+.round-answer-inline {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    margin-left: auto;
+    margin-right: 92px;
+}
+
+.round-answer-toggle {
+    width: 26px;
+    height: 26px;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    color: #777;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 22px;
+}
+
+.round-answer-text {
+    display: none;
+    min-width: 0;
+    max-width: 150px;
+    font-size: 13px;
+    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.round-answer-text.visible {
+    display: block;
+}
+
+body.dark-mode .round-answer-toggle {
+    color: #aaa;
+}
+
+body.dark-mode .round-answer-text {
+    color: #ddd;
+}
+
+
+/* =========================================================
    PISTES
    ========================================================= */
 
@@ -4190,7 +4241,7 @@ style="position: absolute; width: 0; height: 0; overflow: hidden;"
   <div class="games-header">
 
     <h2 id="gamesViewTitle">
-        🎶 Mes parties
+        🎶 Parties
     </h2>
 
     <div class="games-header-actions">
@@ -6475,7 +6526,11 @@ async function initializeApp() {
     loadTheme();
     loadData();
 
-    await loadGamesFromCloud();
+    /*
+     * Affiche immédiatement les données locales.
+     * La synchronisation Cloudflare se fait ensuite
+     * en arrière-plan, comme avant.
+     */
 
     history.replaceState(
     {
@@ -6498,10 +6553,41 @@ history.pushState(
 );
 
 isBrowserBack = true;
-await showGames();
+
+gamesView = "games";
+currentGroupId = null;
+
+document.getElementById(
+    "gamesViewTitle"
+).textContent =
+    "🎶 Parties";
+
+document.getElementById(
+    "gamesViewToggle"
+).textContent =
+    "🎉 Voir les groupes";
+
+showScreen("gamesScreen");
+
+renderFilters();
+renderGames();
+
 isBrowserBack = false;
 
+/*
+ * Mise à jour depuis Cloudflare en arrière-plan.
+ */
+
+await loadGamesFromCloud();
+
+await loadPeopleFromCloud();
+
+renderFilters();
+renderGames();
+
 }
+
+initializeApp();
 
 initializeApp();
 
@@ -14815,6 +14901,36 @@ div.dataset.roundId = round.id;
                 : ""
             }
 
+
+            ${
+                (game.gameType === "pixels" || round.gameType === "pixels") && round.answer
+                ? `
+                    <div class="round-answer-inline">
+
+                        <button
+                            type="button"
+                            class="round-answer-toggle"
+                            onclick="toggleRoundAnswer('${round.id}', this)"
+                            title="Afficher la réponse">
+
+                            💡
+
+                        </button>
+
+                        <div
+                            id="round-answer-text-${round.id}"
+                            class="round-answer-text">
+
+                            ${escapeHTML(round.answer)}
+
+                        </div>
+
+                    </div>
+
+                `
+                : ""
+            }
+
 <div class="round-edit-line">
 
     <button
@@ -14843,6 +14959,42 @@ div.dataset.roundId = round.id;
     });
 
           setupRoundDrag();
+
+}
+
+
+function toggleRoundAnswer(roundId, button) {
+
+    const answer =
+        document.getElementById(
+            "round-answer-text-" + roundId
+        );
+
+    if (!answer) {
+        return;
+    }
+
+    if (answer.classList.contains("visible")) {
+
+        answer.classList.remove("visible");
+
+        button.textContent =
+            "💡";
+
+        button.title =
+            "Afficher la réponse";
+
+    } else {
+
+        answer.classList.add("visible");
+
+        button.textContent =
+            "🙈";
+
+        button.title =
+            "Masquer la réponse";
+
+    }
 
 }
 
@@ -18215,7 +18367,7 @@ function renderPixelsPlay(game) {
         answerButton.className =
             "pause-button pixels-answer-button";
 
-        answerButton.textContent = "▸";
+        answerButton.textContent = "💡";
 
         const answer =
             document.createElement("div");
@@ -18396,7 +18548,7 @@ function renderPixelsPlay(game) {
                 }
 
                 answerButton.textContent =
-                    visible ? "▾" : "▸";
+                    visible ? "🙈" : "💡";
 
                 answerButton.classList.toggle(
                     "visible",
