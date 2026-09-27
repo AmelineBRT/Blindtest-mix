@@ -2844,11 +2844,11 @@ textarea:focus {
     padding: 0;
     background: transparent;
     color: #777;
-    font-size: 13px;
+    font-size: 11px;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 0 0 26px;
+    flex: 0 0 22px;
 }
 
 .round-answer-text {
@@ -14913,7 +14913,7 @@ div.dataset.roundId = round.id;
                             onclick="toggleRoundAnswer('${round.id}', this)"
                             title="Afficher la réponse">
 
-                            ▶
+                            💡
 
                         </button>
 
@@ -14979,7 +14979,7 @@ function toggleRoundAnswer(roundId, button) {
         answer.classList.remove("visible");
 
         button.textContent =
-            "▶";
+            "💡";
 
         button.title =
             "Afficher la réponse";
@@ -14989,7 +14989,7 @@ function toggleRoundAnswer(roundId, button) {
         answer.classList.add("visible");
 
         button.textContent =
-            "▼";
+            "🙈";
 
         button.title =
             "Masquer la réponse";
